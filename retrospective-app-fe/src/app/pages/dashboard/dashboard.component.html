@@ -1,0 +1,30 @@
+<div class="dashboard-container">
+    <app-sidebar/>
+    <div class="main-content">
+        <header>
+            <h1>Welcome, {{ username }}!</h1>
+        </header>
+
+        <div class="quick-actions">
+            <button [routerLink]="['/create-session']" class="action-card create">
+                <span class="material-symbols-outlined">
+                    add_box
+                </span>
+                <h3>Create New Session</h3>
+                <p>Start a new retrospective</p>
+            </button>
+            <button [routerLink]="['/all-sessions']" class="action-card join">
+                <span class="material-symbols-outlined">
+                    add_link
+                </span>
+                <h3>Join Session</h3>
+                <p>Browse and join sessions</p>
+            </button>
+        </div>
+
+        <div class="recent-sessions">
+            <h2>Recent Sessions</h2>
+            <app-recent-session-cards/>
+        </div>
+    </div>
+</div>

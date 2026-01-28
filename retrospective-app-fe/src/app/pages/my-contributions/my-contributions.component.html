@@ -1,0 +1,66 @@
+<div class="contribution-container">
+    <app-sidebar/>
+    <div class="main-content">
+        <h1>My Feedbacks</h1>
+        <div class="feedbacks-container" *ngIf="userFeedbacks.length > 0; else noFeedbacks">
+            <div class="feedback-card" *ngFor="let feedback of userFeedbacks" (click)="viewSession(feedback.sessionId)">
+                <div class="feedback-header">
+                    <div class="feedback-meta">
+                        <span class="material-icons user-icon">account_circle</span>
+                        <div class="user-info">
+                            <h3>{{ feedback.username }}</h3>
+                            <p class="session-name">
+                                <span class="material-icons">event_note</span>
+                                Session #{{ feedback.sessionId }}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="feedback-time">
+                        <span class="material-icons">schedule</span>
+                        {{ feedback.createdAt | date: 'medium' }}
+                    </span>
+                </div>
+                
+                <div class="feedback-content">
+                    <div class="feedback-section" *ngIf="feedback.wentWell && feedback.wentWell.length > 0">
+                        <div class="feedback-type type-went-well">
+                            <span class="material-icons">sentiment_satisfied</span>
+                            <span class="type-label">Went Well</span>
+                        </div>
+                        <ul class="feedback-list">
+                            <li *ngFor="let item of feedback.wentWell">{{ item }}</li>
+                        </ul>
+                    </div>
+
+                    <div class="feedback-section" *ngIf="feedback.needsImprovement && feedback.needsImprovement.length > 0">
+                        <div class="feedback-type type-needs-improvement">
+                            <span class="material-icons">sentiment_dissatisfied</span>
+                            <span class="type-label">Needs Improvement</span>
+                        </div>
+                        <ul class="feedback-list">
+                            <li *ngFor="let item of feedback.needsImprovement">{{ item }}</li>
+                        </ul>
+                    </div>
+
+                    <div class="feedback-section" *ngIf="feedback.actionItems && feedback.actionItems.length > 0">
+                        <div class="feedback-type type-action-items">
+                            <span class="material-icons">lightbulb</span>
+                            <span class="type-label">Action Items</span>
+                        </div>
+                        <ul class="feedback-list">
+                            <li *ngFor="let item of feedback.actionItems">{{ item }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<ng-template #noFeedbacks>
+    <div class="no-feedbacks">
+        <span class="material-icons">feedback</span>
+        <p>No feedbacks available</p>
+        <small>Your contributions will appear here</small>
+    </div>
+</ng-template>

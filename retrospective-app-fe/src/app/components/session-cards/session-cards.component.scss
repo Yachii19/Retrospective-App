@@ -1,0 +1,136 @@
+.sessions-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    .team-section {
+        .team-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 1rem;
+        padding-left: 0.5rem;
+        border-left: 4px solid #4CB1A4;
+        }
+    }
+}
+
+.sessions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    .session-card {
+        display: grid;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e8ecef;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 0;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background: #f8f9fa;
+            transform: translateX(4px);
+        }
+
+        .session-info {
+            h3 {
+                font-size: 1.125rem;
+                color: #2c3e50;
+                font-weight: 600;
+                margin: 0 0 0.5rem 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: color 0.2s ease;
+
+                .material-icons {
+                    font-size: 1.25rem;
+                    color: #95a5a6;
+                    transition: color 0.2s ease;
+                }
+            }
+
+            .team {
+                font-size: 0.875rem;
+                color: #6c757d;
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: color 0.2s ease;
+
+                .material-icons {
+                    font-size: 1.25rem;
+                    color: #95a5a6;
+                    transition: color 0.2s ease;
+                }
+            }
+        }
+
+        .date {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s ease;
+
+            .material-icons {
+                font-size: 1rem;
+                color: #95a5a6;
+                transition: color 0.2s ease;
+            }
+        }
+
+        &:hover {
+            .session-info {
+                h3 {
+                    color: #4CB1A4;
+                    span {
+                        color: #4CB1A4;
+                    }
+                }
+
+                .team {
+                    color: #4CB1A4;
+                    span {
+                        color: #4CB1A4;
+                    }
+                }
+            }
+
+            .date {
+                color: #4CB1A4;
+                span {
+                    color: #4CB1A4;
+                }
+            }
+            
+        }
+    }
+
+    .no-sessions {
+        text-align: center;
+        color: #95a5a6;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+        .material-icons {
+            font-size: 3rem;
+            color: #bdc3c7;
+        }
+    }
+}

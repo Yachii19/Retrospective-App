@@ -1,0 +1,56 @@
+<div class="sessions-wrapper" *ngIf="allSessions.length > 0; else noSessions">
+    <div class="team-section" *ngIf="mysTeamSessions.length > 0">
+        <h2 class="team-header">MYS Team</h2>
+        <div class="sessions-container">
+            <div class="session-card" *ngFor="let session of mysTeamSessions" 
+                 (click)="viewSession(session.sessionId)">
+                <div class="session-info">
+                    <h3>
+                        <span class="material-icons">event_note</span>
+                        {{ session.sessionName }}
+                    </h3>
+                    <p class="team" *ngIf="session.team">
+                        <span class="material-icons">group</span>
+                        {{ session.team }}
+                    </p>
+                </div>
+                <p class="date">
+                    <span class="material-icons">schedule</span>
+                    {{ session.createdAt | date: 'medium' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-section" *ngIf="csmTeamSessions.length > 0">
+        <h2 class="team-header">CSM Team</h2>
+        <div class="sessions-container">
+            <div class="session-card" *ngFor="let session of csmTeamSessions" 
+                 (click)="viewSession(session.sessionId)">
+                <div class="session-info">
+                    <h3>
+                        <span class="material-icons">event_note</span>
+                        {{ session.sessionName }}
+                    </h3>
+                    <p class="team" *ngIf="session.team">
+                        <span class="material-icons">group</span>
+                        {{ session.team }}
+                    </p>
+                </div>
+                <p class="date">
+                    <span class="material-icons">schedule</span>
+                    {{ session.createdAt | date: 'medium' }}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #noSessions>
+    <div class="sessions-container">
+        <div class="no-sessions">
+            <span class="material-icons">inbox</span>
+            <p>No sessions available</p>
+        </div>
+    </div>
+</ng-template>

@@ -1,0 +1,183 @@
+.contribution-container {
+    display: flex;
+    height: 100vh;
+    background: #f5f7fa;
+
+    .main-content {
+        flex: 1;
+        padding: 2rem 3rem;
+        overflow-y: auto;
+
+        h1 {
+            font-size: 2rem;
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+    }
+}
+
+.feedbacks-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.feedback-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-2px);
+        background-color: #f0f0f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .feedback-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e0e0e0;
+
+        .feedback-meta {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+
+            .user-icon {
+                font-size: 2.5rem;
+                color: #007bff;
+            }
+
+            .user-info {
+                h3 {
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    color: #2c3e50;
+                    margin: 0;
+                }
+
+                .session-name {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    font-size: 0.875rem;
+                    color: #6c757d;
+                    margin: 0.25rem 0 0 0;
+
+                    .material-icons {
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+
+        .feedback-time {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+
+            .material-icons {
+                font-size: 1rem;
+            }
+        }
+    }
+
+    .feedback-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+
+        .feedback-section {
+            .feedback-type {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                font-size: 0.875rem;
+                font-weight: 600;
+                margin-bottom: 0.75rem;
+
+                .material-icons {
+                    font-size: 1.25rem;
+                }
+
+                &.type-went-well {
+                    background: #d4edda;
+                    color: #155724;
+                }
+
+                &.type-needs-improvement {
+                    background: #f8d7da;
+                    color: #721c24;
+                }
+
+                &.type-action-items {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                }
+            }
+
+            .feedback-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+
+                li {
+                    position: relative;
+                    padding-left: 1.5rem;
+                    margin-bottom: 0.5rem;
+                    color: #495057;
+                    line-height: 1.6;
+
+                    &:before {
+                        content: "•";
+                        position: absolute;
+                        left: 0.5rem;
+                        color: #007bff;
+                        font-weight: bold;
+                    }
+
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.no-feedbacks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    text-align: center;
+
+    .material-icons {
+        font-size: 4rem;
+        color: #ccc;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.25rem;
+        color: #6c757d;
+        margin: 0.5rem 0;
+    }
+
+    small {
+        color: #adb5bd;
+    }
+}

@@ -1,0 +1,120 @@
+.sidebar {
+    width: 300px;
+    height: 100vh;
+    background: #2C3E50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        background: rgba(76, 177, 164, 0.2);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+
+        span {
+            padding-right: 10px;
+            color: #4CB1A4;
+        }
+
+        .username {
+            margin: 0;
+            font-weight: 600;
+            color: #4CB1A4;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    .sidebar-nav {
+        flex: 1;
+
+        ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+
+            .icon {
+            font-size: 18px;
+            }
+
+            &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            }
+
+            &.active {
+            background: #4CB1A4;
+            color: white;
+            }
+        }
+        }
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        .logout-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+
+        .icon {
+            font-size: 18px;
+        }
+
+        &:hover {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+        }
+    }
+}

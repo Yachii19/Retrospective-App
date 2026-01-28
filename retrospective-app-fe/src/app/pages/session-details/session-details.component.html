@@ -1,0 +1,61 @@
+<div class="session-details-container">
+    <app-sidebar/>
+    <div class="main-content">
+        <div class="session-header">
+            <h1>{{sessionName}}</h1>
+            <button>Export</button>
+        </div>
+        
+        <div class="feedback-submission-form">
+            <h2>Add Your Feedback</h2>
+            <div class="feedback-section">
+                <div>
+                    What Went Well
+                </div>
+                <div class="input-group">
+                    <input #wentWellInput type="text">
+                    <button (click)="addItem('wentWell', wentWellInput)">Add</button>
+                </div>
+                <ul class="items-list">
+                    <li *ngFor="let item of wentWell; let i = index">
+                        {{item}}
+
+                        <button (click)="removeItem('wentWell', i)">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="feedback-section">
+                <div>
+                    Needs Improvements
+                </div>
+                <div class="input-group">
+                    <input (keyup.enter)="addItem('needsImprovement', needsImprovementInput)" #needsImprovementInput type="text">
+                    <button (click)="addItem('needsImprovement', needsImprovementInput)">Add</button>
+                </div>
+                <ul class="items-list">
+                    <li *ngFor="let item of needsImprovement; let i = index">
+                        {{item}}
+                        <button>
+                            <span (click)="removeItem('needsImprovement', i)" class="material-icons">delete</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button>Submit Feedback</button>
+        </div>
+
+        <div class="feedbacks-container">
+            <h1>Feedbacks</h1>
+        </div>
+        <ng-template #noSessionFeedbacks>
+                <div class="no-feedbacks">
+                    <span class="material-icons">feedback</span>
+                    <p>No feedbacks available</p>
+                    <small>Your contributions will appear here</small>
+                </div>
+        </ng-template>
+    </div>
+</div>

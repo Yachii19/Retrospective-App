@@ -1,0 +1,14 @@
+<div class="sessions-grid" *ngIf="recentSessions.length > 0; else noSessions">
+    <div class="session-card" *ngFor="let session of recentSessions"
+            (click)="viewSession(session.sessionId)">
+        <h3>{{ session.sessionName }}</h3>
+        <p class="team" *ngIf="session.team">{{ session.team }}</p>
+        <p class="date">{{ session.createdAt | date: 'medium' }}</p>
+    </div>
+</div>
+<ng-template #noSessions>
+    <div class="no-sessions">
+        <span class="material-icons">inbox</span>
+        <p>No sessions available</p>
+    </div>
+</ng-template>

@@ -1,0 +1,20 @@
+.session-details-container{
+    display: flex;
+    height: 100vh;
+
+    .main-content {
+        padding: 2rem;
+        width: 100%;
+        background: #f5f7fa;
+        overflow-y: auto;
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+
+            
+        }
+    }
+}

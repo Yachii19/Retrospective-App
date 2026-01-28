@@ -1,0 +1,15 @@
+<div class="login-form-wrapper">
+    <img src="assets/favicon.ico" alt="">
+    <div class="input-1">
+        <label for="login">Username</label>
+        <input type="text" 
+            placeholder="Guest Username" 
+            id="login" 
+            [(ngModel)]="username" 
+            (keyup.enter)="signInAsGuest()"
+            (input)="onInputChange()">
+
+        <span class="error-message" *ngIf="showError">Please eneter a username</span>
+    </div>
+    <button (click)="signInAsGuest()">Sign in as Guest</button>
+</div>

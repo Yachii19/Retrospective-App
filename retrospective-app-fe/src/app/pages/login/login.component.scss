@@ -1,0 +1,24 @@
+.login-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+
+    .left-section {
+        flex: 1;
+
+        .login-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .right-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #FFFFFF;
+    }
+}

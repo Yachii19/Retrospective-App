@@ -1,0 +1,51 @@
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="/assets/favicon.ico" alt="Logo">
+        <h2>Retrospect App</h2>
+    </div>
+
+    <div class="user-info">
+        <span class="material-symbols-outlined">
+            account_circle
+        </span>
+        <p class="username">{{ username }}</p>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li [routerLink]="['/dashboard']" routerLinkActive="active">
+                <span class="material-symbols-outlined">
+                    dashboard
+                </span>
+                <span>Dashboard</span>
+            </li>
+            <li [routerLink]="['/all-sessions']" routerLinkActive="active">
+                <span class="material-symbols-outlined">
+                    list_alt
+                </span>
+                <span>All Sessions</span>
+            </li>
+            <li [routerLink]="['/create-session']" routerLinkActive="active">
+                <span class="material-symbols-outlined">
+                    add_2
+                </span>
+                <span>Create Session</span>
+            </li>
+            <li [routerLink]="['/my-contribution']" routerLinkActive="active">
+                <span class="material-symbols-outlined">
+                    workspaces
+                </span>
+                <span>My Contributions</span>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="sidebar-footer">
+        <button (click)="logout()" class="logout-btn">
+            <span class="material-symbols-outlined">
+            exit_to_app
+            </span>
+            <span>Logout</span>
+        </button>
+    </div>
+</div>

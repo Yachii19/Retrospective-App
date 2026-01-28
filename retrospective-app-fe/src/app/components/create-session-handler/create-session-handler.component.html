@@ -1,0 +1,65 @@
+<div class="create-session-wrapper">
+    <div class="header">
+        <h1>
+            <span class="material-icons">add_circle</span>
+            Create New Session
+        </h1>
+        <p>Start a new retrospective session for your team</p>
+    </div>
+
+    <div class="form-container">
+        <div class="form-group">
+            <label for="sessionName">
+                <span class="material-icons">event_note</span>
+                Session Name
+            </label>
+            <input 
+                type="text" 
+                id="sessionName" 
+                name="sessionName" 
+                [(ngModel)]="sessionName"
+                placeholder="Enter session name (e.g., Sprint 24 Retro)"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="team">
+                <span class="material-icons">group</span>
+                Team
+            </label>
+            <select id="team" name="team" [(ngModel)]="team">
+                <option value="MYS Team">MYS Team</option>
+                <option value="CSM Team">CSM Team</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button class="cancel-btn" type="button" (click)="cancel()">
+                <span class="material-icons">close</span>
+                Cancel
+            </button>
+            <button 
+                class="create-btn" 
+                type="button" 
+                (click)="createSession()"
+                [disabled]="!sessionName.trim()">
+                <span class="material-icons">check_circle</span>
+                Create Session
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="success-icon">
+            <span class="material-icons">check</span>
+        </div>
+        <h2>Session Created!</h2>
+        <p>
+            Your retrospective session has been successfully created.
+            <strong>{{ createdSessionName }}</strong>
+        </p>
+        <button (click)="closeModal()">Continue</button>
+    </div>
+</div>
