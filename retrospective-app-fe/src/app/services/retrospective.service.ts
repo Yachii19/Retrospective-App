@@ -7,7 +7,7 @@ import { RetroFeedback, RetroSession } from '../models/retrospective.model';
   providedIn: 'root'
 })
 export class RetrospectiveService {
-  private apiUrl = 'http://localhost:3000/sessions';
+  private apiUrl = 'https://retrospective-app-qb3m.onrender.com/sessions';
 
   constructor(private http: HttpClient) {};
 
