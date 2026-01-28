@@ -116,4 +116,8 @@ export class SessionDetailsComponent {
   removeItem(category: 'wentWell' | 'needsImprovement' | 'actionItems', index: number): void {
     this[category].splice(index, 1);
   }
+
+  goHome(): void {
+    this.router.navigate(['/dashboard']);
+  }
 }

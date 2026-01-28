@@ -1,9 +1,17 @@
 <div class="session-details-container">
-    <app-sidebar/>
     <div class="main-content">
         <div class="session-header">
-            <h1>{{sessionName}}</h1>
-            <button>Export</button>
+            <div class="header-left">
+                <button class="home-btn" (click)="goHome()">
+                    <span class="material-symbols-outlined">home</span>
+                </button>
+                <h1>{{sessionName}}</h1>
+            </div>
+
+            <button class="export-btn">
+                <span class="material-symbols-outlined">save</span>
+                Export
+            </button>
         </div>
         
         <div class="feedback-submission-form">
@@ -13,8 +21,10 @@
                     What Went Well
                 </div>
                 <div class="input-group">
-                    <input #wentWellInput type="text">
-                    <button (click)="addItem('wentWell', wentWellInput)">Add</button>
+                    <input (keyup.enter)="addItem('wentWell', wentWellInput)"  #wentWellInput type="text" placeholder="Add something that went well...">
+                    <button (click)="addItem('wentWell', wentWellInput)">
+                        <span class="material-symbols-outlined">Add_2</span>
+                    </button>
                 </div>
                 <ul class="items-list">
                     <li *ngFor="let item of wentWell; let i = index">
@@ -32,8 +42,10 @@
                     Needs Improvements
                 </div>
                 <div class="input-group">
-                    <input (keyup.enter)="addItem('needsImprovement', needsImprovementInput)" #needsImprovementInput type="text">
-                    <button (click)="addItem('needsImprovement', needsImprovementInput)">Add</button>
+                    <input (keyup.enter)="addItem('needsImprovement', needsImprovementInput)" #needsImprovementInput type="text" placeholder="Add something that needs improvement...">
+                    <button (click)="addItem('needsImprovement', needsImprovementInput)">
+                        <span class="material-symbols-outlined">Add_2</span>
+                    </button>
                 </div>
                 <ul class="items-list">
                     <li *ngFor="let item of needsImprovement; let i = index">
@@ -44,12 +56,83 @@
                     </li>
                 </ul>
             </div>
-            <button>Submit Feedback</button>
+
+            <div class="feedback-section">
+                <div>
+                    Action Items
+                </div>
+                <div class="input-group">
+                    <input (keyup.enter)="addItem('actionItems', actionItemsInput)"  #actionItemsInput type="text" placeholder="Add an action item...">
+                    <button (click)="addItem('actionItems', actionItemsInput)" >
+                        <span class="material-symbols-outlined">Add_2</span>
+                    </button>
+                </div>
+
+                <ul class="items-list">
+                    <li *ngFor="let item of actionItems; let i = index">
+                        {{ item }}
+                        <button>
+                            <span (click)="removeItem('actionItems', i)" class="material-icons">delete</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <button (click)="addFeedback()">
+                Submit Feedback
+            </button>
         </div>
 
-        <div class="feedbacks-container">
+        <div class="feedbacks-container" *ngIf="sessionFeedbacks.length > 0; else noSessionFeedbacks">
             <h1>Feedbacks</h1>
+            <div class="feedback-card" *ngFor="let feedback of sessionFeedbacks">
+                <div class="feedback-header">
+                    <div class="user-info">
+                        <span class="material-icons">account_circle</span>
+                        <span class="username">{{feedback.username}}</span>
+                    </div>
+
+                    <div class="header-time">
+                        <span class="material-icons">schedule</span>
+                        <span class="time">{{feedback.createdAt | date: 'medium'}}</span>
+                    </div>
+                </div>
+
+                <div class="feedback-content" *ngIf="feedback.wentWell && feedback.wentWell.length > 0">
+                    <div class="feedback-label went-well">
+                        <span class="material-symbols-outlined"> sentiment_satisfied </span>
+                        <span>Went Well</span>
+                    </div>
+                
+                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
+                        <li>{{content}}</li>
+                    </ul>
+        
+                </div>
+
+                <div class="feedback-content" *ngIf="feedback.needsImprovement && feedback.needsImprovement.length > 0">
+                     <div class="feedback-label needs-improvement">
+                        <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+                        <span>Needs Improvement</span>
+                    </div>
+                
+                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
+                        <li>{{content}}</li>
+                    </ul>
+                </div>
+
+                <div class="feedback-content" *ngIf="feedback.actionItems && feedback.actionItems.length > 0">
+                     <div class="feedback-label action-items">
+                        <span class="material-symbols-outlined">lightbulb_2</span>
+                        <span>Went Well</span>
+                    </div>
+                
+                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
+                        <li>{{content}}</li>
+                    </ul>
+                </div>
+            </div>
         </div>
+
         <ng-template #noSessionFeedbacks>
                 <div class="no-feedbacks">
                     <span class="material-icons">feedback</span>

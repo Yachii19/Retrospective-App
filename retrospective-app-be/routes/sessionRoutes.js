@@ -3,9 +3,6 @@ const router = express.Router();
 const sessionService = require('../services/sessionService');
 const feedbackService = require('../services/feedbackService');
 const fileGeneratorService = require('../services/fileGeneratorService');
-const path = require('path');
-const fs = require('fs');
-const config = require('../config/config');
 
 router.post('/', (req, res) => {
     try {
@@ -74,22 +71,6 @@ router.post('/:id/generate', (req, res) => {
         res.status(200).json({ message: 'File generated successfully', fileName });
     } catch (err) {
         res.status(500).json({ message: 'Error generating file', error: err.message });
-    }
-});
-
-router.get('/sessions/:id/download', (req, res) => {
-    try {
-        const sessionId = req.params.id;
-        const fileName = fileGeneratorService.generateSessionTextFile(sessionId);
-        const filePath = path.join(config.outputFolder, fileName);
-        
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ message: 'File not found' });
-        }
-        
-        res.download(filePath, fileName);
-    } catch (error) {
-        res.status(500).json({ message: 'Error downloading file', error: error.message });
     }
 });
 

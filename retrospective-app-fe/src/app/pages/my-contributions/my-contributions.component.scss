@@ -33,7 +33,7 @@
 
     &:hover {
         transform: translateY(-2px);
-        background-color: #f0f0f0;
+        background-color: #e2e2e2;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
 
@@ -52,7 +52,7 @@
 
             .user-icon {
                 font-size: 2.5rem;
-                color: #007bff;
+                color: #4CB1A4;
             }
 
             .user-info {
@@ -118,8 +118,8 @@
                 }
 
                 &.type-needs-improvement {
-                    background: #f8d7da;
-                    color: #721c24;
+                    background: #fff3cd;
+                    color: #856404;
                 }
 
                 &.type-action-items {
