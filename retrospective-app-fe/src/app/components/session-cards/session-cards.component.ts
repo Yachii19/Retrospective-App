@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { RetroSession } from '../../models/retrospective.model';
 import { RetrospectiveService } from '../../services/retrospective.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RetroSession } from '../../models/session.model';
+import { SessionService } from '../../services/session.service';
 
 @Component({
   selector: 'app-session-cards',
@@ -15,7 +16,7 @@ export class SessionCardsComponent {
   allSessions: RetroSession[] = [];
 
   constructor(
-      private retroService: RetrospectiveService,
+      private sessionService: SessionService,
       private router: Router
     ) {}
   
@@ -24,9 +25,10 @@ export class SessionCardsComponent {
   }
 
   loadAllSessions(): void {
-    this.retroService.getSessions().subscribe({
-      next: (sessions: any) => {
-
+    console.log(this.allSessions);
+    this.sessionService.getAllSessions().subscribe({
+      next: (response: any) => {
+        let sessions = response.data;
         if(Array.isArray(sessions)) {
           this.allSessions = sessions
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -40,7 +42,7 @@ export class SessionCardsComponent {
       }
     })
 
-    console.log(this.allSessions);
+ 
   }
 
   get mysTeamSessions() {

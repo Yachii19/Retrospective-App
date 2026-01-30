@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const sessionService = require('../services/sessionService');
-const feedbackService = require('../services/feedbackService');
 const fileGeneratorService = require('../services/fileGeneratorService');
 
 router.post('/', (req, res) => {
@@ -16,7 +15,10 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
     try {
         const sessions = sessionService.getAllSessions();
-        res.json(sessions);
+        res.status(200).send({
+            message: `All Sessions List: `,
+            data: sessions
+        })
     } catch (err) {
         res.status(500).json({ message: 'Error fetching sessions', error: err.message });
     }
@@ -25,7 +27,7 @@ router.get('/', (req, res) => {
 router.get('/:sessionId', (req, res) => {
     try {
         const session = sessionService.getSessionById(req.params.sessionId);
-        res.status(201).send({
+        res.status(200).send({
             message: `Session with ID: ${req.params.sessionId}`,
             data: session
         })
@@ -34,36 +36,84 @@ router.get('/:sessionId', (req, res) => {
     }
 })
 
-router.post('/:id/feedback', (req, res) => {
+router.get('/team/:teamName', (req, res) => {
     try {
-        feedbackService.addFeedback(req.params.id, req.body);
-        res.status(201).json({ message: 'Feedback added' });
+        const { teamName } = req.params;
+        const sessions = sessionService.getSessionsByTeam(teamName);
+        res.status(200).json({
+            message: `Sessions for team: ${teamName}`,
+            data: sessions
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error adding feedback', error: err.message });
+        res.status(500).json({ message: 'Error fetching sessions by team', error: err.message });
     }
 });
 
-router.get('/:id/feedback', (req, res) => {
+// Join a session
+router.post('/:sessionId/join', (req, res) => {
     try {
-        const feedback = feedbackService.getFeedbackBySessionId(req.params.id);
-        res.json(feedback);
+        const { sessionId } = req.params;
+        const { email, username } = req.body;
+
+        if (!email || !username) {
+            return res.status(400).json({ message: 'Email and username are required' });
+        }
+
+        const session = sessionService.joinSession(sessionId, email, username);
+        res.status(200).json({
+            message: 'Successfully joined session',
+            data: session
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching feedback', error: err.message });
+        res.status(400).json({ message: err.message });
     }
 });
 
-router.get('/feedback/user/:username', (req, res) => {
+// Leave a session
+router.post('/:sessionId/leave', (req, res) => {
     try {
-        const username = req.params.username;
-        const feedbackData = feedbackService.getFeedbackByUser(username);
-        res.status(200).send({
-            message: `Feedback of user: ${username}`,
-            data: feedbackData
-        })
+        const { sessionId } = req.params;
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        const session = sessionService.leaveSession(sessionId, email);
+        res.status(200).json({
+            message: 'Successfully left session',
+            data: session
+        });
     } catch (err) {
-        res.status(500).json({ message: 'Error fetching feedback', error: err.message });
+        res.status(400).json({ message: err.message });
     }
-})
+});
+
+// Get session members
+router.get('/:sessionId/members', (req, res) => {
+    try {
+        const members = sessionService.getSessionMembers(req.params.sessionId);
+        res.status(200).json({
+            message: 'Session members retrieved',
+            data: members
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// Get user's sessions
+router.get('/user/:email/sessions', (req, res) => {
+    try {
+        const sessions = sessionService.getUserSessions(req.params.email);
+        res.status(200).json({
+            message: 'User sessions retrieved',
+            data: sessions
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 router.post('/:id/generate', (req, res) => {
     try {

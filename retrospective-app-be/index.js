@@ -3,6 +3,8 @@ const fs = require('fs');
 const cors = require('cors');
 const config = require('./config/config');
 const sessionRoutes = require('./routes/sessionRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -12,7 +14,6 @@ app.use(cors({
     credentials: true,
 }));
 
-// Ensure directories exist
 if (!fs.existsSync(config.outputFolder)) {
     fs.mkdirSync(config.outputFolder);
 }
@@ -21,7 +22,8 @@ if (!fs.existsSync(config.dataFolder)) {
     fs.mkdirSync(config.dataFolder);
 }
 
-// Routes
 app.use('/sessions', sessionRoutes);
+app.use('/feedback', feedbackRoutes);
+app.use('/auth', authRoutes);
 
 app.listen(config.port, () => console.log(`Server running on http://localhost:${config.port}`));

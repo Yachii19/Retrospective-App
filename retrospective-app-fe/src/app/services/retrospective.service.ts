@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { RetroFeedback, RetroSession } from '../models/retrospective.model';
+import { RetroSession } from '../models/session.model';
+import { RetroFeedback } from '../models/feedback.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RetrospectiveService {
-  private apiUrl = 'https://retrospective-app-qb3m.onrender.com/sessions';
+  private apiUrl = 'http://localhost:3000/sessions';
 
   constructor(private http: HttpClient) {};
 

@@ -3,8 +3,8 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RetrospectiveService } from '../../services/retrospective.service';
-import { RetroFeedback } from '../../models/retrospective.model';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
+import { RetroFeedback } from '../../models/feedback.model';
 
 @Component({
   selector: 'app-session-details',
@@ -76,27 +76,27 @@ export class SessionDetailsComponent {
   }
 
   addFeedback(): void {
-    if (!this.wentWell.length && !this.needsImprovement.length && !this.actionItems.length) {
-      alert('Please add at least one feedback item');
-      return;
-    }
+    // if (!this.wentWell.length && !this.needsImprovement.length && !this.actionItems.length) {
+    //   alert('Please add at least one feedback item');
+    //   return;
+    // }
 
-    const feedback: RetroFeedback = {
-      sessionId: this.sessionId,
-      username: this.username || '',
-      createdAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      wentWell: this.wentWell,
-      needsImprovement: this.needsImprovement,
-      actionItems: this.actionItems
-    };
+    // const feedback: RetroFeedback = {
+    //   sessionId: this.sessionId,
+    //   username: this.username || '',
+    //   createdAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+    //   wentWell: this.wentWell,
+    //   needsImprovement: this.needsImprovement,
+    //   actionItems: this.actionItems
+    // };
 
-    this.retroService.addFeedback(this.sessionId, feedback).subscribe({
-      next: () => {
-        this.loadSessionFeedbacks();
-        this.clearForm();
-      },
-      error: (err) => console.error('Error adding feedback:', err)
-    });
+    // this.retroService.addFeedback(this.sessionId, feedback).subscribe({
+    //   next: () => {
+    //     this.loadSessionFeedbacks();
+    //     this.clearForm();
+    //   },
+    //   error: (err) => console.error('Error adding feedback:', err)
+    // });
   }
 
   clearForm(): void {
@@ -120,4 +120,16 @@ export class SessionDetailsComponent {
   goHome(): void {
     this.router.navigate(['/dashboard']);
   }
+
+  exportFeedback(): void {
+    this.retroService.generateOutput(this.sessionId).subscribe({
+      next: (response) => {
+        console.log('File generated:', response.fileName);
+      },
+      error: (err) => {
+        console.error('Error generating file:', err);
+      }
+    });
+  }
+
 }

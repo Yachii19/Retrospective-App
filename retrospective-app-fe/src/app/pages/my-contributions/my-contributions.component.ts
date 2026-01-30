@@ -4,7 +4,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RetrospectiveService } from '../../services/retrospective.service';
-import { RetroFeedback } from '../../models/retrospective.model';
+import { RetroFeedback } from '../../models/feedback.model';
 
 @Component({
   selector: 'app-my-contributions',
@@ -15,7 +15,7 @@ import { RetroFeedback } from '../../models/retrospective.model';
 })
 export class MyContributionsComponent {
   username: string | null = '';
-  userFeedbacks: RetroFeedback[] = [];
+  userFeedbacks:RetroFeedback[] = [];
 
   constructor(
     private authService: AuthService,

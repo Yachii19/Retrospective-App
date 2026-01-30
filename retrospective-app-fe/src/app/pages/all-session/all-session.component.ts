@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
-import { RetroSession } from '../../models/retrospective.model';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { SessionCardsComponent } from '../../components/session-cards/session-cards.component';
+import { RetroSession } from '../../models/session.model';
 
 @Component({
   selector: 'app-all-session',
