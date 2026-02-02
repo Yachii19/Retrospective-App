@@ -19,6 +19,7 @@
                 name="sessionName" 
                 [(ngModel)]="sessionName"
                 placeholder="Enter session name (e.g., Sprint 24 Retro)"
+                (input)="onInputChange()"
                 required>
         </div>
 
@@ -33,6 +34,72 @@
             </select>
         </div>
 
+        <div class="form-group">
+            <div class="section-label-container">
+                <label for="section">
+                    <span class="material-icons">view_lists</span>
+                    Sections
+                </label>
+                <span class="section-reminder">(Optional - default will be used if empty)</span>
+            </div>
+
+            <div class="section-list" *ngIf="sections.length > 0; else noCustomSections">
+                <div class="section-item" *ngFor="let section of sections; let i = index">
+                    <div class="section-info">
+                        <span class="material-icons">drag_indicator</span>
+                        <span class="section-title">{{ section.title }}</span>
+                    </div>
+
+                    <button
+                        class="remove-btn"
+                        title="Remove Section"
+                        type="button"
+                        (click)="removeSection(i)"
+                    >
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <ng-template #noCustomSections>
+                <div class="custom-section-container">
+              
+                        <span class="material-icons">inbox</span>
+                        <p class="reminder-bold">No custom sections added yet</p>
+                        <p class="reminder-light">Default section (Went Well and Needs Improvement) will be used</p>
+    
+                </div>
+            </ng-template>
+
+            <div class="add-section-container">
+                <input 
+                    type="text" 
+                    id="newSectionTitle" 
+                    name="newSectionTitle" 
+                    [(ngModel)]="newSectionTitle"
+                    required
+                    type="text" 
+                    class="add-session-input" 
+                    placeholder="Enter new session"
+                    (keyup.enter)="addSection()"
+                    (input)="onInputChange()"
+                >
+                <button 
+                    class="add-section-btn"
+                    (click)="addSection()"
+                >
+                    <span class="material-icons">add</span>
+                </button>
+            </div>
+
+            <div class="error-message" *ngIf="showError">
+                <span class="material-icons">error</span>
+                {{ errorMessage }}
+            </div>
+        </div>
+
+        
+
         <div class="button-group">
             <button class="cancel-btn" type="button" (click)="cancel()">
                 <span class="material-icons">close</span>
@@ -42,11 +109,13 @@
                 class="create-btn" 
                 type="button" 
                 (click)="createSession()"
-                [disabled]="!sessionName.trim()">
+            >
                 <span class="material-icons">check_circle</span>
                 Create Session
             </button>
         </div>
+
+        
     </div>
 </div>
 

@@ -1,9 +1,9 @@
-<!-- <div class="contribution-container">
+<div class="contribution-container">
     <app-sidebar/>
     <div class="main-content">
         <h1>My Feedbacks</h1>
         <div class="feedbacks-container" *ngIf="userFeedbacks.length > 0; else noFeedbacks">
-            <div class="feedback-card" *ngFor="let feedback of userFeedbacks" (click)="viewSession(feedback.sessionId)">
+            <div class="feedback-card" *ngFor="let feedback of userFeedbacks; let i = index" (click)="viewSession(feedback.sessionId)">
                 <div class="feedback-header">
                     <div class="feedback-meta">
                         <span class="material-icons user-icon">account_circle</span>
@@ -21,38 +21,26 @@
                     </span>
                 </div>
                 
-                <div class="feedback-content">
-
-                    <div class="feedback-section" *ngIf="feedback.wentWell && feedback.wentWell.length > 0">
+                <div class="feedback-content" *ngFor="let sectionItem of userFeedbacks[i].sections">
+                    <div class="feedback-section" *ngIf="sectionItem.items?.length">
                         <div class="feedback-type type-went-well">
-                            <span class="material-icons">sentiment_satisfied</span>
-                            <span class="type-label">Went Well</span>
+                        <span class="material-icons"> 
+                            {{ 
+                                sectionItem.key === 'went-well' ? 'sentiment_satisfied'
+                                : sectionItem.key === 'needs-improvement' ? 'build_circle'
+                                : 'adjust' 
+                            }}
+                        </span>
+                        <span class="type-label">{{sectionItem.title}}</span>
                         </div>
+        
                         <ul class="feedback-list">
-                            <li *ngFor="let item of feedback.wentWell">{{ item }}</li>
+                            <li *ngFor="let item of sectionItem.items">{{item}}</li>
                         </ul>
-                    </div>
-
-                    <div class="feedback-section" *ngIf="feedback.needsImprovement && feedback.needsImprovement.length > 0">
-                        <div class="feedback-type type-needs-improvement">
-                            <span class="material-icons">sentiment_dissatisfied</span>
-                            <span class="type-label">Needs Improvement</span>
-                        </div>
-                        <ul class="feedback-list">
-                            <li *ngFor="let item of feedback.needsImprovement">{{ item }}</li>
-                        </ul>
-                    </div>
-
-                    <div class="feedback-section" *ngIf="feedback.actionItems && feedback.actionItems.length > 0">
-                        <div class="feedback-type type-action-items">
-                            <span class="material-icons">lightbulb</span>
-                            <span class="type-label">Action Items</span>
-                        </div>
-                        <ul class="feedback-list">
-                            <li *ngFor="let item of feedback.actionItems">{{ item }}</li>
-                        </ul>
+   
                     </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -64,4 +52,4 @@
         <p>No feedbacks available</p>
         <small>Your contributions will appear here</small>
     </div>
-</ng-template> -->
+</ng-template>

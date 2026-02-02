@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { RetrospectiveService } from '../../services/retrospective.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RetroSession } from '../../models/session.model';
 import { SessionService } from '../../services/session.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-session-cards',
@@ -14,9 +14,11 @@ import { SessionService } from '../../services/session.service';
 })
 export class SessionCardsComponent {
   allSessions: RetroSession[] = [];
+  joiningSessionId: string | null = null;
 
   constructor(
       private sessionService: SessionService,
+      private authService: AuthService,
       private router: Router
     ) {}
   
@@ -25,7 +27,6 @@ export class SessionCardsComponent {
   }
 
   loadAllSessions(): void {
-    console.log(this.allSessions);
     this.sessionService.getAllSessions().subscribe({
       next: (response: any) => {
         let sessions = response.data;
@@ -41,8 +42,6 @@ export class SessionCardsComponent {
         this.allSessions = [];
       }
     })
-
- 
   }
 
   get mysTeamSessions() {
@@ -54,6 +53,33 @@ export class SessionCardsComponent {
   }
 
   viewSession(sessionId: string): void {
-    this.router.navigate(['/session', sessionId]);
+    const email = this.authService.getEmail();
+    const username = this.authService.getUsername();
+
+    if (!email || !username) {
+      console.error('User not logged in');
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.joiningSessionId = sessionId;
+
+    // Auto-join the session
+    this.sessionService.joinSession(sessionId, email, username).subscribe({
+      next: (response) => {
+        console.log('Successfully joined session:', response);
+        this.joiningSessionId = null;
+        this.router.navigate(['/session', sessionId]);
+      },
+      error: (err) => {
+        console.log('Join session error:', err);
+        // User might already be in the session, that's okay
+        if (err.error?.message?.includes('already joined')) {
+          console.log('User already in session, proceeding...');
+        }
+        this.joiningSessionId = null;
+        this.router.navigate(['/session', sessionId]);
+      }
+    });
   }
 }

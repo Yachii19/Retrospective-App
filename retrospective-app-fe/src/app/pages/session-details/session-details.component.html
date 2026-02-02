@@ -1,144 +1,57 @@
-<!-- <div class="session-details-container">
+<div class="session-details-container">
     <div class="main-content">
         <div class="session-header">
             <div class="header-left">
                 <button class="home-btn" (click)="goHome()">
                     <span class="material-symbols-outlined">home</span>
                 </button>
-                <h1>{{sessionName}}</h1>
+                <h1>{{session?.sessionName}}</h1>
             </div>
 
-            <button class="export-btn" (click)="exportFeedback()">
+            <button class="export-btn">
                 <span class="material-symbols-outlined">save</span>
                 Export
             </button>
         </div>
-        
-        <div class="feedback-submission-form">
-            <h2>Add Your Feedback</h2>
-            <div class="feedback-section">
-                <div>
-                    What Went Well
+
+        <div class="session-grid">
+            <div class="session-content" *ngFor="let section of session?.sections">
+                <div class="section-header">
+                    <span class="material-icons">
+                        {{ 
+                            section.key === 'went-well' ? 'sentiment_satisfied'
+                            : section.key === 'needs-improvement' ? 'build_circle'
+                            : 'adjust' 
+                        }}
+                    </span>
+                    {{section.title}}
                 </div>
-                <div class="input-group">
-                    <input (keyup.enter)="addItem('wentWell', wentWellInput)"  #wentWellInput type="text" placeholder="Add something that went well...">
-                    <button (click)="addItem('wentWell', wentWellInput)">
-                        <span class="material-symbols-outlined">Add_2</span>
+
+                <div class="section-content">
+                    <!-- Display feedbacks for this section -->
+                    <div class="feedback-item" *ngFor="let feedback of getSectionFeedbacks(section.key)">
+                        <div class="feedback-header">
+                            <span class="username">{{ feedback.username }}</span>
+                            <span class="votes">👍 {{ feedback.votes }}</span>
+                        </div>
+                        <ul>
+                            <li *ngFor="let item of getItemsForSection(feedback, section.key)">
+                                {{ item }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- No feedback message -->
+                    <div class="no-feedback" *ngIf="getSectionFeedbacks(section.key).length === 0">
+                        <p>No feedback yet</p>
+                    </div>
+
+                    <!-- Add Feedback Section -->
+                    <button>
+                        Submit
                     </button>
-                </div>
-                <ul class="items-list">
-                    <li *ngFor="let item of wentWell; let i = index">
-                        {{item}}
-
-                        <button (click)="removeItem('wentWell', i)">
-                            <span class="material-icons">delete</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="feedback-section">
-                <div>
-                    Needs Improvements
-                </div>
-                <div class="input-group">
-                    <input (keyup.enter)="addItem('needsImprovement', needsImprovementInput)" #needsImprovementInput type="text" placeholder="Add something that needs improvement...">
-                    <button (click)="addItem('needsImprovement', needsImprovementInput)">
-                        <span class="material-symbols-outlined">Add_2</span>
-                    </button>
-                </div>
-                <ul class="items-list">
-                    <li *ngFor="let item of needsImprovement; let i = index">
-                        {{item}}
-                        <button>
-                            <span (click)="removeItem('needsImprovement', i)" class="material-icons">delete</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="feedback-section">
-                <div>
-                    Action Items
-                </div>
-                <div class="input-group">
-                    <input (keyup.enter)="addItem('actionItems', actionItemsInput)"  #actionItemsInput type="text" placeholder="Add an action item...">
-                    <button (click)="addItem('actionItems', actionItemsInput)" >
-                        <span class="material-symbols-outlined">Add_2</span>
-                    </button>
-                </div>
-
-                <ul class="items-list">
-                    <li *ngFor="let item of actionItems; let i = index">
-                        {{ item }}
-                        <button>
-                            <span (click)="removeItem('actionItems', i)" class="material-icons">delete</span>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <button (click)="addFeedback()">
-                Submit Feedback
-            </button>
-        </div>
-
-        <div class="feedbacks-container" *ngIf="sessionFeedbacks.length > 0; else noSessionFeedbacks">
-            <h1>Feedbacks</h1>
-            <div class="feedback-card" *ngFor="let feedback of sessionFeedbacks">
-                <div class="feedback-header">
-                    <div class="user-info">
-                        <span class="material-icons">account_circle</span>
-                        <span class="username">{{feedback.username}}</span>
-                    </div>
-
-                    <div class="header-time">
-                        <span class="material-icons">schedule</span>
-                        <span class="time">{{feedback.createdAt | date: 'medium'}}</span>
-                    </div>
-                </div>
-
-                <div class="feedback-content" *ngIf="feedback.wentWell && feedback.wentWell.length > 0">
-                    <div class="feedback-label went-well">
-                        <span class="material-symbols-outlined"> sentiment_satisfied </span>
-                        <span>Went Well</span>
-                    </div>
-                
-                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
-                        <li>{{content}}</li>
-                    </ul>
-        
-                </div>
-
-                <div class="feedback-content" *ngIf="feedback.needsImprovement && feedback.needsImprovement.length > 0">
-                     <div class="feedback-label needs-improvement">
-                        <span class="material-symbols-outlined">sentiment_dissatisfied</span>
-                        <span>Needs Improvement</span>
-                    </div>
-                
-                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
-                        <li>{{content}}</li>
-                    </ul>
-                </div>
-
-                <div class="feedback-content" *ngIf="feedback.actionItems && feedback.actionItems.length > 0">
-                     <div class="feedback-label action-items">
-                        <span class="material-symbols-outlined">lightbulb_2</span>
-                        <span>Went Well</span>
-                    </div>
-                
-                    <ul class="content-list" *ngFor="let content of feedback.wentWell">
-                        <li>{{content}}</li>
-                    </ul>
                 </div>
             </div>
         </div>
-
-        <ng-template #noSessionFeedbacks>
-                <div class="no-feedbacks">
-                    <span class="material-icons">feedback</span>
-                    <p>No feedbacks available</p>
-                    <small>Your contributions will appear here</small>
-                </div>
-        </ng-template>
     </div>
-</div> -->
+</div>

@@ -58,10 +58,9 @@ router.post('/:feedbackId/vote', (req, res) => {
 });
 
 // Unvote feedback
-router.delete('/:feedbackId/vote', (req, res) => {
+router.delete('/:feedbackId/vote/:username', (req, res) => {
     try {
-        const { feedbackId } = req.params;
-        const { username } = req.body;
+        const { feedbackId, username } = req.params;
         
         if (!username) {
             return res.status(400).json({ message: 'Username is required' });

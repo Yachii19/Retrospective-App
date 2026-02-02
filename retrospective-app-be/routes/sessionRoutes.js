@@ -65,7 +65,7 @@ router.post('/:sessionId/join', (req, res) => {
             data: session
         });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(200).json({ message: err.message });
     }
 });
 

@@ -31,9 +31,10 @@ class FeedbackService {
         });
 
         const feedback = { 
-            id: Date.now(),
+            feedbackId: Date.now(),
             sessionId,
             username: feedbackData.username,
+            userEmail:feedbackData.userEmail,
             sections: feedbackSections,
             votes: 0,
             votedBy: [],
@@ -65,7 +66,7 @@ class FeedbackService {
             .filter(Boolean)
             .map(line => JSON.parse(line));
 
-        const feedbackIndex = feedbacks.findIndex(f => f.id == feedbackId);
+        const feedbackIndex = feedbacks.findIndex(f => f.feedbackId == feedbackId);
         
         if (feedbackIndex === -1) {
             throw new Error('Feedback not found');
@@ -107,7 +108,7 @@ class FeedbackService {
             .filter(Boolean)
             .map(line => JSON.parse(line));
 
-        const feedbackIndex = feedbacks.findIndex(f => f.id == feedbackId);
+        const feedbackIndex = feedbacks.findIndex(f => f.feedbackId == feedbackId);
         
         if (feedbackIndex === -1) {
             throw new Error('Feedback not found');
@@ -158,7 +159,7 @@ class FeedbackService {
                 // Only include sections with items
                 if (section.items && section.items.length > 0 && section.actionItem) {
                     allActionItems.push({
-                        feedbackId: feedback.id,
+                        feedbackId: feedback.feedbackId,
                         username: feedback.username,
                         sectionKey: section.key,
                         sectionTitle: section.title,
@@ -182,7 +183,7 @@ class FeedbackService {
             .filter(Boolean)
             .map(line => JSON.parse(line));
 
-        const feedback = feedbacks.find(f => f.id == feedbackId);
+        const feedback = feedbacks.find(f => f.feedbackId == feedbackId);
         
         if (!feedback) {
             throw new Error('Feedback not found');
@@ -222,7 +223,7 @@ class FeedbackService {
             if (section && section.items && section.items.length > 0) {
                 section.items.forEach(item => {
                     sectionItems.push({
-                        feedbackId: feedback.id,
+                        feedbackId: feedback.feedbackId,
                         username: feedback.username,
                         item: item,
                         votes: feedback.votes || 0,
@@ -246,7 +247,7 @@ class FeedbackService {
             .filter(Boolean)
             .map(line => JSON.parse(line));
 
-        const feedbackIndex = feedbacks.findIndex(f => f.id == feedbackId);
+        const feedbackIndex = feedbacks.findIndex(f => f.feedbackId == feedbackId);
         
         if (feedbackIndex === -1) {
             throw new Error('Feedback not found');
@@ -281,7 +282,7 @@ class FeedbackService {
             .filter(Boolean)
             .map(line => JSON.parse(line));
 
-        const feedbackIndex = feedbacks.findIndex(f => f.id == feedbackId);
+        const feedbackIndex = feedbacks.findIndex(f => f.feedbackId == feedbackId);
         
         if (feedbackIndex === -1) {
             throw new Error('Feedback not found');
@@ -302,9 +303,9 @@ class FeedbackService {
         return this.filterEmptySections(feedback);
     }
 
-    getFeedbackByUser(username) {
+    getFeedbackByUser(userEmail) {
         if (!fs.existsSync(feedbackFile)) return [];
-        
+
         const feedbacks = fs.readFileSync(feedbackFile, 'utf-8')
             .split('\n')
             .filter(Boolean)
@@ -315,11 +316,10 @@ class FeedbackService {
                     return null;
                 }
             })
-            .filter(f => f && f.username === username)
+            .filter(f => f && f.userEmail === userEmail)
             .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        
-        // Filter out empty sections from all feedbacks
-        return feedbacks.map(feedback => this.filterEmptySections(feedback));
+
+        return feedbacks;
     }
 }
 

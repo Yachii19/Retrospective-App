@@ -26,6 +26,7 @@ export class CreateSessionHandlerComponent {
   showError: boolean = false;
   errorMessage: string = '';
   isLoading: boolean = false;
+  joiningSessionId: string | null = '';
 
   constructor(
     private sessionService: SessionService,
@@ -36,22 +37,62 @@ export class CreateSessionHandlerComponent {
   ngOnInit(): void {
     this.username = this.authService.getUsername();
   }
+
+  onInputChange():void {
+    this.showError = false;
+    this.errorMessage = '';
+  }
+
   createSession(): void {
     if (!this.sessionName.trim()) {
       this.showError = true;
-      this.errorMessage = 'Session name is empty. Please provide a name!'
+      this.errorMessage = 'Session name is empty. Please provide a name!';
       return;
     }
+
+    const email = this.authService.getEmail();
+    const username = this.authService.getUsername();
+
+    if (!email || !username) {
+      console.error('User not logged in');
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.isLoading = true;
 
     this.sessionService.createSession(this.sessionName, this.team, this.username, this.sections).subscribe({
       next: (session) => {
         console.log('Session created:', session);
         this.createdSessionName = session.sessionName;
         this.createdSessionId = session.sessionId;
-        this.showSuccessModal = true;
+
+        this.joiningSessionId = this.createdSessionId;
+
+        this.sessionService.joinSession(this.createdSessionId, email, username).subscribe({
+          next: (response) => {
+            console.log('Successfully joined session:', response);
+            this.joiningSessionId = null;
+            this.isLoading = false;
+            this.showSuccessModal = true;
+          },
+          error: (err) => {
+            console.log('Join session error:', err);
+            // User might already be in the session, that's okay
+            if (err.error?.message?.includes('already joined')) {
+              console.log('User already in session, proceeding...');
+            }
+            this.joiningSessionId = null;
+            this.isLoading = false;
+            this.showSuccessModal = true;
+          }
+        });
       },
       error: (error) => {
         console.error('Error creating session:', error);
+        this.isLoading = false;
+        this.showError = true;
+        this.errorMessage = 'Failed to create session. Please try again.';
       }
     });
   }
@@ -82,6 +123,8 @@ export class CreateSessionHandlerComponent {
     this.showError = false;
     this.errorMessage = '';
   }
+
+  
 
   removeSection(index: number): void {
     this.sections.splice(index, 1);

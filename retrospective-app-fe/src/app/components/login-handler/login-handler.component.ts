@@ -24,12 +24,12 @@ export class LoginHandlerComponent {
     private authService: AuthService
   ) {}
 
-  onInputChange() {
+  onInputChange():void {
     this.showError = false;
     this.errorMessage = '';
   }
 
-  toggleMode() {
+  toggleMode():void {
     this.isLoginMode = !this.isLoginMode;
     this.showError = false;
     this.errorMessage = '';
@@ -38,7 +38,7 @@ export class LoginHandlerComponent {
     this.password = '';
   }
 
-  signIn() {
+  signIn():void {
     if (!this.email.trim() || !this.password.trim()) {
       this.showError = true;
       this.errorMessage = 'Email and password are required';
@@ -58,7 +58,7 @@ export class LoginHandlerComponent {
     });
   }
 
-  signUp() {
+  signUp():void {
     // Validate inputs
     if (!this.username.trim() || !this.email.trim() || !this.password.trim()) {
       this.showError = true;
@@ -79,7 +79,7 @@ export class LoginHandlerComponent {
     });
   }
 
-  handleSubmit() {
+  handleSubmit():void {
     if (this.isLoginMode) {
       this.signIn();
     } else {

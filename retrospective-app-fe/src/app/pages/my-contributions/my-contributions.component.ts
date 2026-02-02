@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RetrospectiveService } from '../../services/retrospective.service';
 import { RetroFeedback } from '../../models/feedback.model';
+import { FeedbackService } from '../../services/feedback.service';
 
 @Component({
   selector: 'app-my-contributions',
@@ -15,11 +16,13 @@ import { RetroFeedback } from '../../models/feedback.model';
 })
 export class MyContributionsComponent {
   username: string | null = '';
+  userEmail: string | null = '';
   userFeedbacks:RetroFeedback[] = [];
+
 
   constructor(
     private authService: AuthService,
-    private retroService: RetrospectiveService,
+    private feedbackService: FeedbackService,
     private router: Router
   ) {}
 
@@ -28,14 +31,14 @@ export class MyContributionsComponent {
       this.router.navigate(['/']);
       return;
     }
-
     this.username = this.authService.getUsername();
+    this.userEmail = this.authService.getEmail();
     this.loadFeedbacks();
     console.log(this.username);
   }
 
   loadFeedbacks(): void {
-    this.retroService.getFeedbackByUser(this.username).subscribe({
+    this.feedbackService.getFeedbackByUser(this.userEmail).subscribe({
       next: (response: any) => {
         const feedbacks = response.data;
         console.log(feedbacks);

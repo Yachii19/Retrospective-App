@@ -1,5 +1,5 @@
 export interface RetroFeedback {
-  id: number;
+  feedbackId: number;
   sessionId: string;
   username: string;
   sections: FeedbackSection[];

@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RetroSession } from '../../models/session.model';
 import { SessionService } from '../../services/session.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-recent-session-cards',
@@ -13,8 +14,10 @@ import { SessionService } from '../../services/session.service';
 })
 export class RecentSessionCardsComponent {
   recentSessions: RetroSession[] = [];
+  joiningSessionId: string | null = '';
 
   constructor(
+      private authService: AuthService,
       private sessionService: SessionService,
       private router: Router
     ) {}
@@ -46,6 +49,32 @@ export class RecentSessionCardsComponent {
   }
 
   viewSession(sessionId: string): void {
-    this.router.navigate(['/session', sessionId]);
+    const email = this.authService.getEmail();
+    const username = this.authService.getUsername();
+
+    if (!email || !username) {
+      console.error('User not logged in');
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.joiningSessionId = sessionId;
+
+     this.sessionService.joinSession(sessionId, email, username).subscribe({
+      next: (response) => {
+        console.log('Successfully joined session:', response);
+        this.joiningSessionId = null;
+        this.router.navigate(['/session', sessionId]);
+      },
+      error: (err) => {
+        console.log('Join session error:', err);
+        // User might already be in the session, that's okay
+        if (err.error?.message?.includes('already joined')) {
+          console.log('User already in session, proceeding...');
+        }
+        this.joiningSessionId = null;
+        this.router.navigate(['/session', sessionId]);
+      }
+    });
   }
 }

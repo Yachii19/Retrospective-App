@@ -18,8 +18,7 @@ class SessionService {
             team: sessionData.team,
             sections: sessionData.sections || [
                 { key: 'went-well', title: 'Went Well' },
-                { key: 'needs-improvement', title: 'Needs Improvement' },
-                { key: 'action-items', title: 'Action Items' }
+                { key: 'needs-improvement', title: 'Needs Improvement' }
             ],
             members: sessionData.members || [],
             createdBy: sessionData.createdBy || null,
@@ -39,7 +38,9 @@ class SessionService {
 
     getSessionById(sessionId) {
         const sessions = this.getAllSessions();
-        return sessions.find(s => s.id == sessionId);
+        const numericSessionId = parseInt(sessionId);
+        console.log(sessions.find(s => s.sessionId == numericSessionId));
+        return sessions.find(s => s.sessionId == numericSessionId);
     }
 
     getSessionsByTeam(team) {
@@ -59,7 +60,7 @@ class SessionService {
 
         // Convert sessionId to number for comparison
         const numericSessionId = parseInt(sessionId);
-        const sessionIndex = sessions.findIndex(s => s.id === numericSessionId);
+        const sessionIndex = sessions.findIndex(s => s.sessionId === numericSessionId);
         console.log(sessionIndex);
         if (sessionIndex === -1) {
             throw new Error('Session not found');
@@ -100,7 +101,7 @@ class SessionService {
 
         // Convert sessionId to number for comparison
         const numericSessionId = parseInt(sessionId);
-        const sessionIndex = sessions.findIndex(s => s.id === numericSessionId);
+        const sessionIndex = sessions.findIndex(s => s.sessionId === numericSessionId);
         
         if (sessionIndex === -1) {
             throw new Error('Session not found');

@@ -2,31 +2,29 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RetrospectiveService } from '../../services/retrospective.service';
-import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { RetroFeedback } from '../../models/feedback.model';
+import { FeedbackService } from '../../services/feedback.service';
+import { SessionService } from '../../services/session.service';
+import { RetroSession } from '../../models/session.model';
 
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule],
   templateUrl: './session-details.component.html',
   styleUrl: './session-details.component.scss'
 })
 export class SessionDetailsComponent {
   username: string | null = '';
+  userEmail: string | null = '';
   sessionId: string = '';
-  sessionName: string = '';
   sessionFeedbacks: RetroFeedback[] = [];
-
-
-  wentWell: string[] = [];
-  needsImprovement: string[] = [];
-  actionItems: string[] = [];
+  session: RetroSession | null = null;
 
   constructor(
     private authService: AuthService,
-    private retroService: RetrospectiveService,
+    private feedbackService: FeedbackService,
+    private sessionService: SessionService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
@@ -38,98 +36,53 @@ export class SessionDetailsComponent {
     }
 
     this.username = this.authService.getUsername();
+    this.userEmail = this.authService.getEmail();
+    
     this.route.params.subscribe(params => {
       this.sessionId = params['id'];
       this.loadSession();
-      this.loadSessionFeedbacks();
+      this.loadFeedbacks();
     })
   }
 
   loadSession(): void {
-    this.retroService.getSession(this.sessionId).subscribe({
+    this.sessionService.getSessionById(this.sessionId).subscribe({
       next: (response: any) => {
-        const session = response.data;
-        this.sessionName = session.sessionName;
-        console.log(this.sessionName);
+        this.session = response.data;
       },
       error: (err) => {
-        console.error(`Error fetching session: ${err}`);
-        this.sessionName = '';
+        console.error(`Error loading session: ${err}`);
+        this.session = null;
       }
-    })
+    });
   }
 
-  loadSessionFeedbacks(): void {
-    this.retroService.getFeedback(this.sessionId).subscribe({
-      next: (feedback: any) => {
-        if(Array.isArray(feedback)) {
-          this.sessionFeedbacks = feedback;
-        } else {
-          this.sessionFeedbacks = [];
-        }
+  loadFeedbacks(): void {
+    this.feedbackService.getSessionFeedbacks(parseInt(this.sessionId)).subscribe({
+      next: (feedbacks) => {
+        this.sessionFeedbacks = feedbacks;
       },
       error: (err) => {
-        console.error(`Error fetching feedbacks: ${err}`);
+        console.error(`Error loading feedbacks: ${err}`);
         this.sessionFeedbacks = [];
       }
-    })
+    });
   }
 
-  addFeedback(): void {
-    // if (!this.wentWell.length && !this.needsImprovement.length && !this.actionItems.length) {
-    //   alert('Please add at least one feedback item');
-    //   return;
-    // }
-
-    // const feedback: RetroFeedback = {
-    //   sessionId: this.sessionId,
-    //   username: this.username || '',
-    //   createdAt: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-    //   wentWell: this.wentWell,
-    //   needsImprovement: this.needsImprovement,
-    //   actionItems: this.actionItems
-    // };
-
-    // this.retroService.addFeedback(this.sessionId, feedback).subscribe({
-    //   next: () => {
-    //     this.loadSessionFeedbacks();
-    //     this.clearForm();
-    //   },
-    //   error: (err) => console.error('Error adding feedback:', err)
-    // });
+  getSectionFeedbacks(sectionKey: string): RetroFeedback[] {
+    return this.sessionFeedbacks.filter(feedback => 
+      feedback.sections.some(section => 
+        section.key === sectionKey && section.items && section.items.length > 0
+      )
+    );
   }
 
-  clearForm(): void {
-    this.wentWell = [];
-    this.needsImprovement = [];
-    this.actionItems = [];
-  }
-
-  addItem(category: 'wentWell' | 'needsImprovement' | 'actionItems', input: HTMLInputElement): void {
-    const value = input.value.trim();
-    if (value) {
-      this[category].push(value);
-      input.value = '';
-    }
-  }
-
-  removeItem(category: 'wentWell' | 'needsImprovement' | 'actionItems', index: number): void {
-    this[category].splice(index, 1);
+  getItemsForSection(feedback: RetroFeedback, sectionKey: string): string[] {
+    const section = feedback.sections.find(s => s.key === sectionKey);
+    return section?.items || [];
   }
 
   goHome(): void {
     this.router.navigate(['/dashboard']);
   }
-
-  exportFeedback(): void {
-    this.retroService.generateOutput(this.sessionId).subscribe({
-      next: (response) => {
-        console.log('File generated:', response.fileName);
-      },
-      error: (err) => {
-        console.error('Error generating file:', err);
-      }
-    });
-  }
-
 }
