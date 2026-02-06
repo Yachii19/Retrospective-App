@@ -60,7 +60,7 @@ export class RecentSessionCardsComponent {
 
     this.joiningSessionId = sessionId;
 
-     this.sessionService.joinSession(sessionId, email, username).subscribe({
+     this.sessionService.joinSession(sessionId).subscribe({
       next: (response) => {
         console.log('Successfully joined session:', response);
         this.joiningSessionId = null;

@@ -5,16 +5,12 @@ export interface User {
   createdAt: string;
 }
 
-export interface LoginResponse {
+export interface AuthResponse {
   message: string;
-  data: {
-    user: User;
-    token: string;
-    expiresAt: string;
+  token: string;
+  user: {
+    _id: string;
+    username: string;
+    email: string;
   };
-}
-
-export interface RegisterResponse {
-  message: string;
-  data: User;
 }

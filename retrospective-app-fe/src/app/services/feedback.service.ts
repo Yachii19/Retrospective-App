@@ -1,64 +1,48 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { RetroFeedback } from '../models/feedback.model';
+import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse } from '../models/feedback.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FeedbackService {
-  private apiUrl = 'http://localhost:3000/feedback';
+  private apiUrl = 'http://localhost:3000/api/feedback';
 
   constructor(private http: HttpClient) {};
 
-  getFeedbackByUser(userEmail: string | null): Observable<{message: string, data: RetroFeedback[] }> {
-    if (!userEmail) {
-      throw new Error('User email is required');
-    }
-    return this.http.get<{ message: string, data: RetroFeedback[] }>(`${this.apiUrl}/user/${encodeURIComponent(userEmail)}`);
+  getFeedbackByUser(): Observable<UserFeedbackResponse> {
+    return this.http.get<UserFeedbackResponse>(`${this.apiUrl}/user/session-feedbacks`);
   }
 
-  addFeedback(sessionId: number, feedbackData: any): Observable<{ message: string, data: RetroFeedback }> {
+  addFeedback(sessionId: string, feedbackData: AddFeedbackRequest): Observable<FeedbackResponse> {
     return this.http.post<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${sessionId}`, feedbackData);
   }
 
-  getSessionFeedbacks(sessionId: number): Observable<RetroFeedback[]> {
-    return this.http.get<RetroFeedback[]>(`${this.apiUrl}/${sessionId}`);
+  getSessionFeedbacks(sessionId: string): Observable<FeedbackResponse> {
+    return this.http.get<FeedbackResponse>(`${this.apiUrl}/${sessionId}`);
   }
 
-  getFeedbackBySection(sessiodId: number, sectionkey: string): Observable<{ message: string, data: RetroFeedback[] }> {
-    return this.http.get<{ message: string, data: RetroFeedback[] }>(`${this.apiUrl}/${sessiodId}/section/${sectionkey}`);
+  getFeedbackBySection(sessionId: string, sectionKey: string): Observable<{message: string, data: RetroFeedback[]}> {
+    return this.http.get<{message: string, data: RetroFeedback[]}>(`${this.apiUrl}/${sessionId}/section/${sectionKey}`);
   }
 
-  voteFeedback(feedbackId: number, username: string): Observable<{ message: string, data: RetroFeedback }> {
-    return this.http.post<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/vote`, { username });
+  voteFeedback(feedbackId: string): Observable<FeedbackResponse> {
+    return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/vote`, {});
+  }
+  unvoteFeedback(feedbackId: string): Observable<FeedbackResponse> {
+    return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/unvote`, {});
   }
 
-  unvoteFeedback(feedbackId: number, username: string): Observable<{ message: string, data: RetroFeedback }> {
-    return this.http.delete<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/vote/${username}`);
-  }
 
-  toggleActionItemStatus(feedbackId: number, sectionKey: string, status: 'Open' | 'Closed', userEmail: string): Observable<{ message: string, data: RetroFeedback }> {
-    return this.http.post<{ message: string, data: RetroFeedback }>(
-      `${this.apiUrl}/${feedbackId}/section/${sectionKey}/action-item/toggle`,
-      { status, userEmail }
-    );
-  }
-
-  updateActionItem(feedbackId: number, sectionKey: string, updateData: { assignee?: string, dueDate?: string }): Observable<{ message: string, data: RetroFeedback }> {
+  toggleFeedbackVisibility(feedbackId: string, data: ToggleVisibilityRequest): Observable<FeedbackResponse> {
     return this.http.put<{ message: string, data: RetroFeedback }>(
-      `${this.apiUrl}/${feedbackId}/section/${sectionKey}/action-item`,
-      updateData
+      `${this.apiUrl}/${feedbackId}/toggle-visibility`,
+      data
     );
   }
 
-  getSessionActionItems(sessionId: number, userEmail: string): Observable<{ message: string, data: any[] }> {
-    return this.http.get<{ message: string, data: any[] }>(
-      `${this.apiUrl}/session/${sessionId}/action-items?userEmail=${encodeURIComponent(userEmail)}`
-    );
-  }
-
-  getFeedbackById(feedbackId: number): Observable<RetroFeedback> {
-    return this.http.get<RetroFeedback>(`${this.apiUrl}/${feedbackId}`);
+  getFeedbackById(feedbackId: string): Observable<FeedbackResponse> {
+    return this.http.get<FeedbackResponse>(`${this.apiUrl}/${feedbackId}`);
   }
 }

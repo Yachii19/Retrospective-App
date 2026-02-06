@@ -61,27 +61,20 @@ export class CreateSessionHandlerComponent {
 
     this.isLoading = true;
 
-    this.sessionService.createSession(this.sessionName, this.team, this.username, this.sections).subscribe({
-      next: (session) => {
-        console.log('Session created:', session);
-        this.createdSessionName = session.sessionName;
-        this.createdSessionId = session.sessionId;
+    this.sessionService.createSession(this.sessionName, this.team, this.sections).subscribe({
+      next: (response) => {
+        this.createdSessionName = response.data.sessionName;
+        this.createdSessionId = response.data._id;
 
         this.joiningSessionId = this.createdSessionId;
 
-        this.sessionService.joinSession(this.createdSessionId, email, username).subscribe({
+        this.sessionService.joinSession(this.createdSessionId).subscribe({
           next: (response) => {
-            console.log('Successfully joined session:', response);
             this.joiningSessionId = null;
             this.isLoading = false;
             this.showSuccessModal = true;
           },
-          error: (err) => {
-            console.log('Join session error:', err);
-            // User might already be in the session, that's okay
-            if (err.error?.message?.includes('already joined')) {
-              console.log('User already in session, proceeding...');
-            }
+          error: (error) => {
             this.joiningSessionId = null;
             this.isLoading = false;
             this.showSuccessModal = true;
@@ -92,7 +85,7 @@ export class CreateSessionHandlerComponent {
         console.error('Error creating session:', error);
         this.isLoading = false;
         this.showError = true;
-        this.errorMessage = 'Failed to create session. Please try again.';
+        this.errorMessage = error.error?.message
       }
     });
   }

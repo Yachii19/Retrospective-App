@@ -53,5 +53,14 @@ export const routes: Routes = [
                 (m) => m.SessionDetailsComponent
             )
         }
+    },
+    {
+        path: '**',
+        pathMatch: 'full',
+        loadComponent: () => {
+            return import('./pages/not-found/not-found.component').then(
+                (m) => m.NotFoundComponent
+            );
+        }
     }
 ];

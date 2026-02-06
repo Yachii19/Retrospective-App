@@ -1,0 +1,74 @@
+<div class="session-grid">
+    <div class="session-content" *ngFor="let section of session?.sections">
+        <div class="section-header">
+            <span class="material-icons">
+                {{ 
+                    section.key === 'went-well' ? 'sentiment_satisfied'
+                    : section.key === 'needs-improvement' ? 'build_circle'
+                    : 'adjust' 
+                }}
+            </span>
+            {{section.title}}
+        </div>
+
+        <div class="feedback-list">
+            <div *ngFor="let feedback of sessionFeedbacks[section.key]">
+                <div class="feedback-item">
+                    <div class="feedback-header">
+                        <span class="username">{{feedback.feedbackPoster.username}}</span>
+                        <span class="votes" (click)="addVote(feedback._id, section.key)" [class.voted]="hasUserVoted(feedback)">
+                            <span class="material-icons">{{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}</span>
+                            {{feedback.votes}}
+                        </span>
+                    </div>
+                    <ul>
+                        <li *ngFor="let item of feedback.sections[0]?.items">
+                           {{item}}
+                        </li>
+                    </ul>
+
+                    <!-- Voters Tooltip -->
+                    <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
+                        <div class="voter-list">
+                             <div *ngFor="let voter of feedback.votedBy">
+                                <span class="material-symbols-outlined">
+                                    account_circle
+                                </span>
+                                <span class="name">
+                                    {{voter.username}}
+                                </span>
+                                
+                            </div>
+                        </div>
+                           
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- No feedback message -->
+            <div class="no-feedback" *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
+                
+                <span class="material-icons empty-icon">comment</span>
+                <p>No feedback yet. Be the first to contribute!</p>
+            </div>
+        </div>
+
+         <!-- Add Feedback Section -->
+        <div class="input-section">
+            <input 
+                type="text" 
+                [id]="'feedback_input_' + section.key" 
+                [name]="'feedback_input_' + section.key" 
+                [(ngModel)]="feedbackInputs[section.key]"
+                placeholder="Share your thoughts..."
+                (input)="onInputChange()">
+            <button (click)="addFeedback(section.key)">Submit</button>
+        </div>
+        
+        <!-- Error message -->
+        <div class="error-message" *ngIf="showError">
+            {{errorMessage}}
+        </div>
+    </div>
+</div>

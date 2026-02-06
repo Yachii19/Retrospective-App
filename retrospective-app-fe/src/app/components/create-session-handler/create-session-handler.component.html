@@ -20,6 +20,7 @@
                 [(ngModel)]="sessionName"
                 placeholder="Enter session name (e.g., Sprint 24 Retro)"
                 (input)="onInputChange()"
+                (keyup.enter)="createSession()"
                 required>
         </div>
 

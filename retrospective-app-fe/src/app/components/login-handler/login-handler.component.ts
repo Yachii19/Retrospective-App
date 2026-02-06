@@ -18,6 +18,7 @@ export class LoginHandlerComponent {
   showError: boolean = false;
   errorMessage: string = '';
   isLoginMode: boolean = true;
+  isLoading: boolean = false;
 
   constructor(
     private router: Router,
@@ -45,13 +46,15 @@ export class LoginHandlerComponent {
       return;
     }
 
+    this.isLoading = true;
+
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
-        console.log('Login successful:', response);
-        this.router.navigate(['/dashboard']); // or wherever you want to navigate
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
-        console.error('Login failed:', error);
+        this.isLoading = false;
         this.showError = true;
         this.errorMessage = error.error?.message || 'Login failed. Please try again.';
       }
@@ -59,20 +62,26 @@ export class LoginHandlerComponent {
   }
 
   signUp():void {
-    // Validate inputs
     if (!this.username.trim() || !this.email.trim() || !this.password.trim()) {
       this.showError = true;
       this.errorMessage = 'Username, email, and password are required';
       return;
     }
 
+    this.isLoading = true;
+
     this.authService.register(this.username, this.email, this.password).subscribe({
       next: (response) => {
         console.log('Registration successful:', response);
-        this.router.navigate(['/dashboard']); // or wherever you want to navigate
+        console.log('User:', this.authService.getUser());
+        console.log('Token stored:', this.authService.getToken());
+        
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         console.error('Registration failed:', error);
+        this.isLoading = false;
         this.showError = true;
         this.errorMessage = error.error?.message || 'Registration failed. Please try again.';
       }

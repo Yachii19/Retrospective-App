@@ -10,7 +10,8 @@
             id="username" 
             [(ngModel)]="username" 
             (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()">
+            (input)="onInputChange()"
+            [disabled]="isLoading">
     </div>
 
     <div class="input-1">
@@ -20,7 +21,8 @@
             id="email" 
             [(ngModel)]="email" 
             (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()">
+            (input)="onInputChange()"
+            [disabled]="isLoading">
     </div>
 
     <div class="input-1">
@@ -30,18 +32,19 @@
             id="password" 
             [(ngModel)]="password" 
             (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()">
+            (input)="onInputChange()"
+            [disabled]="isLoading">
     </div>
 
     <span class="error-message" *ngIf="showError">{{ errorMessage }}</span>
 
-    <button (click)="handleSubmit()">
-        {{ isLoginMode ? 'Sign In' : 'Sign Up' }}
+    <button (click)="handleSubmit()" [disabled]="isLoading">
+        {{ isLoading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Sign Up') }}
     </button>
 
     <p class="toggle-mode">
         {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
-        <a (click)="toggleMode()">
+        <a (click)="toggleMode()" *ngIf="!isLoading">
             {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
         </a>
     </p>

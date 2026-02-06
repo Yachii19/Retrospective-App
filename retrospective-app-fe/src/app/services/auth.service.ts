@@ -1,56 +1,96 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
-import { LoginResponse, RegisterResponse, User } from '../models/user.model';
+import { Router } from '@angular/router';
+import { AuthResponse } from '../models/user.model';
+
+// Simple interfaces that match backend response
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  // Backend URL
+  private apiUrl = 'http://localhost:3000/api/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
 
-  register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/register`, { username, email, password }).pipe(
+  // Register new user
+  register(username: string, email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { 
+      username, 
+      email, 
+      password,
+      
+    }).pipe(
       tap(response => {
-        localStorage.setItem('user', JSON.stringify(response.data));
-        localStorage.setItem('username', response.data.username);
-        localStorage.setItem('email', response.data.email);
+        // Save token and user data to localStorage
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        console.log('Token saved:', response.token);
       })
     );
   }
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
+  // Login existing user
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { 
+      email, 
+      password 
+    }).pipe(
       tap(response => {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('username', response.data.user.username);
-        localStorage.setItem('email', response.data.user.email);
+        // Save token and user data to localStorage
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        console.log('Token saved:', response.token);
       })
     );
   }
 
-  getUsername(): string | null {
-    return localStorage.getItem('username');
-  }
-
-  getEmail(): string | null {
-    return localStorage.getItem('email');
-  }
-
-  getUser(): User | null {
+  // Get current user from localStorage
+  getUser() {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  isLoggedIn(): boolean {
-    return !!this.getUsername();
+  // Get username
+  getUsername(): string | null {
+    const user = this.getUser();
+    return user ? user.username : null;
   }
 
+  // Get email
+  getEmail(): string | null {
+    const user = this.getUser();
+    return user ? user.email : null;
+  }
+
+  // Get token
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  // Get authorization headers with token
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+  }
+
+  // Check if user is logged in
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  // Logout user
   logout(): void {
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.router.navigate(['/login']);
   }
 }

@@ -65,7 +65,7 @@ export class SessionCardsComponent {
     this.joiningSessionId = sessionId;
 
     // Auto-join the session
-    this.sessionService.joinSession(sessionId, email, username).subscribe({
+    this.sessionService.joinSession(sessionId).subscribe({
       next: (response) => {
         console.log('Successfully joined session:', response);
         this.joiningSessionId = null;

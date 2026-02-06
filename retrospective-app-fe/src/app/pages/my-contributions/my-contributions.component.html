@@ -1,55 +1,197 @@
 <div class="contribution-container">
     <app-sidebar/>
     <div class="main-content">
-        <h1>My Feedbacks</h1>
-        <div class="feedbacks-container" *ngIf="userFeedbacks.length > 0; else noFeedbacks">
-            <div class="feedback-card" *ngFor="let feedback of userFeedbacks; let i = index" (click)="viewSession(feedback.sessionId)">
-                <div class="feedback-header">
-                    <div class="feedback-meta">
-                        <span class="material-icons user-icon">account_circle</span>
-                        <div class="user-info">
-                            <h3>{{ feedback.username }}</h3>
-                            <p class="session-name">
-                                <span class="material-icons">event_note</span>
-                                Session #{{ feedback.sessionId }}
-                            </p>
-                        </div>
-                    </div>
-                    <span class="feedback-time">
-                        <span class="material-icons">schedule</span>
-                        {{ feedback.createdAt | date: 'medium' }}
-                    </span>
-                </div>
-                
-                <div class="feedback-content" *ngFor="let sectionItem of userFeedbacks[i].sections">
-                    <div class="feedback-section" *ngIf="sectionItem.items?.length">
-                        <div class="feedback-type type-went-well">
-                        <span class="material-icons"> 
-                            {{ 
-                                sectionItem.key === 'went-well' ? 'sentiment_satisfied'
-                                : sectionItem.key === 'needs-improvement' ? 'build_circle'
-                                : 'adjust' 
-                            }}
-                        </span>
-                        <span class="type-label">{{sectionItem.title}}</span>
-                        </div>
-        
-                        <ul class="feedback-list">
-                            <li *ngFor="let item of sectionItem.items">{{item}}</li>
-                        </ul>
-   
-                    </div>
-                </div>
-
+        <!-- My Sessions Column -->
+        <div class="section-wrapper">
+            <div class="section-header">
+                <h1>
+                    <span class="material-icons">event</span>
+                    My Sessions
+                </h1>
+                <span class="count-badge">{{ userSessions.length }}</span>
             </div>
+
+            <div class="cards-column" *ngIf="userSessions.length > 0; else noSessions">
+                <div class="card session-card" *ngFor="let session of userSessions" 
+                        (click)="viewSession(session._id)">
+            
+                    <div class="card-header">
+                        <div class="user-info">
+                            <div class="avatar-wrapper">
+                                <span class="material-icons avatar-icon">account_circle</span>
+                            </div>
+                            <div class="user-details">
+                                <h3 class="user-name">{{ session.createdBy.username }}</h3>
+                                <div class="timestamp">
+                                    <span class="material-icons">schedule</span>
+                                    <span>{{ session.createdAt | date: 'MMM d, y, h:mm a' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">event_note</span>
+                                <span>Session Name</span>
+                            </div>
+                            <div class="info-value session-title">{{ session.sessionName }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">tag</span>
+                                <span>Session ID</span>
+                            </div>
+                            <div class="info-value">#{{ session._id?.slice(-8) }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">groups</span>
+                                <span>Team</span>
+                            </div>
+                            <div class="info-value">{{ session.team || 'No team assigned' }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">people</span>
+                                <span>Members</span>
+                            </div>
+                            <div class="info-value">{{ session.members?.length || 0 }} members</div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="action-button">
+                            <span class="material-icons">settings</span>
+                            Manage Session
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #noSessions>
+                <div class="empty-state">
+                    <span class="material-icons empty-icon">event</span>
+                    <h3>No sessions available</h3>
+                    <small>Create your first retrospective session to get started</small>
+                </div>
+            </ng-template>
+        </div>
+
+        <!-- My Feedbacks Column -->
+        <div class="section-wrapper">
+            <div class="section-header">
+                <h1>
+                    <span class="material-icons">comment</span>
+                    My Feedbacks
+                </h1>
+                <span class="count-badge">{{ feedbackCount }}</span>
+            </div>
+
+            <div class="cards-column" *ngIf="userFeedbacks.length > 0; else noFeedbacks">
+                <!-- Loop through each session group -->
+                <div class="card feedback-card" *ngFor="let sessionGroup of userFeedbacks" 
+                        (click)="viewSession(sessionGroup._id)">
+                    <div class="card-header">
+                        <div class="user-info">
+                            <div class="avatar-wrapper">
+                                <span class="material-icons avatar-icon">account_circle</span>
+                            </div>
+                            <div class="user-details">
+                                <h3 class="user-name">{{ sessionGroup.feedbacks[0].feedbackPoster.username }}</h3>
+                                <div class="timestamp">
+                                    <span class="material-icons">schedule</span>
+                                    <span>{{ sessionGroup.feedbacks[0]?.createdAt | date: 'MMM d, y, h:mm a' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">event_note</span>
+                                <span>Session Name</span>
+                            </div>
+                            <div class="info-value session-title">{{ sessionGroup.sessionName }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">groups</span>
+                                <span>Team</span>
+                            </div>
+                            <div class="info-value">{{ sessionGroup.team || 'No team assigned' }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">tag</span>
+                                <span>Session ID</span>
+                            </div>
+                            <div class="info-value">#{{ sessionGroup._id?.slice(-8) }}</div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="info-label">
+                                <span class="material-icons">comment</span>
+                                <span>Total Feedbacks</span>
+                            </div>
+                            <div class="info-value">{{ sessionGroup.feedbacks.length }} feedback(s)</div>
+                        </div>
+
+                        <div class="feedback-content">
+                            <div class="content-header">
+                                <span class="material-icons">rate_review</span>
+                                <span>All Feedback Details</span>
+                            </div>
+                            
+                            <div class="feedback-sections">
+                                <!-- Dynamically render all sections -->
+                                <div class="section-item" 
+                                     *ngFor="let section of getAllSections(sessionGroup)"
+                                     [hidden]="getItemsBySection(sessionGroup, section.key).length === 0">
+                                    <div class="section-content">
+                                        <div class="section-badge">
+                                            <span class="material-icons badge-icon">
+                                                {{ getSectionIcon(section.key) }}
+                                            </span>
+                                            <span class="badge-label">{{ section.title }}</span>
+                                            <span class="badge-count">{{ getItemsBySection(sessionGroup, section.key).length }}</span>
+                                        </div>
+                                        <ul class="items-list">
+                                            <li *ngFor="let item of getItemsBySection(sessionGroup, section.key)" class="list-item">
+                                                <span class="bullet"></span>
+                                                <span class="item-text">{{ item }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="action-button">
+                            <span class="material-icons">visibility</span>
+                            View Full Session
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Feedbacks Template -->
+            <ng-template #noFeedbacks>
+                <div class="empty-state">
+                    <span class="material-icons empty-icon">comment</span>
+                    <h3>No feedbacks available</h3>
+                    <small>Your feedback contributions will appear here</small>
+                </div>
+            </ng-template>
         </div>
     </div>
-    
 </div>
-<ng-template #noFeedbacks>
-    <div class="no-feedbacks">
-        <span class="material-icons">feedback</span>
-        <p>No feedbacks available</p>
-        <small>Your contributions will appear here</small>
-    </div>
-</ng-template>

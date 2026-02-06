@@ -1,49 +1,49 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { RetroSession, Member, RetroSection } from '../models/session.model';
+import { RetroSection, SessionResponse, CreateSessionResponse, JoinSessionResponse } from '../models/session.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  private apiUrl = 'http://localhost:3000/sessions'
+  private apiUrl = 'http://localhost:3000/api/sessions'
 
   constructor(private http: HttpClient) {}
 
-  createSession(sessionName: string, team: string, createdBy: string | null, sections: RetroSection[]): Observable<RetroSession> {
-    return this.http.post<RetroSession>(`${this.apiUrl}/`, { sessionName, team, createdBy, sections });
+  createSession(sessionName: string, team: string, sections?: RetroSection[]): Observable<CreateSessionResponse> {
+    return this.http.post<CreateSessionResponse>(`${this.apiUrl}/`, { sessionName, team, sections });
   }
 
-  getAllSessions(): Observable<{ message: string, data: RetroSession[] }> {
-    return this.http.get<{ message: string, data: RetroSession[] }>(`${this.apiUrl}/`);
+  getAllSessions(): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/`);
   }
 
-  getSessionById(sessionId: string): Observable<{ message: string, data: RetroSession }> {
-    return this.http.get<{ message: string, data: RetroSession }>(`${this.apiUrl}/${sessionId}`);
+  getSessionById(sessionId: string): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/${sessionId}`);
   }
 
-  getSessionsByTeam(team: string): Observable<{ message: string, data: RetroSession[] }> {
-    return this.http.get<{ message: string, data: RetroSession[] }>(`${this.apiUrl}/team/${team}`);
+  getSessionsByTeam(team: string): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/team/${team}`);
   }
 
-  joinSession(sessionId: string, email: string, username: string): Observable<{ message: string, data: RetroSession }> {
-    return this.http.post<{ message: string, data: RetroSession }>(`${this.apiUrl}/${sessionId}/join`, { email, username });
+  joinSession(sessionId: string): Observable<JoinSessionResponse> {
+    return this.http.patch<JoinSessionResponse>(`${this.apiUrl}/${sessionId}/join`, {});
   }
 
-  leaveSession(sessionId: string, email: string): Observable<{ message: string, data: RetroSession }> {
-    return this.http.post<{ message: string, data: RetroSession }>(`${this.apiUrl}/${sessionId}/leave`, { email });
+  leaveSession(sessionId: string): Observable<SessionResponse> {
+    return this.http.post<SessionResponse>(`${this.apiUrl}/${sessionId}/leave`, {});
   }
 
-  getSessionMembers(sessionId: string): Observable<{ message: string, data: Member[] }> {
-    return this.http.get<{ message: string, data: Member[] }>(`${this.apiUrl}/${sessionId}/members`);
+  getSessionMembers(sessionId: string): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/${sessionId}/members`);
   }
 
-  getUserSessions(email: string): Observable<{ message: string, data: RetroSession[] }> {
-    return this.http.get<{ message: string, data: RetroSession[] }>(`${this.apiUrl}/user/${email}/sessions`);
+  getUserSessions(): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(`${this.apiUrl}/user/sessions`);
   }
 
-  generateSessionFile(sessionId: string): Observable<{ message: string, fileName: string }> {
-    return this.http.post<{ message: string, fileName: string }>(`${this.apiUrl}/${sessionId}/generate`, {});
+  generateSessionFile(sessionId: string): Observable<SessionResponse> { 
+    return this.http.post<SessionResponse>(`${this.apiUrl}/${sessionId}/generate`, {});
   }
 }

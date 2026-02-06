@@ -2,23 +2,24 @@
     <app-sidebar/>
     <div class="main-content">
         <header>
-            <h1>Welcome, {{ username }}!</h1>
+            <h1>Welcome back, {{ username }}!</h1>
+            <p>Let's make your next retrospective session productive</p>
         </header>
 
         <div class="quick-actions">
             <button [routerLink]="['/create-session']" class="action-card create">
-                <span class="material-symbols-outlined">
-                    add_box
-                </span>
+                <div class="icon-wrapper">
+                    <span class="material-symbols-outlined">add_box</span>
+                </div>
                 <h3>Create New Session</h3>
-                <p>Start a new retrospective</p>
+                <p>Start a fresh retrospective session for your team</p>
             </button>
             <button [routerLink]="['/all-sessions']" class="action-card join">
-                <span class="material-symbols-outlined">
-                    add_link
-                </span>
+                <div class="icon-wrapper">
+                    <span class="material-symbols-outlined">add_link</span>
+                </div>
                 <h3>Join Session</h3>
-                <p>Browse and join sessions</p>
+                <p>Browse available sessions and collaborate with your team</p>
             </button>
         </div>
 

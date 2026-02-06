@@ -1,14 +1,47 @@
 <div class="sessions-grid" *ngIf="recentSessions.length > 0; else noSessions">
     <div class="session-card" *ngFor="let session of recentSessions"
-            (click)="viewSession(session.sessionId)">
-        <h3>{{ session.sessionName }}</h3>
-        <p class="team" *ngIf="session.team">{{ session.team }}</p>
-        <p class="date">{{ session.createdAt | date: 'medium' }}</p>
+            (click)="viewSession(session._id)">
+        <div class="card-header">
+            <h3>{{ session.sessionName }}</h3>
+            <span class="team-badge">
+                {{ session.team }}
+            </span>
+        </div>
+        
+        <div class="card-body">
+            <div class="info-row">
+                <span class="material-icons">person</span>
+                <span class="info-text">Created by <strong>{{ session.createdBy.username }}</strong></span>
+            </div>
+            
+            <div class="info-row">
+                <span class="material-icons">group</span>
+                <span class="info-text">{{ session.members.length }} {{ session.members.length === 1 ? 'member' : 'members' }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="material-icons">event</span>
+                <span class="info-text">{{ session.createdAt | date: 'MMM d, y, h:mm a' }}</span>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+            <div class="sections-preview">
+                <span class="material-icons">list</span>
+                <span>{{ session.sections.length }} section{{ session.sections.length === 1 ? '' : 's' }}</span>
+            </div>
+            <button class="view-btn">
+                <span>View Session</span>
+                <span class="material-icons">arrow_forward</span>
+            </button>
+        </div>
     </div>
 </div>
+
 <ng-template #noSessions>
     <div class="no-sessions">
-        <span class="material-icons">inbox</span>
+        <span class="material-icons">event</span>
         <p>No sessions available</p>
+        <small>Create your first retrospective session to get started</small>
     </div>
 </ng-template>

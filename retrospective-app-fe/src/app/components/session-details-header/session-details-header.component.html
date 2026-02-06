@@ -1,0 +1,38 @@
+<div class="session-header">
+    <div class="header-left">
+        <button class="home-btn" (click)="goHome()">
+            <span class="material-symbols-outlined">home</span>
+        </button>
+        <h1>{{session?.sessionName}}</h1>
+    </div>
+
+    <div class="header-right">
+        <button class="export-btn" (click)="export()">
+            <span class="material-symbols-outlined">save</span>
+            Export
+        </button>
+
+        <div class="members-badge">
+            <div class="icon-wrapper">
+                <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="count-wrapper">
+                <span class="label">Members</span>
+                <span class="count">{{membersCount}}</span>
+            </div>
+
+            <div>s
+            </div>
+
+            <div class="header-tooltip" *ngIf="session?.members && session.members.length > 0">
+                <div class="tooltip-header">Team Members</div>
+                <ul class="member-list">
+                    <li *ngFor="let member of session.members">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="member-name">{{member.username}}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

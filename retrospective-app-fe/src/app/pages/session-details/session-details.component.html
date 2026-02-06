@@ -1,57 +1,7 @@
 <div class="session-details-container">
     <div class="main-content">
-        <div class="session-header">
-            <div class="header-left">
-                <button class="home-btn" (click)="goHome()">
-                    <span class="material-symbols-outlined">home</span>
-                </button>
-                <h1>{{session?.sessionName}}</h1>
-            </div>
+        <app-session-details-header/>
 
-            <button class="export-btn">
-                <span class="material-symbols-outlined">save</span>
-                Export
-            </button>
-        </div>
-
-        <div class="session-grid">
-            <div class="session-content" *ngFor="let section of session?.sections">
-                <div class="section-header">
-                    <span class="material-icons">
-                        {{ 
-                            section.key === 'went-well' ? 'sentiment_satisfied'
-                            : section.key === 'needs-improvement' ? 'build_circle'
-                            : 'adjust' 
-                        }}
-                    </span>
-                    {{section.title}}
-                </div>
-
-                <div class="section-content">
-                    <!-- Display feedbacks for this section -->
-                    <div class="feedback-item" *ngFor="let feedback of getSectionFeedbacks(section.key)">
-                        <div class="feedback-header">
-                            <span class="username">{{ feedback.username }}</span>
-                            <span class="votes">👍 {{ feedback.votes }}</span>
-                        </div>
-                        <ul>
-                            <li *ngFor="let item of getItemsForSection(feedback, section.key)">
-                                {{ item }}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- No feedback message -->
-                    <div class="no-feedback" *ngIf="getSectionFeedbacks(section.key).length === 0">
-                        <p>No feedback yet</p>
-                    </div>
-
-                    <!-- Add Feedback Section -->
-                    <button>
-                        Submit
-                    </button>
-                </div>
-            </div>
-        </div>
+        <app-session-details-handler/>
     </div>
 </div>
