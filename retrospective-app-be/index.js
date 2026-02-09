@@ -14,7 +14,8 @@ app.use(
   cors({
     origin: [
         'http://localhost:4200',
-        'https://csx-retrospective-app.vercel.app'
+        'https://csx-retrospective-app.vercel.app',
+        'https://cs-retrospective-app.vercel.app'
     ],
     credentials: true,
   })
