@@ -44,7 +44,7 @@
                                 <span class="material-icons">tag</span>
                                 <span>Session ID</span>
                             </div>
-                            <div class="info-value">#{{ session._id?.slice(-8) }}</div>
+                            <div class="info-value">#{{ session._id.slice(-8) }}</div>
                         </div>
 
                         <div class="info-section">
@@ -60,7 +60,7 @@
                                 <span class="material-icons">people</span>
                                 <span>Members</span>
                             </div>
-                            <div class="info-value">{{ session.members?.length || 0 }} members</div>
+                            <div class="info-value">{{ session.members.length || 0 }} members</div>
                         </div>
                     </div>
 
@@ -105,7 +105,7 @@
                                 <h3 class="user-name">{{ sessionGroup.feedbacks[0].feedbackPoster.username }}</h3>
                                 <div class="timestamp">
                                     <span class="material-icons">schedule</span>
-                                    <span>{{ sessionGroup.feedbacks[0]?.createdAt | date: 'MMM d, y, h:mm a' }}</span>
+                                    <span>{{ sessionGroup.feedbacks[0].createdAt | date: 'MMM d, y, h:mm a' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                                 <span class="material-icons">tag</span>
                                 <span>Session ID</span>
                             </div>
-                            <div class="info-value">#{{ sessionGroup._id?.slice(-8) }}</div>
+                            <div class="info-value">#{{ sessionGroup._id.slice(-8) }}</div>
                         </div>
 
                         <div class="info-section">
