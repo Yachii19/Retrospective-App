@@ -58,12 +58,18 @@ export class MyContributionsComponent {
     })
   }
 
+
+
   loadFeedbacks(): void {
     this.feedbackService.getFeedbackByUser().subscribe({
       next: (response) => {
         console.log('Feedbacks response:', response.data);
         if(Array.isArray(response.data)) {
           this.userFeedbacks = response.data;
+
+          this.userFeedbacks.forEach(sessionGroup => {
+            this.feedbackCount += sessionGroup.feedbacks.length
+          });
         } else {
           this.userFeedbacks = [];
         }
