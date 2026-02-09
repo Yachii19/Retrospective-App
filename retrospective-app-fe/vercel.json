@@ -1,4 +1,9 @@
 {
+  "buildCommand": "ng build --configuration production",
+  "outputDirectory": "dist/retrospective-app-fe/browser",
+  "devCommand": "ng serve",
+  "installCommand": "npm install",
+  "framework": "angular",
   "rewrites": [
     {
       "source": "/(.*)",
