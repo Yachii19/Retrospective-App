@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../models/user.model';
+import { environment } from '../../environments/environment';
 
 // Simple interfaces that match backend response
 
@@ -10,13 +11,15 @@ import { AuthResponse } from '../models/user.model';
   providedIn: 'root'
 })
 export class AuthService {
-  // Backend URL
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = `${environment.apiBaseUrl}/auth`;
 
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) {
+    console.log('Auth Service initialized with API URL:', this.apiUrl);
+    console.log('Environment:', environment.production ? 'Production' : 'Development');
+  }
 
   // Register new user
   register(username: string, email: string, password: string): Observable<AuthResponse> {
@@ -24,7 +27,6 @@ export class AuthService {
       username, 
       email, 
       password,
-      
     }).pipe(
       tap(response => {
         // Save token and user data to localStorage
