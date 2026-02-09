@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { RetroSession } from '../models/session.model';
 import { RetroFeedback } from '../models/feedback.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RetrospectiveService {
-  private apiUrl = 'http://localhost:3000/sessions';
+  private apiUrl = `${environment.apiBaseUrl}`;
 
   constructor(private http: HttpClient) {};
 

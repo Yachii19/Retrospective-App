@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse, UpdateActionItemsRequest } from '../models/feedback.model';
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FeedbackService {
-  private apiUrl = 'http://localhost:3000/api/feedback';
+  private apiUrl = `${environment.apiBaseUrl}/feedback`;
 
   constructor(private http: HttpClient) {};
 

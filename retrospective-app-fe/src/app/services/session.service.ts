@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { RetroSection, SessionResponse, CreateSessionResponse, JoinSessionResponse } from '../models/session.model';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionService {
-  private apiUrl = 'http://localhost:3000/api/sessions'
+  private apiUrl = `${environment.apiBaseUrl}/sessions`
 
   constructor(private http: HttpClient) {}
 
