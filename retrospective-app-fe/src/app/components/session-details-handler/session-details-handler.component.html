@@ -19,37 +19,120 @@
                         <span class="votes" (click)="addVote(feedback._id, section.key)" [class.voted]="hasUserVoted(feedback)">
                             <span class="material-icons">{{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}</span>
                             {{feedback.votes}}
+                         
+                            <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
+                                <div class="voter-list">
+                                    <div *ngFor="let voter of feedback.votedBy">
+                                        <span class="material-symbols-outlined">account_circle</span>
+                                        <span class="name">{{voter.username}}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </span>
                     </div>
                     <ul>
-                        <li *ngFor="let item of feedback.sections[0]?.items">
+                        <li *ngFor="let item of getSectionItems(feedback, section.key)">
                            {{item}}
                         </li>
                     </ul>
+                    
+                    <!-- Action Items Section -->
+                    <div class="action-items-section" *ngIf="shouldShowActionItems(feedback, section.key)">
+                        <div class="action-item-boxes">
+                            <!-- Status Box with Toggle -->
+                            <div class="action-box status-box">
+                                <button 
+                                    class="status-toggle"
+                                    [class.open]="getSectionActionItems(feedback, section.key)?.status === 'Open'"
+                                    [class.closed]="getSectionActionItems(feedback, section.key)?.status === 'Closed'"
+                                    [disabled]="!isSessionCreator"
+                                    (click)="toggleActionItemStatus(feedback._id, section.key)">
+                                    <span class="material-icons">
+                                        {{ getSectionActionItems(feedback, section.key)?.status === 'Open' ? 'lock_open' : 'lock' }}
+                                    </span>
+                                    {{ getSectionActionItems(feedback, section.key)?.status }}
+                                </button>
+                            </div>
 
-                    <!-- Voters Tooltip -->
-                    <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
-                        <div class="voter-list">
-                             <div *ngFor="let voter of feedback.votedBy">
-                                <span class="material-symbols-outlined">
-                                    account_circle
-                                </span>
-                                <span class="name">
-                                    {{voter.username}}
-                                </span>
-                                
+                            <!-- Assignee Box -->
+                            <div class="action-box assignee-box">
+                                <div class="assignee-content">
+                                    <div class="assignee-display" *ngIf="!isSessionCreator || !editingAssignee[feedback._id + section.key]">
+                                        <span class="material-icons">person</span>
+                                        <span class="assignee-name">
+                                            {{getSectionActionItems(feedback, section.key)?.assignee || 'Not assigned'}}
+                                        </span>
+                                        <button 
+                                            *ngIf="isSessionCreator"
+                                            class="edit-btn-icon"
+                                            (click)="startEditAssignee(feedback._id, section.key)">
+                                            <span class="material-icons">edit</span>
+                                        </button>
+                                    </div>
+                                    <div *ngIf="isSessionCreator && editingAssignee[feedback._id + section.key]" class="edit-dropdown">
+                                        <span class="material-icons">person</span>
+                                        <select 
+                                            class="assignee-select"
+                                            [(ngModel)]="tempAssignee[feedback._id + section.key]">
+                                            <option [value]="''">Not assigned</option>
+                                            <option *ngFor="let member of session?.members" [value]="member.sessionMember.username">
+                                                {{member.sessionMember.username}}
+                                            </option>
+                                        </select>
+                                        <div class="edit-actions-inline">
+                                            <button class="save-btn-small" (click)="saveAssignee(feedback._id, section.key)">
+                                                <span class="material-icons">check</span>
+                                            </button>
+                                            <button class="cancel-btn-small" (click)="cancelEdit(feedback._id, section.key, 'assignee')">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Due Date Box -->
+                            <div class="action-box duedate-box">
+                                <div class="duedate-content">
+                                    <div class="duedate-display" *ngIf="!isSessionCreator || !editingDueDate[feedback._id + section.key]">
+                                        <span class="material-icons">event</span>
+                                        <span class="due-date">
+                                            {{getSectionActionItems(feedback, section.key)?.dueDate ? (getSectionActionItems(feedback, section.key)?.dueDate | date:'MMM d, y') : 'Not set'}}
+                                        </span>
+                                        <button 
+                                            *ngIf="isSessionCreator"
+                                            class="edit-btn-icon"
+                                            (click)="startEditDueDate(feedback._id, section.key)">
+                                            <span class="material-icons">edit</span>
+                                        </button>
+                                    </div>
+                                    <div *ngIf="isSessionCreator && editingDueDate[feedback._id + section.key]" class="edit-date">
+                                        <span class="material-icons">event</span>
+                                        <input 
+                                            type="date"
+                                            class="date-input"
+                                            [(ngModel)]="tempDueDate[feedback._id + section.key]"
+                                            (keyup.enter)="saveDueDate(feedback._id, section.key)"
+                                            (keyup.escape)="cancelEdit(feedback._id, section.key, 'dueDate')">
+                                        <div class="edit-actions-inline">
+                                            <button class="save-btn-small" (click)="saveDueDate(feedback._id, section.key)">
+                                                <span class="material-icons">check</span>
+                                            </button>
+                                            <button class="cancel-btn-small" (click)="cancelEdit(feedback._id, section.key, 'dueDate')">
+                                                <span class="material-icons">close</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                           
-                        
                     </div>
                 </div>
             </div>
 
             <!-- No feedback message -->
             <div class="no-feedback" *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
-                
-                <span class="material-icons empty-icon">comment</span>
+                <span class="material-icons">comment</span>
                 <p>No feedback yet. Be the first to contribute!</p>
             </div>
         </div>
@@ -62,12 +145,14 @@
                 [name]="'feedback_input_' + section.key" 
                 [(ngModel)]="feedbackInputs[section.key]"
                 placeholder="Share your thoughts..."
+                (keyup.enter)="addFeedback(section.key)"
                 (input)="onInputChange()">
             <button (click)="addFeedback(section.key)">Submit</button>
         </div>
         
         <!-- Error message -->
         <div class="error-message" *ngIf="showError">
+            <span class="material-icons">error</span>
             {{errorMessage}}
         </div>
     </div>

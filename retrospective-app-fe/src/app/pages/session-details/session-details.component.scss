@@ -1,13 +1,23 @@
 .session-details-container {
-    display: flex;
-    justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-    padding-bottom: 2rem;
+    background: #f5f7fa;
+    padding: 2rem 0;
 
     .main-content {
-        width: 90%;
-        padding: 2rem;
-        max-width: 1400px;
+        width: 95%;
+        max-width: 1700px;
+        margin: 0 auto;
+        padding: 0 1rem; 
+    }
+}
+
+@media (max-width: 768px) {
+    .session-details-container {
+        padding: 1rem 0;
+
+        .main-content {
+            width: 95%;
+            padding: 0 0.5rem;
+        }
     }
 }

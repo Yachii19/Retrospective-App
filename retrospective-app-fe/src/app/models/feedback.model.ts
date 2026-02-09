@@ -27,10 +27,10 @@ export interface FeedbackSection {
   key: string;
   title: string;
   items: string[];
-  actionItems?: ActionItem;
+  actionItems: ActionItems;
 }
 
-export interface ActionItem {
+export interface ActionItems {
   status: 'Open' | 'Closed';
   assignee: string | null;
   dueDate: string | null;
@@ -60,4 +60,10 @@ export interface AddFeedbackRequest {
 
 export interface ToggleVisibilityRequest {
   key: string;
+}
+
+export interface UpdateActionItemsRequest {
+  key: string;
+  assignee?: string | null;
+  dueDate?: string | null;
 }

@@ -87,6 +87,17 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  // Check user sessions ID
+  isCreator(creatorId: string | undefined): boolean {
+    const user = this.getUser();
+    if(user._id === creatorId) {
+      console.log(creatorId);
+      return true;
+    } else {
+      return false
+    }
+  }
+
   // Logout user
   logout(): void {
     localStorage.removeItem('token');

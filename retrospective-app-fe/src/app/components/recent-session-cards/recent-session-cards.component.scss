@@ -74,6 +74,9 @@
 
                 .info-text {
                     line-height: 1.4;
+                    overflow: hidden;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
 
                     strong {
                         color: #2c3e50;

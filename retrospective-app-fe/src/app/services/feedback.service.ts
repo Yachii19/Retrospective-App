@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse } from '../models/feedback.model';
+import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse, UpdateActionItemsRequest } from '../models/feedback.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,9 +34,8 @@ export class FeedbackService {
     return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/unvote`, {});
   }
 
-
   toggleFeedbackVisibility(feedbackId: string, data: ToggleVisibilityRequest): Observable<FeedbackResponse> {
-    return this.http.put<{ message: string, data: RetroFeedback }>(
+    return this.http.patch<{ message: string, data: RetroFeedback }>(
       `${this.apiUrl}/${feedbackId}/toggle-visibility`,
       data
     );
@@ -44,5 +43,9 @@ export class FeedbackService {
 
   getFeedbackById(feedbackId: string): Observable<FeedbackResponse> {
     return this.http.get<FeedbackResponse>(`${this.apiUrl}/${feedbackId}`);
+  }
+
+  updateActionItems(feedbackId: string, data: UpdateActionItemsRequest): Observable<FeedbackResponse> {
+    return this.http.patch<FeedbackResponse>(`http://localhost:3000/api/feedback/${feedbackId}/action-items`, data);
   }
 }

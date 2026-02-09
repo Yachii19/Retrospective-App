@@ -1,4 +1,4 @@
-<div class="session-header">
+<div class="session-header" [class.scrolled]="isScrolled">
     <div class="header-left">
         <button class="home-btn" (click)="goHome()">
             <span class="material-symbols-outlined">home</span>
@@ -7,7 +7,7 @@
     </div>
 
     <div class="header-right">
-        <button class="export-btn" (click)="export()">
+        <button class="export-btn" (click)="export()" *ngIf="creator">
             <span class="material-symbols-outlined">save</span>
             Export
         </button>
@@ -21,18 +21,18 @@
                 <span class="count">{{membersCount}}</span>
             </div>
 
-            <div>s
-            </div>
-
-            <div class="header-tooltip" *ngIf="session?.members && session.members.length > 0">
+             <div class="header-tooltip" *ngIf="session && session.members && session.members.length > 0">
                 <div class="tooltip-header">Team Members</div>
                 <ul class="member-list">
-                    <li *ngFor="let member of session.members">
-                        <span class="material-symbols-outlined">person</span>
-                        <span class="member-name">{{member.username}}</span>
+                    <li *ngFor="let member of session.members" [class.creator]="isMemberCreator(member.sessionMember._id)">
+                        <span class="material-symbols-outlined member-icon">
+                            {{ isMemberCreator(member.sessionMember._id) ? 'workspace_premium' : 'account_circle' }}
+                        </span>
+                        <span class="member-name">{{member.sessionMember.username}}
+                             <small *ngIf="isMemberCreator(member.sessionMember._id)">(Creator)</small>
+                        </span>
                     </li>
                 </ul>
             </div>
         </div>
-    </div>
 </div>
