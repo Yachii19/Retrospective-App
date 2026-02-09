@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../models/user.model';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/environment.development';
 
 // Simple interfaces that match backend response
 
