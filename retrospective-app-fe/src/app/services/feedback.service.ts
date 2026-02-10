@@ -28,6 +28,10 @@ export class FeedbackService {
     return this.http.get<{message: string, data: RetroFeedback[]}>(`${this.apiUrl}/${sessionId}/section/${sectionKey}`);
   }
 
+  getFilteredFeedbacksByMember(sessionId: string, memberId: string): Observable<FeedbackResponse> {
+    return this.http.get<FeedbackResponse>(`${this.apiUrl}/session/${sessionId}/filter/${memberId}`);
+  }
+
   voteFeedback(feedbackId: string): Observable<FeedbackResponse> {
     return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/vote`, {});
   }

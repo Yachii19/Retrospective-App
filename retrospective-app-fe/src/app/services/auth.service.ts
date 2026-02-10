@@ -17,8 +17,6 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {
-    console.log('Auth Service initialized with API URL:', this.apiUrl);
-    console.log('Environment:', environment.production ? 'Production' : 'Development');
   }
 
   // Register new user

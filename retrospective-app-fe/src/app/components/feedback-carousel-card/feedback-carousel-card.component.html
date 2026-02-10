@@ -1,0 +1,47 @@
+<div class="feedback-card-wrapper">
+    <nz-card [nzTitle]="cardTitle" [nzExtra]="votesBadge" class="feedback-highlight-card">
+        <!-- Card Title Template -->
+        <ng-template #cardTitle>
+            <!-- Display all section titles or just the first one -->
+            <span class="section-name" *ngFor="let section of feedback.sections; let last = last">
+                {{ section.title }}<span *ngIf="!last">, </span>
+            </span>
+        </ng-template>
+
+        <!-- Votes Badge Template -->
+        <ng-template #votesBadge>
+            <nz-badge class="votes-badge">
+                <span class="material-icons">{{ feedback.votes > 0 ? 'thumb_up' : 'thumb_up_off_alt' }}</span>
+                <span class="vote-count">{{ feedback.votes }}</span>
+            </nz-badge>
+        </ng-template>
+
+        <!-- Feedback Content -->
+        <div class="feedback-content">
+            
+            <div class="feedback-meta">
+                <nz-tag [nzColor]="'blue'">
+                    <span class="material-symbols-outlined icon">
+                        account_circle
+                    </span>
+                    {{ feedback.feedbackPoster.username }}
+                </nz-tag>
+                <nz-tag [nzColor]="'default'">
+                    <span class="material-symbols-outlined icon">
+                        event
+                    </span>
+                    {{ feedback.createdAt | date: 'MMM d, y' }}
+                </nz-tag>
+            </div>
+
+            <!-- Section Details -->
+            <div class="section-details" *ngFor="let section of feedback.sections">
+                <div *ngIf="section.items && section.items.length > 0" class="section-items">
+                    <ul>
+                        <li *ngFor="let item of section.items">{{ item }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nz-card>
+</div>

@@ -21,6 +21,7 @@ export class SessionDetailsHeaderComponent {
   creator: boolean = false;
   user: User | null = null;
   isScrolled: boolean = false;
+  isHighlightsPage: boolean = false;
 
   constructor(
     private router: Router,
@@ -33,6 +34,8 @@ export class SessionDetailsHeaderComponent {
     this.route.params.subscribe(params => {
       this.sessionId = params['id'];
     })
+
+    this.isHighlightsPage = this.router.url.includes('/highlight');
 
     this.loadSession();
   }
@@ -57,6 +60,10 @@ export class SessionDetailsHeaderComponent {
         this.session = null;
       }
     });    
+  }
+
+  highlightSession(): void {
+    this.router.navigate([`/session/${this.sessionId}/highlight`]);
   }
 
   goHome(): void {
