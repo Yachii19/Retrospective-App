@@ -227,6 +227,54 @@ exports.getFeedbackByUserAndSession = async (req, res) => {
     }
 }
 
+
+exports.filterFeedbacksByMember = async (req, res) => {
+    try {
+        const {sessionId, memberId} = req.params;
+        const session = await Session.findById(sessionId);
+        
+        if (!session) {
+            return res.status(404).send({
+                message: `Session with ID: ${sessionId} not found!`
+            });
+        }
+
+        const isMemberIncluded = session.members.some(
+            member => member.sessionMember._id.toString() === memberId
+        );
+
+        if(!isMemberIncluded) {
+            return res.status(404).send({
+                message: `Member ID: ${memberId} isn't included in the session`
+            });
+        }
+
+        const filteredFeedbacks = await Feedback.find({
+            feedbackSession: sessionId,
+            feedbackPoster: memberId
+        })
+        .populate('feedbackPoster', 'email username')
+        .populate('votedBy', 'email username');
+
+        if (!filteredFeedbacks || filteredFeedbacks.length === 0) {
+            return res.status(200).send({
+                message: `Member has no feedback`,
+                data: []
+            });
+        }
+
+        res.status(200).send({
+            message: `Filtered feedbacks list:`,
+            data: filteredFeedbacks
+        })
+    } catch (err) {
+        console.log(`Error fetching filtered feedbacks: ${err}`);
+        return res.status(500).send({
+            message: "Server error when fetching filtered feedacks"
+        });
+    }
+}
+
 exports.addFeedbackBySection = async (req, res) => {
     try {
         const sessionId = req.params.sessionId;

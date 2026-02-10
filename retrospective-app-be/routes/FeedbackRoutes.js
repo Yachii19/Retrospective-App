@@ -6,6 +6,7 @@ const { verifyToken } = require("../middlewares/auth");
 router.get("/:sessionId", verifyToken, feedbackController.getFeedbackBySessionId);
 router.get("/:sessionId/section/:sectionKey", verifyToken, feedbackController.getFeedbackBySessionAndSection);
 router.get("/user/session-feedbacks", verifyToken, feedbackController.getFeedbackByUserAndSession)
+router.get("/session/:sessionId/filter/:memberId", feedbackController.filterFeedbacksByMember);
 
 router.post("/:sessionId", verifyToken, feedbackController.addFeedbackBySection);
 
