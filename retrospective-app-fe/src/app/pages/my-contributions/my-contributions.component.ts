@@ -58,40 +58,43 @@ export class MyContributionsComponent {
     })
   }
 
-
-
   loadFeedbacks(): void {
     this.feedbackService.getFeedbackByUser().subscribe({
       next: (response) => {
-        console.log('Feedbacks response:', response.data);
         if(Array.isArray(response.data)) {
           this.userFeedbacks = response.data;
-
-          this.userFeedbacks.forEach(sessionGroup => {
-            this.feedbackCount += sessionGroup.feedbacks.length
-          });
+          
+          this.feedbackCount = this.calculateTotalFeedbackCount();
         } else {
           this.userFeedbacks = [];
+          this.feedbackCount = 0;
         }
       },
       error: (err) => {
         console.error(`Error loading user feedbacks ${err}`);
         this.userFeedbacks = [];
+        this.feedbackCount = 0;
       }
     })
   }
 
-  getTotalFeedbackCount(): number {
+  // Calculate total feedback count from userFeedbacks
+  private calculateTotalFeedbackCount(): number {
     return this.userFeedbacks.reduce((total, sessionGroup) => {
       return total + sessionGroup.feedbacks.length;
     }, 0);
+  }
+
+  // Public getter (optional - you can use feedbackCount directly in template)
+  getTotalFeedbackCount(): number {
+    return this.feedbackCount;
   }
 
   getAllSections(sessionGroup: UserRetroFeedback): { key: string, title: string }[] {
     const sectionsMap = new Map<string, string>();
 
     sessionGroup.feedbacks.forEach(feedback => {
-      this.feedbackCount += feedback.sections.length
+      // REMOVED: Don't modify feedbackCount here during change detection
       feedback.sections.forEach(section => {
         if (!sectionsMap.has(section.key)) {
           sectionsMap.set(section.key, section.title);
@@ -130,7 +133,6 @@ export class MyContributionsComponent {
   }
 
   viewSession(sessionId: string): void {
-    console.log('Navigating to session:', sessionId);
     this.router.navigate(['/session', sessionId]);
   }
 }

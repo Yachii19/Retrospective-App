@@ -30,7 +30,6 @@ export class AuthService {
         // Save token and user data to localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('Token saved:', response.token);
       })
     );
   }
@@ -45,7 +44,6 @@ export class AuthService {
         // Save token and user data to localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('Token saved:', response.token);
       })
     );
   }
@@ -91,7 +89,6 @@ export class AuthService {
   isCreator(creatorId: string | undefined): boolean {
     const user = this.getUser();
     if(user._id === creatorId) {
-      console.log(creatorId);
       return true;
     } else {
       return false

@@ -62,12 +62,10 @@ export class RecentSessionCardsComponent {
 
      this.sessionService.joinSession(sessionId).subscribe({
       next: (response) => {
-        console.log('Successfully joined session:', response);
         this.joiningSessionId = null;
         this.router.navigate(['/session', sessionId]);
       },
       error: (err) => {
-        console.log('Join session error:', err);
         // User might already be in the session, that's okay
         if (err.error?.message?.includes('already joined')) {
           console.log('User already in session, proceeding...');

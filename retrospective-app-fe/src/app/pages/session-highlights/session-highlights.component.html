@@ -35,7 +35,7 @@
             <!-- Error State -->
             <div *ngIf="error && !loading" class="error-container">
                 <nz-empty 
-                    nzNotFoundContent="Failed to load highlights"
+                    nzNotFoundContent={{error}}
                     [nzNotFoundImage]="'simple'">
                 </nz-empty>
             </div>

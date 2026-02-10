@@ -48,7 +48,6 @@ export class SessionDetailsHeaderComponent {
   loadSession(): void {
     this.sessionService.getSessionById(this.sessionId).subscribe({
       next: (response: any) => {
-        console.log(response);
         this.session = response.data;
         this.membersCount = response.membersCount;
 
@@ -77,7 +76,6 @@ export class SessionDetailsHeaderComponent {
       return false
     }
   }
-  
 
   export(): void {
     console.log(this.sessionId);
