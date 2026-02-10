@@ -21,7 +21,6 @@ app.use(
   })
 );
 
-
 app.use("/api/auth", require("./routes/AuthRoutes.js"));
 app.use("/api/sessions", require("./routes/SessionRoutes.js"));
 app.use("/api/feedback", require("./routes/FeedbackRoutes.js"));
