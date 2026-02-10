@@ -21,11 +21,11 @@ export class SessionDetailsHandlerComponent {
   sessionFeedbacks:  { [key: string]: RetroFeedback[]} = {};
   feedbackInputs: { [key: string]: string } = {};
   showError: boolean = false;
-  errorMessage: string = "";
+  errorMessage: string = '';
   currentUserId: string = '';
   isSessionCreator: boolean = false;
   
-  // Add these new properties
+
   editingAssignee: { [key: string]: boolean } = {};
   editingDueDate: { [key: string]: boolean } = {};
   tempAssignee: { [key: string]: string } = {};

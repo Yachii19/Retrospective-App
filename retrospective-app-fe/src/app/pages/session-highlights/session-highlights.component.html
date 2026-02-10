@@ -1,0 +1,93 @@
+<div class="session-highlights-container">
+
+    <div class="main-content">
+        <app-session-details-header/>
+        <div class="wrapper">
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div>
+                    <h2>Session Highlights</h2>
+                </div>
+                
+                <div class="filter-controls">
+                    <label>Filter by Member:</label>
+                    <nz-select 
+                        [(ngModel)]="selectedMemberId" 
+                        (ngModelChange)="onMemberFilterChange()"
+                        [nzLoading]="loading"
+                        nzPlaceHolder="Select a member"
+                        style="width: 250px;">
+                        <nz-option nzValue="all" nzLabel="All Members"></nz-option>
+                        <nz-option 
+                            *ngFor="let member of sessionMembers" 
+                            [nzValue]="member._id" 
+                            [nzLabel]="member.username">
+                        </nz-option>
+                    </nz-select>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div *ngIf="loading" class="loading-container">
+                <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+            </div>
+
+            <!-- Error State -->
+            <div *ngIf="error && !loading" class="error-container">
+                <nz-empty 
+                    nzNotFoundContent="Failed to load highlights"
+                    [nzNotFoundImage]="'simple'">
+                </nz-empty>
+            </div>
+
+            <!-- Carousel with Feedbacks -->
+            <div *ngIf="!loading && !error && sessionFeedbacks.length > 0" class="carousel-container">
+                <div class="carousel-wrapper">
+                    <!-- Previous Arrow -->
+                    <button 
+                        class="carousel-arrow carousel-arrow-prev" 
+                        (click)="previousSlide()"
+                        [disabled]="currentSlide === 0">
+                        <span nz-icon nzType="left" nzTheme="outline"></span>
+                    </button>
+
+                    <!-- Carousel -->
+                    <nz-carousel 
+                        #carouselRef
+                        [nzEffect]="'scrollx'"
+                        [nzAutoPlay]="false"
+                        [nzDots]="true"
+                        [nzEnableSwipe]="true"
+                        (nzAfterChange)="onSlideChange($event)">
+                        <div nz-carousel-content *ngFor="let feedback of sessionFeedbacks">
+                            <app-feedback-carousel-card 
+                                [feedback]="feedback"
+                                [hasUserVoted]="hasUserVoted(feedback)" class="feedback-carousel">
+                            </app-feedback-carousel-card>
+                        </div>
+                    </nz-carousel>
+
+                    <!-- Next Arrow -->
+                    <button 
+                        class="carousel-arrow carousel-arrow-next" 
+                        (click)="nextSlide()"
+                        [disabled]="currentSlide === sessionFeedbacks.length - 1">
+                        <span nz-icon nzType="right" nzTheme="outline"></span>
+                    </button>
+                </div>
+
+                <div class="feedback-counter">
+                    {{ currentSlide + 1 }} / {{ sessionFeedbacks.length }} feedback{{ sessionFeedbacks.length === 1 ? '' : 's' }}
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!loading && !error && sessionFeedbacks.length === 0" class="empty-container">
+                <nz-empty 
+                    nzNotFoundContent="No feedbacks found for this filter"
+                    [nzNotFoundImage]="'simple'">
+                </nz-empty>
+            </div>
+        </div>
+    </div>
+</div>

@@ -55,6 +55,15 @@ export const routes: Routes = [
         }
     },
     {
+        path: 'session/:id/highlight',
+        pathMatch: 'full',
+        loadComponent: () => {
+            return import('./pages/session-highlights/session-highlights.component').then(
+                (m) => m.SessionHighlightsComponent
+            )
+        }
+    },
+    {
         path: '**',
         pathMatch: 'full',
         loadComponent: () => {
