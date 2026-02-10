@@ -71,7 +71,6 @@ export class SessionDetailsHandlerComponent {
         .subscribe({
           next: (response) => {
             this.sessionFeedbacks[section.key] = response.data;
-            console.log(this.sessionFeedbacks);
           },
           error: (err) => {
             console.error(`Error loading feedbacks for ${section.key}:`, err);
@@ -86,8 +85,6 @@ export class SessionDetailsHandlerComponent {
   }
 
   addFeedback(sectionKey: string): void {
-    console.log("Adding feedback for section:", sectionKey);
-    
     const feedbackText = this.feedbackInputs[sectionKey] || '';
     
     if(!feedbackText.trim()) {
@@ -103,7 +100,6 @@ export class SessionDetailsHandlerComponent {
 
     this.feedbackService.addFeedback(this.sessionId, feedbackData).subscribe({
       next: (response) => {
-        console.log('Feedback added successfully:', response);
         
         this.feedbackInputs[sectionKey] = '';
         
@@ -141,7 +137,6 @@ export class SessionDetailsHandlerComponent {
     if (!hasVoted) {
       this.feedbackService.voteFeedback(feedbackId).subscribe({
         next: (response) => {
-          console.log('Vote added successfully');
           this.feedbackService.getFeedbackBySection(this.sessionId, sectionKey).subscribe({
             next: (response) => {
               this.sessionFeedbacks[sectionKey] = response.data;
@@ -149,7 +144,6 @@ export class SessionDetailsHandlerComponent {
           });
         },
         error: (error) => {
-          console.log(`Error adding vote: ${error.error?.message}`);
           this.showError = true;
           this.errorMessage = error.error?.message || 'Failed to add vote';
         }
@@ -157,7 +151,6 @@ export class SessionDetailsHandlerComponent {
     } else {
       this.feedbackService.unvoteFeedback(feedbackId).subscribe({
         next: (response) => {
-          console.log('Vote removed successfully');
           this.feedbackService.getFeedbackBySection(this.sessionId, sectionKey).subscribe({
             next: (response) => {
               this.sessionFeedbacks[sectionKey] = response.data;
@@ -165,7 +158,6 @@ export class SessionDetailsHandlerComponent {
           });
         },
         error: (error) => {
-          console.log(`Error removing vote: ${error.error?.message}`);
           this.showError = true;
           this.errorMessage = error.error?.message || 'Failed to remove vote';
         }
@@ -192,7 +184,6 @@ export class SessionDetailsHandlerComponent {
 
     this.feedbackService.toggleFeedbackVisibility(feedbackId.trim(), { key: sectionKey }).subscribe({
       next: (response) => {
-        console.log('Action item status toggled successfully');
         this.feedbackService.getFeedbackBySection(this.sessionId.trim(), sectionKey).subscribe({
           next: (response) => {
             this.sessionFeedbacks[sectionKey] = response.data;
@@ -236,7 +227,6 @@ export class SessionDetailsHandlerComponent {
 
     this.feedbackService.updateActionItems(feedbackId, updateData).subscribe({
       next: (response) => {
-        console.log('Action items updated successfully');
         this.feedbackService.getFeedbackBySection(this.sessionId, sectionKey).subscribe({
           next: (response) => {
             this.sessionFeedbacks[sectionKey] = response.data;

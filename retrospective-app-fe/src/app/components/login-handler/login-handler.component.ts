@@ -72,10 +72,6 @@ export class LoginHandlerComponent {
 
     this.authService.register(this.username, this.email, this.password).subscribe({
       next: (response) => {
-        console.log('Registration successful:', response);
-        console.log('User:', this.authService.getUser());
-        console.log('Token stored:', this.authService.getToken());
-        
         this.isLoading = false;
         this.router.navigate(['/dashboard']);
       },

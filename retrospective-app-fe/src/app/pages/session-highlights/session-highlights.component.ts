@@ -74,8 +74,8 @@ export class SessionHighlightsComponent {
         this.loadFeedbacks();
       },
       error: (err) => {
-        console.error(`Error loading session: ${err}`);
-        this.error = err.message
+        console.log(err);
+        this.error = err.error?.message
       }
     })
   }
@@ -90,10 +90,9 @@ export class SessionHighlightsComponent {
         next: (response: any) => {
           this.sessionFeedbacks =response.data;
           this.loading = false;
-          console.log(this.sessionFeedbacks);
         },
         error: (err) => {
-          this.error = err.message;
+          this.error = err.error?.message;
           this.loading = false;
         }
       })
@@ -104,7 +103,7 @@ export class SessionHighlightsComponent {
           this.loading = false;
         },
         error: (err) => {
-          this.error = err.message;
+          this.error = err.error?.message;
           this.loading = false;
         }
       })
