@@ -106,12 +106,17 @@
                     gap: 0.5rem;
                     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
                     transition: all 0.3s ease;
-
-
+                    max-width: 200px;
 
                     &.ant-tag-blue {
                         background: linear-gradient(135deg, #4CB1A4 0%, #3c8d82 100%);
                         color: white;
+
+                        :last-child {
+                            text-wrap: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
                     }
 
                     &.ant-tag-default {

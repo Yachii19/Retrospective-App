@@ -71,7 +71,7 @@ exports.initiateRegister = async (req, res) => {
     } catch (err) {
         console.error(`Registration Error: ${err}`)
         return res.status(500).send({
-            mesage: "Server error during registration"
+            message: "Server error during registration"
         });
     }
 }
