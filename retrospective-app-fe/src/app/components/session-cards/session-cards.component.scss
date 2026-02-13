@@ -1,6 +1,6 @@
 .sessions-wrapper {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 50%);
     gap: 2rem;
 
     .team-section {
@@ -31,6 +31,7 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            max-width: 100%;
 
             .session-card {
                 background: #f8fafb;

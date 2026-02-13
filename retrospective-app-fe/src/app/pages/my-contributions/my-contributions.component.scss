@@ -7,7 +7,7 @@
         flex: 1;
         padding: 2.5rem 3rem 2.5rem 348px;
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 50% 50%;
         gap: 2rem;
         align-items: start;
     }
@@ -113,8 +113,12 @@
                 .user-name {
                     font-size: 1.1rem;
                     font-weight: 700;
+                    max-width: 500px;
                     color: #2c3e50;
                     margin: 0;
+                    text-wrap: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
 
                 .timestamp {

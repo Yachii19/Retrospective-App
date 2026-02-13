@@ -16,6 +16,9 @@
                 color: #4CB1A4;
                 font-weight: 700;
                 margin-bottom: 0.5rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-wrap: nowrap;
             }
 
             p {
