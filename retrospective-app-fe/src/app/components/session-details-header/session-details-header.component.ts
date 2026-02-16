@@ -310,7 +310,7 @@ export(): void {
       doc.text(`Total Feedbacks: ${feedbacks.length} | Sections: ${sectionMap.size}`, 105, 291, { align: 'center' });
       
       // Save the PDF
-      doc.save(`${this.session?.sessionName}-feedbacks.pdf`);
+      doc.save(`${this.session?.team} ${this.session?.sessionName}-feedbacks.pdf`);
     },
     error: (err) => {
       console.error('Error exporting feedbacks:', err.error?.message);
