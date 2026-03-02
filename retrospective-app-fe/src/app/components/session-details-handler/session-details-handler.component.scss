@@ -1,8 +1,8 @@
 .session-grid {
     display: grid;
-    grid-template-columns: repeat(2, 50%);
+    grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-    padding-inline: 2rem;
+    padding-inline: 4rem;
     margin: 0 auto;
     position: relative;
 
