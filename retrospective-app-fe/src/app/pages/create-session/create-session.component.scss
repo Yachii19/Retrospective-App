@@ -1,12 +1,33 @@
 .create-session-container {
     display: flex;
     min-height: 100vh;
-    background: #f5f7fa;
+    background: var(--color-bg-gray);
 
     .content {
         width: 100%;
-        padding: 2rem 3rem 2rem 348px;
+        padding: 2rem 3rem 2rem 288px;
         display: flex;
         justify-content: center;
+        align-items: flex-start;
+
+        // ─── Small Desktop (1025px – 1366px) ──────────────────────────────
+        @media (min-width: 1025px) and (max-width: 1366px) {
+            padding: 2rem 2rem 2rem 300px;
+        }
+
+        // ─── Nest Hub (769px – 1024px) ────────────────────────────────────
+        @media (min-width: 769px) and (max-width: 1024px) {
+            padding: 2rem 1.5rem 2rem 96px;
+        }
+
+        // ─── Tablet (481px – 768px) ───────────────────────────────────────
+        @media (min-width: 481px) and (max-width: 768px) {
+            padding: 5rem 1.25rem 5rem 1.25rem;
+        }
+
+        // ─── Mobile (≤ 480px) ─────────────────────────────────────────────
+        @media (max-width: 480px) {
+            padding: 4.5rem 1rem 5rem 1rem;
+        }
     }
 }

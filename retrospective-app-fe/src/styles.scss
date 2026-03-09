@@ -1,5 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://global-assets.prod.cloud.cloudstaff.com/styles/variables.css");
+
+:root {
+    --color-primary: #007aff;
+    --color-primary-dark: #0056b3;
+    --color-primary-light: rgba(0, 122, 255, 0.05);
+    --color-text-dark: #2c2e3c;
+    --color-text-medium: #414350;
+    --color-text-light: #6b6d7a;
+    --color-text-muted: #9a9ba5;
+    --color-border: #eaeaec;
+    --color-border-light: #e8e9ed;
+    --color-bg-white: #fff;
+    --color-bg-gray: #f5f6fa;
+    --color-bg-card: #f8f9fc;
+    --color-button-border: #40424f;
+}
 
 * {
     padding: 0;
@@ -7,7 +24,17 @@
     box-sizing: border-box;
 }
 
+html {
+    min-height: 100vh;
+    scroll-behavior: smooth;
+    font-size: var(--font-size-root);
+    font-weight: 300;
+    color: var(--color-foreground);
+    background-color: var(--color-background);
+}
+
 body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
+    background-color: var(--color-background);
     font-family: "Montserrat", sans-serif;
+    color: var(--color-foreground);
 }

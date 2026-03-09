@@ -139,14 +139,13 @@
 
          <!-- Add Feedback Section -->
         <div class="input-section">
-            <input 
-                type="text" 
-                [id]="'feedback_input_' + section.key" 
-                [name]="'feedback_input_' + section.key" 
-                [(ngModel)]="feedbackInputs[section.key]"
-                placeholder="Share your thoughts..."
-                (keyup.enter)="addFeedback(section.key)"
-                (input)="onInputChange()">
+            <textarea  
+            [id]="'feedback_input_' + section.key" 
+            [name]="'feedback_input_' + section.key" 
+            [(ngModel)]="feedbackInputs[section.key]"
+            placeholder="Share your thoughts..."
+            (keyup.enter)="addFeedback(section.key)"
+            (input)="onInputChange()"></textarea>
             <button (click)="addFeedback(section.key)">Submit</button>
         </div>
         
