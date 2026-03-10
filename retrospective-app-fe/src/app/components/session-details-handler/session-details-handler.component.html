@@ -1,126 +1,232 @@
 <div class="session-grid">
     <div class="session-content" *ngFor="let section of session?.sections">
+        
+        <!-- Section Header -->
         <div class="section-header">
-            <div>
-                <span class="material-icons">
-                    {{ 
-                        section.key === 'went-well' ? 'sentiment_satisfied'
-                        : section.key === 'needs-improvement' ? 'build_circle'
-                        : 'adjust' 
-                    }}
-                </span>
-                {{section.title}}
+            <div class="section-title">
+                <div class="section-icon-wrapper">
+                    <span class="material-icons">
+                        {{ 
+                            section.key === 'went-well' ? 'sentiment_satisfied'
+                            : section.key === 'needs-improvement' ? 'build_circle'
+                            : 'adjust' 
+                        }}
+                    </span>
+                </div>
+                <span>{{section.title}}</span>
             </div>
-            <div>
-                <span class="material-icons delete-icon" *ngIf="isSessionCreator" (click)="showDeleteSectionModal(section.key)">
-                    delete
+            <div class="section-actions">
+                <span class="feedback-count" *ngIf="sessionFeedbacks[section.key]?.length">
+                    {{ sessionFeedbacks[section.key].length }} 
+                    {{ sessionFeedbacks[section.key].length === 1 ? 'entry' : 'entries' }}
                 </span>
+                <button class="delete-btn" *ngIf="isSessionCreator" 
+                        (click)="showDeleteSectionModal(section.key)">
+                    <span class="material-icons">delete</span>
+                </button>
             </div>
         </div>
 
+        <!-- Feedback List -->
         <div class="feedback-list">
-            <div *ngFor="let feedback of sessionFeedbacks[section.key]">
-                <div class="feedback-item">
-                    <div class="feedback-header">
-                        <span class="username">{{feedback.feedbackPoster.username}}</span>
-                        <span class="votes" (click)="addVote(feedback._id, section.key)" [class.voted]="hasUserVoted(feedback)">
-                            <span class="material-icons">{{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}</span>
-                            {{feedback.votes}}
-                         
-                            <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
-                                <div class="voter-list">
-                                    <div *ngFor="let voter of feedback.votedBy">
-                                        <span class="material-symbols-outlined">account_circle</span>
-                                        <span class="name">{{voter.username}}</span>
-                                    </div>
+            <div class="feedback-item" 
+                 *ngFor="let feedback of sessionFeedbacks[section.key]">
+
+                <!-- Feedback Header -->
+                <div class="feedback-header">
+                    <div class="poster-info">
+                        <div class="avatar">
+                            {{ feedback.feedbackPoster.username.charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="poster-details">
+                            <span class="username">{{feedback.feedbackPoster.username}}</span>
+                            <span class="timestamp">Just now</span>
+                        </div>
+                    </div>
+
+                    <div class="vote-btn" 
+                         (click)="addVote(feedback._id, section.key)" 
+                         [class.voted]="hasUserVoted(feedback)">
+                        <span class="material-icons">
+                            {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
+                        </span>
+                        <span class="vote-count">{{feedback.votes}}</span>
+
+                        <!-- Voters tooltip -->
+                        <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
+                            <div class="tooltip-header">Voted by</div>
+                            <div class="voter-list">
+                                <div class="voter-item" *ngFor="let voter of feedback.votedBy">
+                                    <span class="voter-avatar">
+                                        {{ voter.username.charAt(0).toUpperCase() }}
+                                    </span>
+                                    <span class="name">{{voter.username}}</span>
                                 </div>
                             </div>
-                        </span>
+                        </div>
                     </div>
+                </div>
+
+                <!-- Feedback Body -->
+                <div class="feedback-body">
                     <ul>
                         <li *ngFor="let item of getSectionItems(feedback, section.key)">
-                            <span>{{item.trim()}}</span>
+                            {{item.trim()}}
                         </li>
                     </ul>
+                </div>
 
+                <!-- Replies Section -->
+                <div class="replies-section">
+                    <button class="view-replies-btn" 
+                          >
+                        <span class="material-icons">
+                            <!-- {{ feedback['showReplies'] ? 'expand_less' : 'expand_more' }} -->
+                        </span>
+                        <!-- {{ feedback['showReplies'] ? 'Hide replies' : 'View 3 replies' }} -->
+                    </button>
+
+                    <div class="replies-list">
+                        <!-- sample reply data -->
+                        <div class="reply-item">
+                            <div class="reply-avatar">J</div>
+                            <div class="reply-content">
+                                <div class="reply-header">
+                                    <span class="reply-username">JohnDoe</span>
+                                    <span class="reply-time">2m ago</span>
+                                </div>
+                                <p>Totally agree with this point!</p>
+                            </div>
+                        </div>
+                        <div class="reply-item">
+                            <div class="reply-avatar">M</div>
+                            <div class="reply-content">
+                                <div class="reply-header">
+                                    <span class="reply-username">Miracle-</span>
+                                    <span class="reply-time">5m ago</span>
+                                </div>
+                                <p>We should address this in the next sprint.</p>
+                            </div>
+                        </div>
+                        <div class="reply-item">
+                            <div class="reply-avatar">Y</div>
+                            <div class="reply-content">
+                                <div class="reply-header">
+                                    <span class="reply-username">Yachii19s</span>
+                                    <span class="reply-time">10m ago</span>
+                                </div>
+                                <p>I can take ownership of this action item.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reply input -->
+                    <div class="reply-input-wrapper" >
+                        <div class="reply-avatar self">Y</div>
+                        <input type="text" placeholder="Write a reply..." class="reply-input" />
+                        <button class="reply-submit-btn">
+                            <span class="material-icons">send</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- No feedback message -->
-            <div class="no-feedback" *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
-                <span class="material-icons">comment</span>
-                <p>No feedback yet. Be the first to contribute!</p>
+            <!-- No feedback -->
+            <div class="no-feedback" 
+                 *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
+                <div class="no-feedback-icon">
+                    <span class="material-icons">forum</span>
+                </div>
+                <p>No feedback yet</p>
+                <small>Be the first to contribute!</small>
             </div>
         </div>
 
-         <!-- Add Feedback Section -->
+        <!-- Input Section -->
         <div class="input-section">
-            <textarea  
-            [id]="'feedback_input_' + section.key" 
-            [name]="'feedback_input_' + section.key" 
-            [(ngModel)]="feedbackInputs[section.key]"
-            placeholder="Share your thoughts..."
-            (keyup.enter)="addFeedback(section.key)"
-            (input)="onInputChange()"></textarea>
-            <button (click)="addFeedback(section.key)">Submit</button>
-        </div>
-        
-        <!-- Error message -->
-        <div class="error-message" *ngIf="showError">
-            <span class="material-icons">error</span>
-            {{errorMessage}}
-        </div>
-    </div>
-
-    <div class="add-section-card" *ngIf="isSessionCreator" (click)="showAddSectionModal()">
-        <span class="material-icons">add_circle_outline</span>
-        <p>Add Section</p>
-    </div>
-
-    <div *ngIf="showDeleteModal" class="delete-modal">
-        <div class="delete-modal-content">
-            <span class="material-icons warning-icon">warning</span>
-            <p>Are you sure you want to delete this section?</p>
-            <div class="delete-modal-actions">
-                <button (click)="confirmDeleteSection()" class="confirm-btn">Yes, Delete</button>
-                <button (click)="cancelDeleteSection()" class="cancel-btn">Cancel</button>
+            <div class="input-wrapper">
+                <textarea
+                    [id]="'feedback_input_' + section.key"
+                    [name]="'feedback_input_' + section.key"
+                    [(ngModel)]="feedbackInputs[section.key]"
+                    placeholder="Share your thoughts..."
+                    (keyup.enter)="addFeedback(section.key)"
+                    (input)="onInputChange()"></textarea>
+                <button class="submit-btn" (click)="addFeedback(section.key)">
+                    <span class="material-icons">send</span>
+                    Submit
+                </button>
+            </div>
+            <div class="error-message" *ngIf="showError">
+                <span class="material-icons">error_outline</span>
+                {{errorMessage}}
             </div>
         </div>
     </div>
 
-    <div *ngIf="showAddModal" class="add-section-modal">
-        <div class="add-modal-content">
-            <span class="material-icons add-icon">add_circle</span>
-            <p>Add New Section</p>
+    <!-- Add Section Card -->
+    <div class="add-section-card" *ngIf="isSessionCreator" (click)="showAddSectionModal()">
+        <div class="add-section-inner">
+            <div class="add-icon-wrapper">
+                <span class="material-icons">add</span>
+            </div>
+            <p>Add Section</p>
+            <small>Create a custom section</small>
+        </div>
+    </div>
+</div>
 
-            <label for="section-title-input">Section Title:</label>
+<!-- Delete Modal -->
+<div *ngIf="showDeleteModal" class="delete-modal">
+    <div class="delete-modal-content">
+        <div class="modal-icon-wrapper danger">
+            <span class="material-icons">delete_forever</span>
+        </div>
+        <div class="modal-text">
+            <h3>Delete Section?</h3>
+            <p>This will permanently delete the section and all its feedback. This action cannot be undone.</p>
+        </div>
+        <div class="modal-actions">
+            <button (click)="cancelDeleteSection()" class="cancel-btn">Cancel</button>
+            <button (click)="confirmDeleteSection()" class="confirm-btn">
+                <span class="material-icons">delete</span>
+                Yes, Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Section Modal -->
+<div *ngIf="showAddModal" class="add-section-modal">
+    <div class="add-modal-content">
+        <div class="modal-icon-wrapper primary">
+            <span class="material-icons">add_circle</span>
+        </div>
+        <div class="modal-text">
+            <h3>Add New Section</h3>
+            <p>Create a custom section to collect targeted feedback from your team.</p>
+        </div>
+
+        <div class="modal-field">
+            <label for="section-title-input">Section Title</label>
             <input
                 type="text"
                 [(ngModel)]="newSectionTitle"
                 (ngModelChange)="onSectionTitleChange()"
                 (keydown.enter)="confirmAddSection()"
-                id="section-title-input" 
-                placeholder="Section title e.g. Went Well">
-            <div class="add-modal-actions">
-                <button class="confirm-btn" (click)="confirmAddSection()">Add Section</button>
-                <button class="cancel-btn" (click)="cancelAddSection()">Cancel</button>
-            </div>
+                id="section-title-input"
+                placeholder="e.g. Went Well" />
+            <small class="key-preview" *ngIf="newSectionTitle">
+                <span class="material-icons">key</span>
+                {{ newSectionKey }}
+            </small>
         </div>
-    </div>
 
-    <div *ngIf="showNotifModal" class="notif-modal">
-        <div class="notif-content" [class.success]="notifSuccess" [class.error]="!notifSuccess">
-            <div class="notif-icon-wrapper">
-                <span class="material-icons notif-icon">
-                    {{ notifSuccess ? 'check_circle' : 'error' }}
-                </span>
-            </div>
-            <div class="notif-body">
-                <span class="notif-label">{{ notifSuccess ? 'Success' : 'Error' }}</span>
-                <p>{{ notifMessage }}</p>
-            </div>
-            <button class="notif-close" (click)="closeNotif()">
-                <span class="material-icons">close</span>
+        <div class="modal-actions">
+            <button (click)="cancelAddSection()" class="cancel-btn">Cancel</button>
+            <button (click)="confirmAddSection()" class="confirm-btn">
+                <span class="material-icons">add</span>
+                Add Section
             </button>
         </div>
     </div>
