@@ -48,8 +48,8 @@ export class SessionService {
     return this.http.post<SessionResponse>(`${this.apiUrl}/${sessionId}/generate`, {});
   }
 
-  addSection(sessionId: string): Observable<SessionResponse> {
-    return this.http.patch<SessionResponse>(`${this.apiUrl}/add-section/${sessionId}`, {});
+  addSection(sessionId: string, title: string, key: string): Observable<SessionResponse> {
+    return this.http.patch<SessionResponse>(`${this.apiUrl}/add-section/${sessionId}`, { title, key});
   }
 
   deleteSection(sessionId: string, sectionKey: string): Observable<SessionResponse> {

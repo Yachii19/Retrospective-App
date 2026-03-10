@@ -27,18 +27,23 @@ export class SessionDetailsHandlerComponent {
 
   sectionKeyToDelete: string = '';
   showDeleteModal: boolean = false;
+  
   showAddModal: boolean = false;
+  newSectionTitle: string = '';
+  newSectionKey: string = '';
+
+  showNotifModal: boolean = false;
+  notifSuccess: boolean = true;
+  notifMessage: string = ''
+  private notifTimeout: any = null;
   
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     if (this.showDeleteModal) {
-      this.showDeleteModal = false;
-      this.sectionKeyToDelete = '';
-      document.body.style.overflow = '';
+      this.cancelDeleteSection();
     }
     if (this.showAddModal) {
-      this.showAddModal = false;
-      document.body.style.overflow = '';
+      this.cancelAddSection();
     }
   }
 
@@ -57,6 +62,28 @@ export class SessionDetailsHandlerComponent {
     let user = this.authService.getUser();
     this.currentUserId = user._id;
     this.loadSession();
+  }
+  
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
+    if (this.notifTimeout) clearTimeout(this.notifTimeout);
+  }
+
+  showNotification(message: string, success: boolean): void {
+    if (this.notifTimeout) clearTimeout(this.notifTimeout);
+      this.notifMessage = message;
+      this.notifSuccess = success;
+      this.showNotifModal = true;
+
+      this.notifTimeout = setTimeout(() => {
+        this.showNotifModal = false;
+      }, 3000);
+  }
+
+  closeNotif(): void {
+    this.showNotifModal = false;
+    this.notifMessage = '';
+    if (this.notifTimeout) clearTimeout(this.notifTimeout);
   }
 
   loadSession(): void {
@@ -176,6 +203,13 @@ export class SessionDetailsHandlerComponent {
     }
   }
 
+  onSectionTitleChange(): void {
+    this.newSectionKey = this.newSectionTitle
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-');
+  }
+
   getSectionItems(feedback: RetroFeedback, sectionKey: string): string[] {
     const section = feedback.sections.find(s => s.key === sectionKey);
     return section?.items || [];
@@ -184,23 +218,6 @@ export class SessionDetailsHandlerComponent {
   getSectionActionItems(feedback: RetroFeedback, sectionKey: string): any | null {
     const section = feedback.sections.find(s => s.key === sectionKey);
     return section?.actionItems || null;
-  }
-
-  confirmDeleteSection(): void {
-    if (!this.session) return;
-
-    this.sessionService.deleteSection(this.session._id, this.sectionKeyToDelete).subscribe({
-      next: (response) => {
-        this.showDeleteModal = false;
-        this.sectionKeyToDelete = '';
-        document.body.style.overflow = '';
-        this.loadSession();
-      },
-      error: (error) => {
-        this.showError = true;
-        this.errorMessage = error.error?.message || 'Failed to delete section';
-      }
-    });
   }
 
   showDeleteSectionModal(sectionKey: string): void {
@@ -215,6 +232,20 @@ export class SessionDetailsHandlerComponent {
     document.body.style.overflow = '';
   }
 
+  confirmDeleteSection(): void {
+    if (!this.session) return;
+
+    this.sessionService.deleteSection(this.session._id, this.sectionKeyToDelete).subscribe({
+      next: (response) => {
+        this.showNotification('Section deleted successfully', true);
+        this.cancelDeleteSection();
+        this.loadSession();
+      },
+      error: (error) => {
+        this.showNotification('Failed to delete section', false);
+      }
+    });
+  }
   showAddSectionModal(): void {
     this.showAddModal = true;
     document.body.style.overflow = 'hidden';
@@ -222,10 +253,35 @@ export class SessionDetailsHandlerComponent {
 
   cancelAddSection(): void {
     this.showAddModal = false;
+    this.newSectionTitle = '';
+    this.newSectionKey = '';
     document.body.style.overflow = '';
   }
 
-  ngOnDestroy(): void {
-    document.body.style.overflow = '';
+  confirmAddSection(): void {
+    if (!this.session) return;
+
+    if (!this.newSectionTitle.trim()) {
+      this.showNotification('Section title cannot be empty', false);
+      return;
+    }
+
+    if (!this.newSectionKey) {
+      this.newSectionKey = this.newSectionTitle
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-');
+    }
+
+    this.sessionService.addSection(this.session._id, this.newSectionTitle, this.newSectionKey).subscribe({
+      next: (response) => {
+        this.cancelAddSection();
+        this.loadSession();
+        this.showNotification('Section added successfully', true);
+      },
+      error: (error) => {
+        this.showNotification('Failed to add section', false);
+      }
+    });
   }
 }

@@ -90,15 +90,38 @@
 
     <div *ngIf="showAddModal" class="add-section-modal">
         <div class="add-modal-content">
-            <span></span>
+            <span class="material-icons add-icon">add_circle</span>
             <p>Add New Section</p>
 
             <label for="section-title-input">Section Title:</label>
-            <input id="section-title-input" placeholder="Enter section title">
+            <input
+                type="text"
+                [(ngModel)]="newSectionTitle"
+                (ngModelChange)="onSectionTitleChange()"
+                (keydown.enter)="confirmAddSection()"
+                id="section-title-input" 
+                placeholder="Section title e.g. Went Well">
             <div class="add-modal-actions">
-                <button >Add Section</button>
-                <button (click)="cancelAddSection()">Cancel</button>
+                <button class="confirm-btn" (click)="confirmAddSection()">Add Section</button>
+                <button class="cancel-btn" (click)="cancelAddSection()">Cancel</button>
             </div>
+        </div>
+    </div>
+
+    <div *ngIf="showNotifModal" class="notif-modal">
+        <div class="notif-content" [class.success]="notifSuccess" [class.error]="!notifSuccess">
+            <div class="notif-icon-wrapper">
+                <span class="material-icons notif-icon">
+                    {{ notifSuccess ? 'check_circle' : 'error' }}
+                </span>
+            </div>
+            <div class="notif-body">
+                <span class="notif-label">{{ notifSuccess ? 'Success' : 'Error' }}</span>
+                <p>{{ notifMessage }}</p>
+            </div>
+            <button class="notif-close" (click)="closeNotif()">
+                <span class="material-icons">close</span>
+            </button>
         </div>
     </div>
 </div>
