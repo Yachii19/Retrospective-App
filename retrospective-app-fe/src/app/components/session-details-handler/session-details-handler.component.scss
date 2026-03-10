@@ -31,6 +31,7 @@
         .section-header {
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 0.75rem;
             color: var(--color-text-dark);
             font-size: 1.25rem;
@@ -42,7 +43,26 @@
                 font-size: 1.5rem;
                 color: var(--color-primary);
             }
+
+            > div {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+
+                .delete-icon {
+                    color: var(--color-text-muted);
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        transform: scale(1.1);
+                        color: var(--color-primary);
+                    }
+                }
+            }
         }
+
+
 
         .feedback-list {
             flex: 1;
@@ -254,243 +274,6 @@
                         }
                     }
                 }
-
-                .action-items-section {
-                    margin-top: 1rem;
-                    padding: 0.75rem;
-                    background: var(--color-primary-light);
-                    border-radius: 8px;
-                    border: 1px solid rgba(0, 122, 255, 0.15);
-
-                    .action-item-boxes {
-                        display: grid;
-                        grid-template-columns: repeat(3, 1fr);
-                        gap: 0.75rem;
-
-                        .action-box {
-                            background: var(--color-bg-white);
-                            border-radius: 8px;
-                            padding: 1rem;
-                            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-                            transition: all 0.2s ease;
-                            border: 2px solid transparent;
-                            min-height: 60px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-
-                            &:hover {
-                                border-color: var(--color-primary);
-                                box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
-                            }
-
-                            &.status-box {
-                                .status-toggle {
-                                    display: flex;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                    padding: 0.6rem 1.2rem;
-                                    border: none;
-                                    border-radius: 8px;
-                                    font-size: 0.85rem;
-                                    font-weight: 600;
-                                    font-family: inherit;
-                                    cursor: pointer;
-                                    transition: all 0.2s ease;
-                                    text-transform: uppercase;
-                                    letter-spacing: 0.5px;
-                                    width: 100%;
-                                    justify-content: center;
-
-                                    .material-icons {
-                                        font-size: 1.1rem;
-                                    }
-
-                                    &.open {
-                                        background: var(--color-primary);
-                                        color: white;
-
-                                        &:not(:disabled):hover {
-                                            background: var(--color-primary-dark);
-                                            transform: translateY(-2px);
-                                            box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
-                                        }
-
-                                        &:disabled {
-                                            opacity: 0.8;
-                                            cursor: not-allowed;
-                                        }
-                                    }
-
-                                    &.closed {
-                                        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
-                                        color: white;
-
-                                        &:not(:disabled):hover {
-                                            background: linear-gradient(135deg, #7f8c8d 0%, #6c7a7b 100%);
-                                            transform: translateY(-2px);
-                                            box-shadow: 0 6px 16px rgba(149, 165, 166, 0.3);
-                                        }
-
-                                        &:disabled {
-                                            opacity: 0.8;
-                                            cursor: not-allowed;
-                                        }
-                                    }
-
-                                    &:not(:disabled):active {
-                                        transform: translateY(0);
-                                    }
-                                }
-                            }
-
-                            &.assignee-box,
-                            &.duedate-box {
-                                .assignee-content,
-                                .duedate-content {
-                                    width: 100%;
-
-                                    .assignee-display,
-                                    .duedate-display {
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        width: 100%;
-
-                                        .material-icons {
-                                            color: var(--color-primary);
-                                            font-size: 1.2rem;
-                                            flex-shrink: 0;
-                                        }
-
-                                        .assignee-name,
-                                        .due-date {
-                                            flex: 1;
-                                            color: var(--color-text-dark);
-                                            font-size: 0.9rem;
-                                            font-weight: 500;
-                                            overflow: hidden;
-                                            text-overflow: ellipsis;
-                                            white-space: nowrap;
-                                        }
-
-                                        .edit-btn-icon {
-                                            display: flex;
-                                            align-items: center;
-                                            justify-content: center;
-                                            padding: 0.25rem;
-                                            border: none;
-                                            border-radius: 4px;
-                                            background: var(--color-primary-light);
-                                            color: var(--color-primary);
-                                            cursor: pointer;
-                                            transition: all 0.2s ease;
-                                            flex-shrink: 0;
-
-                                            .material-icons {
-                                                font-size: 1rem;
-                                                color: inherit;
-                                            }
-
-                                            &:hover {
-                                                background: var(--color-primary);
-                                                color: white;
-                                                transform: scale(1.1);
-                                            }
-                                        }
-                                    }
-
-                                    .edit-dropdown,
-                                    .edit-date {
-                                        display: flex;
-                                        align-items: center;
-                                        gap: 0.5rem;
-                                        max-width: 100%;
-
-                                        .material-icons {
-                                            color: var(--color-primary);
-                                            font-size: 1.2rem;
-                                            flex-shrink: 0;
-                                        }
-
-                                        .assignee-select,
-                                        .date-input {
-                                            padding: 0.5rem;
-                                            border: 2px solid var(--color-primary);
-                                            border-radius: 6px;
-                                            font-size: 0.85rem;
-                                            font-family: inherit;
-                                            outline: none;
-                                            background: var(--color-bg-white);
-                                            color: var(--color-text-dark);
-                                            transition: all 0.2s ease;
-                                            width: 100%;
-                                            overflow: hidden;
-                                            white-space: nowrap;
-                                            text-overflow: ellipsis;
-
-                                            &:focus {
-                                                border-color: var(--color-primary-dark);
-                                                box-shadow: 0 0 0 3px var(--color-primary-light);
-                                            }
-                                        }
-
-                                        .date-input {
-                                            width: 55%;
-                                        }
-
-                                        .edit-actions-inline {
-                                            display: flex;
-                                            gap: 0.4rem;
-                                            flex-shrink: 0;
-
-                                            button {
-                                                display: flex;
-                                                align-items: center;
-                                                justify-content: center;
-                                                padding: 0.3rem;
-                                                border: none;
-                                                border-radius: 4px;
-                                                cursor: pointer;
-                                                transition: all 0.2s ease;
-                                                font-family: inherit;
-
-                                                .material-icons {
-                                                    font-size: 0.95rem;
-                                                }
-                                            }
-
-                                            .save-btn-small {
-                                                background: var(--color-primary);
-                                                color: white;
-
-                                                &:hover {
-                                                    background: var(--color-primary-dark);
-                                                    transform: scale(1.1);
-                                                }
-
-                                                span {
-                                                    color: #FFFFFF;
-                                                }
-                                            }
-
-                                            .cancel-btn-small {
-                                                background: var(--color-border-light);
-                                                color: var(--color-text-muted);
-
-                                                &:hover {
-                                                    background: var(--color-border);
-                                                    color: var(--color-text-light);
-                                                    transform: scale(1.1);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -581,6 +364,126 @@
         }
     }
 
+    .add-section-card {
+        border: 2px dashed var(--color-border);
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        min-height: 500px;
+        color: var(--color-text-muted);
+        transition: all 0.2s ease;
+
+        .material-icons {
+            font-size: 3rem;
+            color: var(--color-border);
+            transition: all 0.2s ease;
+        }
+
+        p {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        &:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: var(--color-primary-light);
+
+            .material-icons {
+                color: var(--color-primary);
+                transform: scale(1.1);
+            }
+        }
+    }
+
+    .delete-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        height: 100vh;
+        z-index: 100000;
+        overflow: hidden;
+
+        .delete-modal-content {
+            background: var(--color-bg-white);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 420px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.25rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalPop 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+            .warning-icon {
+                font-size: 3rem;
+                color: #e74c3c;
+            }
+
+            p {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: var(--color-text-dark);
+                text-align: center;
+                margin: 0;
+            }
+
+            .delete-modal-actions {
+                display: flex;
+                gap: 1rem;
+                width: 100%;
+
+                button {
+                    flex: 1;
+                    padding: 0.75rem;
+                    border: none;
+                    border-radius: 8px;
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    font-family: inherit;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .confirm-btn {
+                    background: #e74c3c;
+                    color: white;
+
+                    &:hover {
+                        background: #c0392b;
+                        transform: translateY(-1px);
+                        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+                    }
+                }
+
+                .cancel-btn {
+                    background: var(--color-bg-card);
+                    color: var(--color-text-dark);
+                    border: 2px solid var(--color-border);
+
+                    &:hover {
+                        background: var(--color-border);
+                        transform: translateY(-1px);
+                    }
+                }
+            }
+        }
+    }
+
     // ─── Small Desktop (1025px – 1366px) ──────────────────────────────────────
     @media (min-width: 1025px) and (max-width: 1366px) {
         gap: 1.5rem;
@@ -603,15 +506,10 @@
                 border-bottom: 8px solid var(--color-bg-white) !important;
             }
         }
-
-        .action-item-boxes {
-            grid-template-columns: 1fr !important;
-        }
     }
 
-    // ─── Nest Hub (769px – 1024px) ────────────────────────────────────────────
     @media (min-width: 769px) and (max-width: 1024px) {
-        grid-template-columns: 1fr; // stack sections
+        grid-template-columns: 1fr;
         gap: 1.5rem;
         padding-inline: 1.5rem;
 
@@ -621,10 +519,6 @@
 
             .section-header {
                 font-size: 1.1rem;
-            }
-
-            .action-item-boxes {
-                grid-template-columns: 1fr !important;
             }
 
             .input-section {
@@ -637,7 +531,6 @@
         }
     }
 
-    // ─── Tablet (481px – 768px) ───────────────────────────────────────────────
     @media (min-width: 481px) and (max-width: 768px) {
         grid-template-columns: 1fr;
         gap: 1.25rem;
@@ -661,7 +554,7 @@
                     padding: 1rem;
 
                     &:hover {
-                        transform: none; // disable slide on touch
+                        transform: none;
                     }
 
                     .feedback-header {
@@ -673,7 +566,6 @@
                             padding: 0.35rem 0.75rem;
                             font-size: 0.8rem;
 
-                            // reposition tooltip so it doesn't overflow
                             &:hover .voters-tooltip {
                                 left: auto;
                                 right: 0;
@@ -683,17 +575,6 @@
 
                     ul li {
                         font-size: 0.85rem;
-                    }
-
-                    .action-items-section {
-                        .action-item-boxes {
-                            grid-template-columns: 1fr;
-                        }
-
-                        .assignee-content,
-                        .duedate-content {
-                            width: 100% !important;
-                        }
                     }
                 }
             }
@@ -714,7 +595,6 @@
         }
     }
 
-    // ─── Mobile (≤ 480px) ─────────────────────────────────────────────────────
     @media (max-width: 480px) {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -771,7 +651,6 @@
                                 font-size: 0.9rem;
                             }
 
-                            // tooltip opens above on mobile
                             &:hover .voters-tooltip {
                                 top: auto;
                                 bottom: calc(100% + 0.5rem);
@@ -793,30 +672,6 @@
 
                     ul li {
                         font-size: 0.82rem;
-                    }
-
-                    .action-items-section {
-                        padding: 0.6rem;
-
-                        .action-item-boxes {
-                            grid-template-columns: 1fr;
-                            gap: 0.5rem;
-                        }
-
-                        .action-box {
-                            padding: 0.75rem;
-                            min-height: 50px;
-                        }
-
-                        .assignee-content,
-                        .duedate-content {
-                            width: 100% !important;
-                        }
-
-                        .status-toggle {
-                            font-size: 0.78rem;
-                            padding: 0.5rem 1rem;
-                        }
                     }
                 }
             }

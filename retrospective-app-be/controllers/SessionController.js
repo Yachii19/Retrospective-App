@@ -222,6 +222,40 @@ exports.addSession = async (req, res) => {
     }
 }
 
+exports.addSectionBySessionId = async (req, res) => {
+    try {
+        const sessionId = req.params.sessionId;
+        const { title, key } = req.body;
+
+        const specificSession = await Session.findById(sessionId);
+
+        if (!specificSession) {
+            return res.status(404).send({
+                message: `Session with ID: ${sessionId} not found!`
+            });
+        }
+
+        if (specificSession.sections.some(s => s.key === key)) {
+            return res.status(400).send({
+                message: `Section with key: ${key} already exists!`
+            });
+        }
+
+        specificSession.sections.push({ title, key });
+        await specificSession.save();
+
+        return res.status(200).send({
+            message: "Section added successfully",
+            data: specificSession
+        });
+    } catch (err) {
+        console.log(`Error adding section: ${err}`);
+        return res.status(500).send({
+            message: "Server error when adding section"
+        });
+    }
+}
+
 exports.joinSession = async (req, res) => {
     try {
         const sessionId = req.params.sessionId;
@@ -256,6 +290,47 @@ exports.joinSession = async (req, res) => {
         console.log(`Error joining session: ${err}`);
         return res.status(500).send({
             message: "Server error when joining session"
+        });
+    }
+}
+
+exports.deleteSectionBySessionId = async (req, res) => {
+    try {
+        const sessionId = req.params.sessionId;
+        const { key } = req.body;
+
+        const specificSession = await Session.findById(sessionId);
+
+        if (!key || key === undefined) {
+            return res.status(400).send({
+                message: "Section key is required to delete a section"
+            })
+        }
+
+        if (!specificSession) {
+            return res.status(404).send({
+                message: `Session with ID: ${sessionId} not found!`
+            });
+        }
+
+        const sectionIndex = specificSession.sections.findIndex(s => s.key === key);
+        if (sectionIndex === -1) {
+            return res.status(404).send({
+                message: `Section with key: ${key} not found!`
+            });
+        }
+
+        specificSession.sections.splice(sectionIndex, 1);
+        await specificSession.save();
+
+        return res.status(200).send({
+            message: "Section deleted successfully",
+            data: specificSession
+        });
+    } catch (err) {
+        console.log(`Error deleting section: ${err}`);
+        return res.status(500).send({
+            message: "Server error when deleting section"
         });
     }
 }

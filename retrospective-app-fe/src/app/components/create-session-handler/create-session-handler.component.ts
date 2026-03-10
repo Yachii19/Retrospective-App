@@ -97,10 +97,8 @@ export class CreateSessionHandlerComponent {
       return;
     }
 
-    // Generate key from title (lowercase, replace spaces with hyphens)
     const key = this.newSectionTitle.toLowerCase().replace(/\s+/g, '-');
 
-    // Check if section already exists
     if (this.sections.some(s => s.key === key)) {
       this.showError = true;
       this.errorMessage = 'Section already exists';
@@ -116,8 +114,6 @@ export class CreateSessionHandlerComponent {
     this.showError = false;
     this.errorMessage = '';
   }
-
-  
 
   removeSection(index: number): void {
     this.sections.splice(index, 1);

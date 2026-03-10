@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { FeedbackService } from '../../services/feedback.service';
 import { RetroFeedback } from '../../models/feedback.model';
 import { CommonModule } from '@angular/common';
@@ -24,12 +24,23 @@ export class SessionDetailsHandlerComponent {
   errorMessage: string = '';
   currentUserId: string = '';
   isSessionCreator: boolean = false;
-  
 
-  editingAssignee: { [key: string]: boolean } = {};
-  editingDueDate: { [key: string]: boolean } = {};
-  tempAssignee: { [key: string]: string } = {};
-  tempDueDate: { [key: string]: string } = {};
+  sectionKeyToDelete: string = '';
+  showDeleteModal: boolean = false;
+  showAddModal: boolean = false;
+  
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.showDeleteModal) {
+      this.showDeleteModal = false;
+      this.sectionKeyToDelete = '';
+      document.body.style.overflow = '';
+    }
+    if (this.showAddModal) {
+      this.showAddModal = false;
+      document.body.style.overflow = '';
+    }
+  }
 
   constructor(
     private feedbackService: FeedbackService,
@@ -175,117 +186,46 @@ export class SessionDetailsHandlerComponent {
     return section?.actionItems || null;
   }
 
-  toggleActionItemStatus(feedbackId: string, sectionKey: string): void {
-    if (!this.isSessionCreator) {
-      this.showError = true;
-      this.errorMessage = 'Only the session creator can toggle action item status';
-      return;
-    }
+  confirmDeleteSection(): void {
+    if (!this.session) return;
 
-    this.feedbackService.toggleFeedbackVisibility(feedbackId.trim(), { key: sectionKey }).subscribe({
+    this.sessionService.deleteSection(this.session._id, this.sectionKeyToDelete).subscribe({
       next: (response) => {
-        this.feedbackService.getFeedbackBySection(this.sessionId.trim(), sectionKey).subscribe({
-          next: (response) => {
-            this.sessionFeedbacks[sectionKey] = response.data;
-          }
-        });
+        this.showDeleteModal = false;
+        this.sectionKeyToDelete = '';
+        document.body.style.overflow = '';
+        this.loadSession();
       },
       error: (error) => {
-        console.error(`Error toggling status: ${error.error?.message}`);
         this.showError = true;
-        this.errorMessage = error.error?.message || 'Failed to toggle status';
+        this.errorMessage = error.error?.message || 'Failed to delete section';
       }
     });
   }
 
-  shouldShowActionItems(feedback: RetroFeedback, sectionKey: string): boolean {
-    const actionItems = this.getSectionActionItems(feedback, sectionKey);
-
-    if (!actionItems) {
-      return false;
-    }
-    
-    return this.isSessionCreator || actionItems.status === 'Open';
+  showDeleteSectionModal(sectionKey: string): void {
+    this.sectionKeyToDelete = sectionKey;
+    this.showDeleteModal = true;
+    document.body.style.overflow = 'hidden';
   }
 
-  updateActionItems(feedbackId: string, sectionKey: string, assignee?: string | null, dueDate?: string | null): void {
-    if (!this.isSessionCreator) {
-      this.showError = true;
-      this.errorMessage = 'Only the session creator can update action items';
-      return;
-    }
-
-    const updateData: any = { key: sectionKey };
-    
-    if (assignee !== undefined) {
-      updateData.assignee = assignee;
-    }
-    
-    if (dueDate !== undefined) {
-      updateData.dueDate = dueDate;
-    }
-
-    this.feedbackService.updateActionItems(feedbackId, updateData).subscribe({
-      next: (response) => {
-        this.feedbackService.getFeedbackBySection(this.sessionId, sectionKey).subscribe({
-          next: (response) => {
-            this.sessionFeedbacks[sectionKey] = response.data;
-            this.showError = false;
-          }
-        });
-      },
-      error: (error) => {
-        console.error(`Error updating action items: ${error.error?.message}`);
-        this.showError = true;
-        this.errorMessage = error.error?.message || 'Failed to update action items';
-      }
-    });
+  cancelDeleteSection(): void {
+    this.showDeleteModal = false;
+    this.sectionKeyToDelete = '';
+    document.body.style.overflow = '';
   }
 
-  startEditAssignee(feedbackId: string, sectionKey: string): void {
-    const key = feedbackId + sectionKey;
-    const feedback = this.sessionFeedbacks[sectionKey]?.find(f => f._id === feedbackId);
-    const actionItems = this.getSectionActionItems(feedback!, sectionKey);
-    
-    this.editingAssignee[key] = true;
-    this.tempAssignee[key] = actionItems?.assignee || '';
+  showAddSectionModal(): void {
+    this.showAddModal = true;
+    document.body.style.overflow = 'hidden';
   }
 
-  startEditDueDate(feedbackId: string, sectionKey: string): void {
-    const key = feedbackId + sectionKey;
-    const feedback = this.sessionFeedbacks[sectionKey]?.find(f => f._id === feedbackId);
-    const actionItems = this.getSectionActionItems(feedback!, sectionKey);
-    
-    this.editingDueDate[key] = true;
-    if (actionItems?.dueDate) {
-      this.tempDueDate[key] = new Date(actionItems.dueDate).toISOString().split('T')[0];
-    } else {
-      this.tempDueDate[key] = '';
-    }
+  cancelAddSection(): void {
+    this.showAddModal = false;
+    document.body.style.overflow = '';
   }
 
-  saveAssignee(feedbackId: string, sectionKey: string): void {
-    const key = feedbackId + sectionKey;
-    const assignee = this.tempAssignee[key]?.trim() || null;
-    
-    this.updateActionItems(feedbackId, sectionKey, assignee);
-    this.editingAssignee[key] = false;
-  }
-
-  saveDueDate(feedbackId: string, sectionKey: string): void {
-    const key = feedbackId + sectionKey;
-    const dueDate = this.tempDueDate[key] || null;
-    
-    this.updateActionItems(feedbackId, sectionKey, undefined, dueDate);
-    this.editingDueDate[key] = false;
-  }
-
-  cancelEdit(feedbackId: string, sectionKey: string, field: 'assignee' | 'dueDate'): void {
-    const key = feedbackId + sectionKey;
-    if (field === 'assignee') {
-      this.editingAssignee[key] = false;
-    } else {
-      this.editingDueDate[key] = false;
-    }
+  ngOnDestroy(): void {
+    document.body.style.overflow = '';
   }
 }
