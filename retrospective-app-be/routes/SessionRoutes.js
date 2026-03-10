@@ -13,6 +13,8 @@ router.get("/user/sessions", verifyToken, sessionController.getUserSessions);
 
 router.post("/", verifyToken, sessionController.addSession);
 
+router.patch("/add-section/:sessionId", verifyToken, sessionController.addSectionBySessionId);
 router.patch("/:sessionId/join", verifyToken, sessionController.joinSession);
+router.patch("/delete-section/:sessionId", verifyToken, sessionController.deleteSectionBySessionId);
 
 module.exports = router;
