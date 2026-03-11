@@ -50,7 +50,7 @@ exports.getAllRepliesByFeedbackId = async (req, res) => {
             });
         }
 
-        const replies = await Reply.find({ feedback: feedbackId }).populate("createdBy", "username", "email");
+        const replies = await Reply.find({ feedback: feedbackId }).populate("createdBy", "username email");
 
         res.status(200).send({
             message: "Replies retrieved successfully!",

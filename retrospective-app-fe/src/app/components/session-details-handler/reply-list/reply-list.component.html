@@ -1,0 +1,33 @@
+<!-- Replies Section -->
+<div class="replies-section">
+    <button class="view-replies-btn" 
+            >
+        <span class="material-icons">
+            <!-- {{ feedback['showReplies'] ? 'expand_less' : 'expand_more' }} -->
+        </span>
+        <!-- {{ feedback['showReplies'] ? 'Hide replies' : 'View 3 replies' }} -->
+    </button>
+
+    <div class="replies-list" >
+        <!-- sample reply data -->
+        <div class="reply-item">
+            <div class="reply-avatar">J</div>
+            <div class="reply-content">
+                <div class="reply-header">
+                    <span class="reply-username">JohnDoe</span>
+                    <span class="reply-time">2m ago</span>
+                </div>
+                <p>Totally agree with this point!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reply input -->
+    <div class="reply-input-wrapper" >
+        <div class="reply-avatar self">Y</div>
+        <input type="text" [(ngModel)]="replyInput" placeholder="Write a reply..." class="reply-input" />
+        <button class="reply-submit-btn" (click)="sendReply()">
+            <span class="material-icons">send</span>
+        </button>
+    </div>
+</div>

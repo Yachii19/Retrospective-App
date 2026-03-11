@@ -7,11 +7,14 @@ import { SessionService } from '../../services/session.service';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { ReplyListComponent } from './reply-list/reply-list.component';
+import { TimeAgoPipe } from '../../pipes/time-ago.pipe';
+import { NzNotificationService } from 'ng-zorro-antd/notification'
 
 @Component({
   selector: 'app-session-details-handler',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReplyListComponent, TimeAgoPipe],
   templateUrl: './session-details-handler.component.html',
   styleUrl: './session-details-handler.component.scss'
 })
@@ -31,11 +34,6 @@ export class SessionDetailsHandlerComponent {
   showAddModal: boolean = false;
   newSectionTitle: string = '';
   newSectionKey: string = '';
-
-  showNotifModal: boolean = false;
-  notifSuccess: boolean = true;
-  notifMessage: string = ''
-  private notifTimeout: any = null;
   
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
@@ -48,6 +46,7 @@ export class SessionDetailsHandlerComponent {
   }
 
   constructor(
+    private notification: NzNotificationService,
     private feedbackService: FeedbackService,
     private sessionService: SessionService,
     private authService: AuthService,
@@ -66,24 +65,14 @@ export class SessionDetailsHandlerComponent {
   
   ngOnDestroy(): void {
     document.body.style.overflow = '';
-    if (this.notifTimeout) clearTimeout(this.notifTimeout);
   }
 
   showNotification(message: string, success: boolean): void {
-    if (this.notifTimeout) clearTimeout(this.notifTimeout);
-      this.notifMessage = message;
-      this.notifSuccess = success;
-      this.showNotifModal = true;
-
-      this.notifTimeout = setTimeout(() => {
-        this.showNotifModal = false;
-      }, 3000);
-  }
-
-  closeNotif(): void {
-    this.showNotifModal = false;
-    this.notifMessage = '';
-    if (this.notifTimeout) clearTimeout(this.notifTimeout);
+    if (success) {
+      this.notification.success('Success', message)
+    } else {
+      this.notification.error('error', message)
+    }
   }
 
   loadSession(): void {

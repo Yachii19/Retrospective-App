@@ -40,7 +40,7 @@
                         </div>
                         <div class="poster-details">
                             <span class="username">{{feedback.feedbackPoster.username}}</span>
-                            <span class="timestamp">Just now</span>
+                            <span class="timestamp">{{feedback.createdAt | timeAgo }}</span>
                         </div>
                     </div>
 
@@ -71,64 +71,12 @@
                 <div class="feedback-body">
                     <ul>
                         <li *ngFor="let item of getSectionItems(feedback, section.key)">
-                            {{item.trim()}}
+                            <span>{{item.trim()}}</span>
                         </li>
                     </ul>
                 </div>
 
-                <!-- Replies Section -->
-                <div class="replies-section">
-                    <button class="view-replies-btn" 
-                          >
-                        <span class="material-icons">
-                            <!-- {{ feedback['showReplies'] ? 'expand_less' : 'expand_more' }} -->
-                        </span>
-                        <!-- {{ feedback['showReplies'] ? 'Hide replies' : 'View 3 replies' }} -->
-                    </button>
-
-                    <div class="replies-list">
-                        <!-- sample reply data -->
-                        <div class="reply-item">
-                            <div class="reply-avatar">J</div>
-                            <div class="reply-content">
-                                <div class="reply-header">
-                                    <span class="reply-username">JohnDoe</span>
-                                    <span class="reply-time">2m ago</span>
-                                </div>
-                                <p>Totally agree with this point!</p>
-                            </div>
-                        </div>
-                        <div class="reply-item">
-                            <div class="reply-avatar">M</div>
-                            <div class="reply-content">
-                                <div class="reply-header">
-                                    <span class="reply-username">Miracle-</span>
-                                    <span class="reply-time">5m ago</span>
-                                </div>
-                                <p>We should address this in the next sprint.</p>
-                            </div>
-                        </div>
-                        <div class="reply-item">
-                            <div class="reply-avatar">Y</div>
-                            <div class="reply-content">
-                                <div class="reply-header">
-                                    <span class="reply-username">Yachii19s</span>
-                                    <span class="reply-time">10m ago</span>
-                                </div>
-                                <p>I can take ownership of this action item.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Reply input -->
-                    <div class="reply-input-wrapper" >
-                        <div class="reply-avatar self">Y</div>
-                        <input type="text" placeholder="Write a reply..." class="reply-input" />
-                        <button class="reply-submit-btn">
-                            <span class="material-icons">send</span>
-                        </button>
-                    </div>
-                </div>
+                <app-reply-list [feedbackId]="feedback._id"/>
             </div>
 
             <!-- No feedback -->
