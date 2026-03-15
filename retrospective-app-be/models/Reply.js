@@ -19,7 +19,7 @@ const ReplySchema = new mongoose.Schema(
         }
     },
     {
-        tiemstamps: true
+        timestamps: true
     }
 )
 

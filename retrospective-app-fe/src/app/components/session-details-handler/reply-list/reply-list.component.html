@@ -1,33 +1,58 @@
-<!-- Replies Section -->
 <div class="replies-section">
-    <button class="view-replies-btn" 
-            >
-        <span class="material-icons">
-            <!-- {{ feedback['showReplies'] ? 'expand_less' : 'expand_more' }} -->
-        </span>
-        <!-- {{ feedback['showReplies'] ? 'Hide replies' : 'View 3 replies' }} -->
+    <button class="view-replies-btn" *ngIf="replies.length > 0" (click)="toggleReplies()">
+        <div class="replies-btn-inner">
+            <span class="replies-line"></span>
+            <span class="replies-label">
+                <span class="material-icons">
+                    {{ showReplies ? 'expand_less' : 'expand_more' }}
+                </span>
+                {{ showReplies ? 'Hide replies' : 'View ' + replies.length + (replies.length === 1 ? ' reply' : ' replies') }}
+            </span>
+            <span class="replies-line"></span>
+        </div>
     </button>
 
-    <div class="replies-list" >
-        <!-- sample reply data -->
-        <div class="reply-item">
-            <div class="reply-avatar">J</div>
+    <div class="replies-list" *ngIf="showReplies">
+        <div class="reply-item" *ngFor="let reply of replies">
+            <div class="reply-avatar" [style.background]="reply.createdBy.username | avatarColor">
+                {{ reply.createdBy.username.charAt(0).toUpperCase() }}
+            </div>
             <div class="reply-content">
                 <div class="reply-header">
-                    <span class="reply-username">JohnDoe</span>
-                    <span class="reply-time">2m ago</span>
+                    <span class="reply-username">{{ reply.createdBy.username }}</span>
+                    <span class="reply-dot">·</span>
+                    <span class="reply-time">{{ reply.createdAt | timeAgo }}</span>
                 </div>
-                <p>Totally agree with this point!</p>
+                <p>{{ reply.content }}</p>
             </div>
         </div>
     </div>
 
-    <!-- Reply input -->
-    <div class="reply-input-wrapper" >
-        <div class="reply-avatar self">Y</div>
-        <input type="text" [(ngModel)]="replyInput" placeholder="Write a reply..." class="reply-input" />
-        <button class="reply-submit-btn" (click)="sendReply()">
-            <span class="material-icons">send</span>
+    <div class="reply-input-wrapper" [class.focused]="isFocused">
+        <div class="reply-avatar self" [style.background]="currentUsername | avatarColor">
+            {{ currentUserInitial }}
+        </div>
+        <textarea
+            [(ngModel)]="replyInput"
+            (ngModelChange)="onInputChange()"
+            (keydown.enter)="sendReply()"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+            placeholder="Write a reply..."
+            class="reply-input"
+            rows="1">
+        </textarea>
+        <button class="reply-submit-btn" 
+                (click)="sendReply()"
+                [class.has-content]="(replyInput.trim().length > 0)">
+            <span class="material-symbols-outlined">send</span>
         </button>
     </div>
+
+    <!-- Error Message -->
+    <div class="error-message" *ngIf="showError">
+        <span class="material-icons">error_outline</span>
+        {{ errorMessage }}
+    </div>
+
 </div>

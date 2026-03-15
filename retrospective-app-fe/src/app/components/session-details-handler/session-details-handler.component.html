@@ -1,125 +1,130 @@
-<div class="session-grid">
-    <div class="session-content" *ngFor="let section of session?.sections">
-        
-        <!-- Section Header -->
-        <div class="section-header">
-            <div class="section-title">
-                <div class="section-icon-wrapper">
-                    <span class="material-icons">
-                        {{ 
-                            section.key === 'went-well' ? 'sentiment_satisfied'
-                            : section.key === 'needs-improvement' ? 'build_circle'
-                            : 'adjust' 
-                        }}
-                    </span>
-                </div>
-                <span>{{section.title}}</span>
-            </div>
-            <div class="section-actions">
-                <span class="feedback-count" *ngIf="sessionFeedbacks[section.key]?.length">
-                    {{ sessionFeedbacks[section.key].length }} 
-                    {{ sessionFeedbacks[section.key].length === 1 ? 'entry' : 'entries' }}
-                </span>
-                <button class="delete-btn" *ngIf="isSessionCreator" 
-                        (click)="showDeleteSectionModal(section.key)">
-                    <span class="material-icons">delete</span>
-                </button>
-            </div>
-        </div>
 
-        <!-- Feedback List -->
-        <div class="feedback-list">
-            <div class="feedback-item" 
-                 *ngFor="let feedback of sessionFeedbacks[section.key]">
-
-                <!-- Feedback Header -->
-                <div class="feedback-header">
-                    <div class="poster-info">
-                        <div class="avatar">
-                            {{ feedback.feedbackPoster.username.charAt(0).toUpperCase() }}
-                        </div>
-                        <div class="poster-details">
-                            <span class="username">{{feedback.feedbackPoster.username}}</span>
-                            <span class="timestamp">{{feedback.createdAt | timeAgo }}</span>
-                        </div>
-                    </div>
-
-                    <div class="vote-btn" 
-                         (click)="addVote(feedback._id, section.key)" 
-                         [class.voted]="hasUserVoted(feedback)">
-                        <span class="material-icons">
-                            {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
+<div class="session-grid-inner">
+    <div class="session-grid"
+    [class.grid-fluid]="sectionCount <= 3"
+     [class.grid-fixed]="sectionCount > 3">
+        <div class="session-content" *ngFor="let section of session?.sections">
+            
+            <!-- Section Header -->
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="section-icon-wrapper">
+                        <span class="material-symbols-outlined">
+                            {{ 
+                                section.key === 'went-well' ? 'sentiment_satisfied'
+                                : section.key === 'needs-improvement' ? 'build_circle'
+                                : 'adjust' 
+                            }}
                         </span>
-                        <span class="vote-count">{{feedback.votes}}</span>
+                    </div>
+                    <span>{{section.title}}</span>
+                </div>
+                <div class="section-actions">
+                    <span class="feedback-count" *ngIf="sessionFeedbacks[section.key]?.length">
+                        {{ sessionFeedbacks[section.key].length }} 
+                        {{ sessionFeedbacks[section.key].length === 1 ? 'entry' : 'entries' }}
+                    </span>
+                    <button class="delete-btn" *ngIf="isSessionCreator" 
+                            (click)="showDeleteSectionModal(section.key)">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
+                </div>
+            </div>
 
-                        <!-- Voters tooltip -->
-                        <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
-                            <div class="tooltip-header">Voted by</div>
-                            <div class="voter-list">
-                                <div class="voter-item" *ngFor="let voter of feedback.votedBy">
-                                    <span class="voter-avatar">
-                                        {{ voter.username.charAt(0).toUpperCase() }}
-                                    </span>
-                                    <span class="name">{{voter.username}}</span>
+            <!-- Feedback List -->
+            <div class="feedback-list">
+                <div class="feedback-item" 
+                    *ngFor="let feedback of sessionFeedbacks[section.key]">
+
+                    <!-- Feedback Header -->
+                    <div class="feedback-header">
+                        <div class="poster-info">
+                            <div class="avatar" [style.background]="feedback.feedbackPoster.username | avatarColor">
+                                {{ feedback.feedbackPoster.username.charAt(0).toUpperCase() }}
+                            </div>
+                            <div class="poster-details">
+                                <span class="username">{{feedback.feedbackPoster.username}}</span>
+                                <span class="timestamp">{{feedback.createdAt | timeAgo }}</span>
+                            </div>
+                        </div>
+
+                        <div class="vote-btn" 
+                            (click)="addVote(feedback._id, section.key)" 
+                            [class.voted]="hasUserVoted(feedback)">
+                            <span class="material-icons">
+                                {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
+                            </span>
+                            <span class="vote-count">{{feedback.votes}}</span>
+
+                            <!-- Voters tooltip -->
+                            <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
+                                <div class="tooltip-header">Voted by</div>
+                                <div class="voter-list">
+                                    <div class="voter-item" *ngFor="let voter of feedback.votedBy">
+                                        <span class="voter-avatar">
+                                            {{ voter.username.charAt(0).toUpperCase() }}
+                                        </span>
+                                        <span class="name">{{voter.username}}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Feedback Body -->
+                    <div class="feedback-body">
+                        <ul>
+                            <li *ngFor="let item of getSectionItems(feedback, section.key)">
+                                <span>{{item.trim()}}</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <app-reply-list [feedbackId]="feedback._id"/>
                 </div>
 
-                <!-- Feedback Body -->
-                <div class="feedback-body">
-                    <ul>
-                        <li *ngFor="let item of getSectionItems(feedback, section.key)">
-                            <span>{{item.trim()}}</span>
-                        </li>
-                    </ul>
+                <!-- No feedback -->
+                <div class="no-feedback" 
+                    *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
+                    <div class="no-feedback-icon">
+                        <span class="material-icons">forum</span>
+                    </div>
+                    <p>No feedback yet</p>
+                    <small>Be the first to contribute!</small>
                 </div>
-
-                <app-reply-list [feedbackId]="feedback._id"/>
             </div>
 
-            <!-- No feedback -->
-            <div class="no-feedback" 
-                 *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
-                <div class="no-feedback-icon">
-                    <span class="material-icons">forum</span>
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <textarea
+                        [id]="'feedback_input_' + section.key"
+                        [name]="'feedback_input_' + section.key"
+                        [(ngModel)]="feedbackInputs[section.key]"
+                        placeholder="Share your thoughts..."
+                        (keyup.enter)="addFeedback(section.key)"
+                        (input)="onInputChange()"></textarea>
+                    <button class="submit-btn" (click)="addFeedback(section.key)">
+                        <span class="material-symbols-outlined">send</span>
+                        Submit
+                    </button>
                 </div>
-                <p>No feedback yet</p>
-                <small>Be the first to contribute!</small>
+                <div class="error-message" *ngIf="showError">
+                    <span class="material-icons">error_outline</span>
+                    {{errorMessage}}
+                </div>
             </div>
         </div>
 
-        <!-- Input Section -->
-        <div class="input-section">
-            <div class="input-wrapper">
-                <textarea
-                    [id]="'feedback_input_' + section.key"
-                    [name]="'feedback_input_' + section.key"
-                    [(ngModel)]="feedbackInputs[section.key]"
-                    placeholder="Share your thoughts..."
-                    (keyup.enter)="addFeedback(section.key)"
-                    (input)="onInputChange()"></textarea>
-                <button class="submit-btn" (click)="addFeedback(section.key)">
-                    <span class="material-icons">send</span>
-                    Submit
-                </button>
+        <!-- Add Section Card -->
+        <div class="add-section-card" *ngIf="isSessionCreator" (click)="showAddSectionModal()">
+            <div class="add-section-inner">
+                <div class="add-icon-wrapper">
+                    <span class="material-icons">add</span>
+                </div>
+                <p>Add Section</p>
+                <small>Create a custom section</small>
             </div>
-            <div class="error-message" *ngIf="showError">
-                <span class="material-icons">error_outline</span>
-                {{errorMessage}}
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Section Card -->
-    <div class="add-section-card" *ngIf="isSessionCreator" (click)="showAddSectionModal()">
-        <div class="add-section-inner">
-            <div class="add-icon-wrapper">
-                <span class="material-icons">add</span>
-            </div>
-            <p>Add Section</p>
-            <small>Create a custom section</small>
         </div>
     </div>
 </div>
@@ -164,10 +169,6 @@
                 (keydown.enter)="confirmAddSection()"
                 id="section-title-input"
                 placeholder="e.g. Went Well" />
-            <small class="key-preview" *ngIf="newSectionTitle">
-                <span class="material-icons">key</span>
-                {{ newSectionKey }}
-            </small>
         </div>
 
         <div class="modal-actions">

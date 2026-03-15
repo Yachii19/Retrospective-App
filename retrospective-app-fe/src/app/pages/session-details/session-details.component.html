@@ -1,7 +1,10 @@
 <div class="session-details-container">
     <div class="main-content">
         <app-session-details-header/>
-
-        <app-session-details-handler/>
+        <div class="session-grid-border">
+            <div class="session-grid-wrapper" [class.modal-open]="isModalOpen">
+                <app-session-details-handler (modalStateChange)="isModalOpen = $event"/>
+            </div>
+        </div>
     </div>
 </div>

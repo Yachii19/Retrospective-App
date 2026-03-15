@@ -19,6 +19,7 @@ export class LoginHandlerComponent {
   errorMessage: string = '';
   isLoginMode: boolean = true;
   isLoading: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private router: Router,

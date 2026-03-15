@@ -19,6 +19,45 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #FFFFFF;
+        background: #ffffff;
+        overflow-y: auto;
+        padding: 2rem;
+    }
+
+    // ─── Nest Hub (769–1024px) ────────────────────────────────────────────────
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .left-section { display: none; }
+        .right-section { flex: 1.2; padding: 1.5rem; }
+    }
+
+    // ─── Tablet (481–768px) ───────────────────────────────────────────────────
+    @media (min-width: 481px) and (max-width: 768px) {
+        flex-direction: column;
+
+        .left-section {
+            display: none;
+        }
+
+        .right-section {
+            flex: 1;
+            padding: 2rem 1.5rem;
+            align-items: flex-start;
+            padding-top: 2.5rem;
+        }
+    }
+
+    // ─── Mobile (≤480px) ──────────────────────────────────────────────────────
+    @media (max-width: 480px) {
+        flex-direction: column;
+
+        .left-section {
+            display: none;
+        }
+
+        .right-section {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            align-items: center;
+        }
     }
 }

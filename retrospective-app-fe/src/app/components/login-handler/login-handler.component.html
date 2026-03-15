@@ -1,14 +1,20 @@
 <div class="login-form-wrapper">
-    <img src="assets/favicon.ico" alt="">
-    
-    <h2>{{ isLoginMode ? 'Sign In' : 'Sign Up' }}</h2>
+    <div class="logo-wrapper">
+        <img src="assets/favicon.ico" alt="Cloudstaff">
+        <span class="brand-name">Retrospect</span>
+    </div>
+
+    <h2>{{ isLoginMode ? 'Welcome back' : 'Create account' }}</h2>
+    <p class="subtitle">
+        {{ isLoginMode ? 'Sign in to your Retrospect workspace' : 'Get started with Retrospect today' }}
+    </p>
 
     <div class="input-1" *ngIf="!isLoginMode">
         <label for="username">Username</label>
-        <input type="text" 
-            placeholder="Enter your username" 
-            id="username" 
-            [(ngModel)]="username" 
+        <input type="text"
+            placeholder="Enter your username"
+            id="username"
+            [(ngModel)]="username"
             (keyup.enter)="handleSubmit()"
             (input)="onInputChange()"
             [disabled]="isLoading">
@@ -16,10 +22,10 @@
 
     <div class="input-1">
         <label for="email">Email</label>
-        <input type="email" 
-            placeholder="Enter your email" 
-            id="email" 
-            [(ngModel)]="email" 
+        <input type="email"
+            placeholder="Enter your email"
+            id="email"
+            [(ngModel)]="email"
             (keyup.enter)="handleSubmit()"
             (input)="onInputChange()"
             [disabled]="isLoading">
@@ -27,16 +33,25 @@
 
     <div class="input-1">
         <label for="password">Password</label>
-        <input type="password" 
-            placeholder="Enter your password" 
-            id="password" 
-            [(ngModel)]="password" 
-            (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()"
-            [disabled]="isLoading">
+        <div class="input-icon-wrapper">
+            <input 
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="Enter your password"
+                id="password"
+                [(ngModel)]="password"
+                (keyup.enter)="handleSubmit()"
+                (input)="onInputChange()"
+                [disabled]="isLoading">
+            <button class="toggle-password" type="button" (click)="showPassword = !showPassword" tabindex="-1">
+                <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+        </div>
     </div>
 
-    <span class="error-message" *ngIf="showError">{{ errorMessage }}</span>
+    <span class="error-message" *ngIf="showError">
+        <span class="material-icons" style="font-size: 0.9rem;">error_outline</span>
+        {{ errorMessage }}
+    </span>
 
     <button (click)="handleSubmit()" [disabled]="isLoading">
         {{ isLoading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Sign Up') }}

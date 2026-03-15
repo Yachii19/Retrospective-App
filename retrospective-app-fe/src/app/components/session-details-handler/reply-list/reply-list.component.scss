@@ -1,76 +1,112 @@
 .replies-section {
-    margin-top: 0.875rem;
+    margin-top: 1rem;
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--color-border-light);
 
+    // ── Toggle button ─────────────────────────────────────────────────────────
     .view-replies-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
+        width: 100%;
         background: none;
         border: none;
-        font-size: 0.78rem;
-        font-weight: 600;
-        color: var(--color-text-muted);
         cursor: pointer;
         padding: 0.25rem 0;
         font-family: inherit;
-        transition: color 0.2s ease;
+        margin-bottom: 0.75rem;
 
-        .material-icons { font-size: 1rem; }
+        .replies-btn-inner {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
 
-        &:hover { color: var(--color-primary); }
+            .replies-line {
+                flex: 1;
+                height: 1px;
+                background: var(--color-border-light);
+                border-radius: 1px;
+            }
+
+            .replies-label {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.2rem;
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--color-text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.4px;
+                white-space: nowrap;
+                transition: color 0.2s ease;
+
+                .material-icons {
+                    font-size: 0.9rem;
+                    transition: transform 0.2s ease;
+                }
+            }
+        }
+
+        &:hover .replies-label {
+            color: var(--color-primary);
+        }
+
+        &:hover .replies-line {
+            background: rgba(0, 122, 255, 0.2);
+        }
     }
 
+    // ── Replies list ──────────────────────────────────────────────────────────
     .replies-list {
-        margin-top: 0.75rem;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-        max-height: 200px;
+        gap: 0.4rem;
+        max-height: 220px;
         overflow-y: auto;
-        padding-right: 0.25rem;
+        margin-bottom: 0.75rem;
+        padding: 0.25rem 0.25rem 0.25rem 0;
 
-        &::-webkit-scrollbar { width: 4px; }
-        &::-webkit-scrollbar-track {
-            background: var(--color-bg-gray);
-            border-radius: 4px;
-        }
+        &::-webkit-scrollbar { width: 3px; }
+        &::-webkit-scrollbar-track { background: transparent; }
         &::-webkit-scrollbar-thumb {
             background: var(--color-border);
             border-radius: 4px;
+            &:hover { background: var(--color-primary); }
         }
 
         .reply-item {
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
+            animation: replyFadeIn 0.2s ease;
 
             .reply-avatar {
-                width: 26px;
-                height: 26px;
+                width: 24px;
+                height: 24px;
                 border-radius: 50%;
-                background: var(--color-bg-gray);
-                color: var(--color-text-medium);
-                font-size: 0.7rem;
+                color: white;
+                font-size: 0.65rem;
                 font-weight: 700;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 flex-shrink: 0;
-                border: 1px solid var(--color-border-light);
+                margin-top: 0.15rem;
             }
 
             .reply-content {
                 flex: 1;
-                background: var(--color-bg-card);
-                border-radius: 0 8px 8px 8px;
-                padding: 0.5rem 0.75rem;
-                border: 1px solid var(--color-border-light);
+                background: #f0f4ff;
+                border-radius: 0 10px 10px 10px;
+                padding: 0.45rem 0.75rem;
+                border: 1px solid rgba(0, 122, 255, 0.07);
+                min-width: 0;
+                transition: background 0.15s ease;
+
+                &:hover { background: #e8efff; }
 
                 .reply-header {
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
-                    margin-bottom: 0.2rem;
+                    gap: 0.3rem;
+                    margin-bottom: 0.15rem;
 
                     .reply-username {
                         font-size: 0.75rem;
@@ -78,8 +114,14 @@
                         color: var(--color-text-dark);
                     }
 
+                    .reply-dot {
+                        color: var(--color-text-muted);
+                        font-size: 0.75rem;
+                        line-height: 1;
+                    }
+
                     .reply-time {
-                        font-size: 0.68rem;
+                        font-size: 0.67rem;
                         color: var(--color-text-muted);
                     }
                 }
@@ -89,49 +131,67 @@
                     font-size: 0.8rem;
                     color: var(--color-text-medium);
                     line-height: 1.5;
+                    white-space: pre-wrap;
+                    word-break: break-word;
                 }
             }
         }
     }
 
-    // ── Reply Input ───────────────────────────────────────────
+    // ── Reply input wrapper ───────────────────────────────────────────────────
     .reply-input-wrapper {
         display: flex;
-        align-items: center;
+        align-items: flex-end;
         gap: 0.5rem;
-        margin-top: 0.5rem;
+        padding: 0.4rem 0.4rem 0.4rem 0.5rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: 14px;
+        background: var(--color-bg-white);
+        transition: all 0.2s ease;
+
+        &.focused {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+        }
 
         .reply-avatar.self {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            background: var(--color-primary);
             color: white;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            margin-bottom: 0.3rem;
         }
 
         .reply-input {
             flex: 1;
-            padding: 0.45rem 0.75rem;
-            border: 1.5px solid var(--color-border);
-            border-radius: 20px;
+            border: none;
+            background: transparent;
             font-size: 0.8rem;
             font-family: inherit;
-            background: var(--color-bg-white);
             color: var(--color-text-dark);
-            transition: all 0.2s ease;
+            resize: none;
+            min-height: 28px;
+            max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.5;
+            padding: 0.3rem 0;
+            outline: none;
+            min-width: 0;
 
             &::placeholder { color: var(--color-text-muted); }
 
-            &:focus {
-                outline: none;
-                border-color: var(--color-primary);
-                box-shadow: 0 0 0 3px var(--color-primary-light);
+            &::-webkit-scrollbar { width: 3px; }
+            &::-webkit-scrollbar-track { background: transparent; }
+            &::-webkit-scrollbar-thumb {
+                background: var(--color-border);
+                border-radius: 4px;
+                &:hover { background: var(--color-primary); }
             }
         }
 
@@ -139,23 +199,99 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
             border: none;
-            background: var(--color-primary);
-            color: white;
+            background: var(--color-bg-gray);
+            color: var(--color-text-muted);
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: inherit;
             flex-shrink: 0;
 
-            .material-icons { font-size: 0.95rem; }
+            .material-symbols-outlined { font-size: 0.9rem; }
+
+            &.has-content {
+                background: var(--color-primary);
+                color: white;
+            }
 
             &:hover {
+                transform: scale(1.08);
+            }
+
+            &.has-content:hover {
                 background: var(--color-primary-dark);
-                transform: scale(1.05);
+                box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3);
+            }
+
+            &:active { transform: scale(0.95); }
+        }
+    }
+
+    // ── Error ─────────────────────────────────────────────────────────────────
+    .error-message {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
+        color: #e74c3c;
+        font-weight: 500;
+        padding: 0.4rem 0.6rem;
+        background: #fef2f2;
+        border-radius: 6px;
+        border: 1px solid rgba(231, 76, 60, 0.15);
+
+        .material-icons { font-size: 0.85rem; }
+    }
+}
+
+// ─── Tablet & below ────────────────────────────────────────────────────────────
+@media (max-width: 768px) {
+    .replies-section {
+        .replies-list {
+            max-height: 180px;
+        }
+
+        .reply-input-wrapper {
+            border-radius: 10px;
+        }
+    }
+}
+
+// ─── Mobile (≤480px) ──────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+    .replies-section {
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+
+        .view-replies-btn {
+            .replies-btn-inner .replies-label {
+                font-size: 0.68rem;
+            }
+        }
+
+        .replies-list {
+            max-height: 150px;
+
+            .reply-item .reply-content p {
+                font-size: 0.75rem;
+            }
+        }
+
+        .reply-input-wrapper {
+            padding: 0.3rem 0.3rem 0.3rem 0.4rem;
+
+            .reply-input {
+                font-size: 0.75rem;
             }
         }
     }
+}
+
+@keyframes replyFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
 }

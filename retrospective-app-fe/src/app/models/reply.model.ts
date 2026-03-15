@@ -3,6 +3,8 @@ export interface Reply {
     feedbackId: string;
     content: string;
     createdBy: User;
+    createdAt: string,
+    updatedAt: string
 }
 
 export interface User {

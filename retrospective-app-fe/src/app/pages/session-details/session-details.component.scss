@@ -1,5 +1,5 @@
 .session-details-container {
-    min-height: 100vh; 
+    min-height: 100vh;
     background: #f5f7fa;
     padding: 2rem 0;
     overflow: hidden;
@@ -8,17 +8,170 @@
         width: 95%;
         max-width: 1700px;
         margin: 0 auto;
-        padding: 0 1rem; 
+        padding: 0 1rem;
     }
 }
 
-@media (max-width: 768px) {
+.session-grid-border {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    box-shadow:
+        0 0 0 1px rgba(0, 122, 255, 0.06),
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 8px 32px rgba(0, 122, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    overflow: hidden;
+}
+
+.session-grid-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    user-select: none;
+    width: 100%;
+    padding-block: 1.5rem;
+
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 2rem,
+        black 2rem,
+        black calc(100% - 2rem),
+        transparent calc(100% - 2rem)
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent 2rem,
+        black 2rem,
+        black calc(100% - 2rem),
+        transparent calc(100% - 2rem)
+    );
+
+    &.modal-open {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
+// ─── Large Desktop (1700px+) ───────────────────────────────────────────────────
+@media (min-width: 1700px) {
+    .session-details-container .main-content {
+        padding: 0 2rem;
+    }
+}
+
+// ─── Small Desktop / Laptop (1025px–1366px) ────────────────────────────────────
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .session-details-container {
+        padding: 1.5rem 0;
+
+        .main-content {
+            width: 97%;
+            padding: 0 1rem;
+        }
+    }
+}
+
+// ─── Nest Hub (769px–1024px) ───────────────────────────────────────────────────
+@media (min-width: 769px) and (max-width: 1024px) {
+    .session-details-container {
+        padding: 1.25rem 0;
+
+        .main-content {
+            width: 97%;
+            padding: 0 0.75rem;
+        }
+    }
+
+    .session-grid-border {
+        border-radius: 16px;
+    }
+
+    .session-grid-wrapper {
+        padding-block: 1.25rem;
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 1.5rem,
+            black 1.5rem,
+            black calc(100% - 1.5rem),
+            transparent calc(100% - 1.5rem)
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 1.5rem,
+            black 1.5rem,
+            black calc(100% - 1.5rem),
+            transparent calc(100% - 1.5rem)
+        );
+    }
+}
+
+// ─── Tablet (481px–768px) ──────────────────────────────────────────────────────
+@media (min-width: 481px) and (max-width: 768px) {
     .session-details-container {
         padding: 1rem 0;
 
         .main-content {
-            width: 95%;
+            width: 100%;
+            padding: 0 0.75rem;
+        }
+    }
+
+    .session-grid-border {
+        border-radius: 14px;
+    }
+
+    .session-grid-wrapper {
+        padding-block: 1rem;
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 1rem,
+            black 1rem,
+            black calc(100% - 1rem),
+            transparent calc(100% - 1rem)
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 1rem,
+            black 1rem,
+            black calc(100% - 1rem),
+            transparent calc(100% - 1rem)
+        );
+    }
+}
+
+// ─── Mobile (≤480px) ──────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+    .session-details-container {
+        padding: 0.75rem 0;
+
+        .main-content {
+            width: 100%;
             padding: 0 0.5rem;
         }
+    }
+
+    .session-grid-border {
+        border-radius: 12px;
+    }
+
+    .session-grid-wrapper {
+        padding-block: 0.75rem;
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0.75rem,
+            black 0.75rem,
+            black calc(100% - 0.75rem),
+            transparent calc(100% - 0.75rem)
+        );
+        mask-image: linear-gradient(
+            to right,
+            transparent 0.75rem,
+            black 0.75rem,
+            black calc(100% - 0.75rem),
+            transparent calc(100% - 0.75rem)
+        );
     }
 }
