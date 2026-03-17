@@ -102,16 +102,19 @@
                         [name]="'feedback_input_' + section.key"
                         [(ngModel)]="feedbackInputs[section.key]"
                         placeholder="Share your thoughts..."
-                        (keyup.enter)="addFeedback(section.key)"
-                        (input)="onInputChange()"></textarea>
-                    <button class="submit-btn" (click)="addFeedback(section.key)">
+                        (keydown.enter)="addFeedback(section.key , $event)"
+                        (input)="onInputChange(section.key)"></textarea>
+                    <button 
+                        class="submit-btn" 
+                        (click)="addFeedback(section.key)"
+                        [disabled]="submissionInProgress[section.key]">
                         <span class="material-symbols-outlined">send</span>
                         Submit
                     </button>
                 </div>
-                <div class="error-message" *ngIf="showError">
+                <div class="error-message" *ngIf="sectionErrors[section.key]">
                     <span class="material-icons">error_outline</span>
-                    {{errorMessage}}
+                    {{sectionErrors[section.key]}}
                 </div>
             </div>
         </div>

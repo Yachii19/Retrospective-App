@@ -10,7 +10,7 @@ module.exports.createAccessToken = (user) => {
     email: user.email,
     username: user.username
   };
-  return jwt.sign(data, secret, {});
+  return jwt.sign(data, secret, { expiresIn: "24h" });
 };
 
 module.exports.verifyToken = async (req, res, next) => {

@@ -27,8 +27,9 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   sessionId: string = '';
   sessionFeedbacks: { [key: string]: RetroFeedback[] } = {};
   feedbackInputs: { [key: string]: string } = {};
-  showError: boolean = false;
-  errorMessage: string = '';
+
+  sectionErrors: { [key: string]: string } = {};
+
   currentUserId: string = '';
   isSessionCreator: boolean = false;
 
@@ -38,6 +39,8 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   showAddModal: boolean = false;
   newSectionTitle: string = '';
   newSectionKey: string = '';
+
+  submissionInProgress: { [key: string]: boolean } = {};
 
   get sectionCount(): number {
     const sections = this.session?.sections?.length ?? 0;
@@ -107,33 +110,40 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
   // ── Feedback ──────────────────────────────────────────────────────────────
 
-  onInputChange(): void {
-    this.showError = false;
-    this.errorMessage = '';
+  onInputChange(sectionKey: string): void {
+    this.sectionErrors[sectionKey] = '';
   }
 
-  addFeedback(sectionKey: string): void {
+  addFeedback(sectionKey: string, event?: Event): void {
+    if  (event) event.preventDefault();
+
+    if (this.submissionInProgress[sectionKey]) return;
+
     const feedbackText = this.feedbackInputs[sectionKey] || '';
 
     if (!feedbackText.trim()) {
-      this.showError = true;
-      this.errorMessage = 'Feedback input is empty. Please provide a feedback!';
+      this.sectionErrors[sectionKey] = 'Feedback input is empty. Please provide a feedback!';
       return;
     }
+
+    this.submissionInProgress[sectionKey] = true;
 
     const feedbackData = { sectionKey, feedbackText };
 
     this.feedbackService.addFeedback(this.sessionId, feedbackData).subscribe({
       next: () => {
         this.feedbackInputs[sectionKey] = '';
+        this.sectionErrors[sectionKey] = '';
         this.reloadSectionFeedbacks(sectionKey);
-        this.showError = false;
-        this.errorMessage = '';
+        this.submissionInProgress[sectionKey] = false;
       },
       error: (err) => {
         console.error('Error adding feedback:', err);
-        this.showError = true;
-        this.errorMessage = 'Failed to add feedback. Please try again.';
+        this.sectionErrors[sectionKey] = 'Failed to add feedback. Please try again.';
+        this.submissionInProgress[sectionKey] = false;
+      },
+      complete: () => {
+        this.submissionInProgress[sectionKey] = false;
       }
     });
   }
@@ -166,14 +176,12 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     action$.subscribe({
       next: () => this.reloadSectionFeedbacks(sectionKey),
       error: (error) => {
-        this.showError = true;
-        this.errorMessage = error.error?.message || 'Failed to update vote';
+        this.sectionErrors[sectionKey] = error.error?.message || 'Failed to update vote';
       }
     });
   }
 
   // ── Section helpers ───────────────────────────────────────────────────────
-
   onSectionTitleChange(): void {
     this.newSectionKey = this.newSectionTitle
       .toLowerCase()

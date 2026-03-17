@@ -69,7 +69,9 @@ export class ReplyListComponent {
     this.showReplies = !this.showReplies;
   }
 
-  sendReply(): void {
+  sendReply(event?: Event): void {
+    if (event) event.preventDefault();
+
     if(!this.replyInput.trim()) {
       this.showError = true;
       this.errorMessage = 'Please provide a message reply!';
