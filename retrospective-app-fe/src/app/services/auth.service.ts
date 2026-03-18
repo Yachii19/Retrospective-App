@@ -20,20 +20,46 @@ export class AuthService {
   }
 
   // Register new user
-  register(username: string, email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, { 
+  register(username: string, email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, { 
       username, 
       email, 
       password,
+    });
+  }
+
+  verifyOTP(email: string, otp: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/verify-otp`, { 
+      email, 
+      otp,
     }).pipe(
       tap(response => {
-        // Save token and user data to localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
       })
     );
   }
 
+  resendOTP(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/resend-otp`, { 
+      email, 
+    });
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { 
+      email, 
+    });
+  }
+
+  resetPassword = (email: string, token: string, newPassword: string): Observable<any> => {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, {
+      email,
+      token,
+      newPassword
+    });
+  }
+ 
   // Login existing user
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { 

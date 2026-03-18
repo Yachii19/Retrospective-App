@@ -3,11 +3,15 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NzModalService, NzModalRef } from 'ng-zorro-antd/modal';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { OtpModalComponent } from '../shared/otp-modal/otp-modal.component';
+import { ForgotPasswordModalComponent } from '../shared/forgot-password-modal/forgot-password-modal.component';
 
 @Component({
   selector: 'app-login-handler',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, OtpModalComponent, ForgotPasswordModalComponent],
   templateUrl: './login-handler.component.html',
   styleUrl: './login-handler.component.scss'
 })
@@ -23,7 +27,9 @@ export class LoginHandlerComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private modal: NzModalService,
+    private notification: NzNotificationService
   ) {}
 
   onInputChange():void {
@@ -56,6 +62,12 @@ export class LoginHandlerComponent {
       },
       error: (error) => {
         this.isLoading = false;
+
+        if (error.status === 403) {
+          this.openOtpModal(error.error?.email || this.email);
+          return;
+        }
+
         this.showError = true;
         this.errorMessage = error.error?.message || 'Login failed. Please try again.';
       }
@@ -74,7 +86,7 @@ export class LoginHandlerComponent {
     this.authService.register(this.username, this.email, this.password).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.router.navigate(['/dashboard']);
+        this.openOtpModal(this.email);
       },
       error: (error) => {
         console.error('Registration failed:', error);
@@ -91,5 +103,36 @@ export class LoginHandlerComponent {
     } else {
       this.signUp();
     }
+  }
+
+  openOtpModal(email: string): void {
+    const modalRef: NzModalRef = this.modal.create({
+      nzTitle: '',
+      nzFooter: null,
+      nzClosable: false,
+      nzMaskClosable: false,
+      nzCentered: true,
+      nzWidth: 420,
+      nzContent: OtpModalComponent,
+      nzData: { email }
+    });
+
+    modalRef.afterClose.subscribe((result) => {
+      if (result === 'verified') {
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
+  openForgotPasswordModal(): void {
+    this.modal.create({
+      nzTitle: '',
+      nzFooter: null,
+      nzClosable: false,
+      nzMaskClosable: true,
+      nzCentered: true,
+      nzWidth: 420,
+      nzContent: ForgotPasswordModalComponent
+    })
   }
 }

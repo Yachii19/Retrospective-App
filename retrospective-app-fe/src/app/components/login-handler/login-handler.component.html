@@ -1,7 +1,7 @@
 <div class="login-form-wrapper">
     <div class="logo-wrapper">
         <img src="assets/favicon.ico" alt="Cloudstaff">
-        <span class="brand-name">Retrospect</span>
+        <span class="brand-name">RetroFlow</span>
     </div>
 
     <h2>{{ isLoginMode ? 'Welcome back' : 'Create account' }}</h2>
@@ -34,7 +34,7 @@
     <div class="input-1">
         <label for="password">Password</label>
         <div class="input-icon-wrapper">
-            <input 
+            <input
                 [type]="showPassword ? 'text' : 'password'"
                 placeholder="Enter your password"
                 id="password"
@@ -46,6 +46,11 @@
                 <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
             </button>
         </div>
+    </div>
+
+    <!-- Forgot password link — only in login mode -->
+    <div class="forgot-password" *ngIf="isLoginMode">
+        <a (click)="openForgotPasswordModal()">Forgot password?</a>
     </div>
 
     <span class="error-message" *ngIf="showError">

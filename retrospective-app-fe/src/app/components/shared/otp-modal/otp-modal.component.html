@@ -1,0 +1,40 @@
+<div class="otp-modal">
+  <div class="otp-modal-icon">
+    <span class="material-symbols-outlined">mark_email_unread</span>
+  </div>
+
+  <h2>Verify your email</h2>
+  <p class="otp-subtitle">
+    We sent a 6-digit code to <strong>{{ data.email }}</strong>. Enter it below to continue.
+  </p>
+
+  <div class="otp-inputs">
+    <input
+      *ngFor="let i of [0,1,2,3,4,5]"
+      type="text"
+      maxlength="1"
+      inputmode="numeric"
+      class="otp-box"
+      [(ngModel)]="otpDigits[i]"
+      (input)="onDigitInput($event, i)"
+      (keydown)="onKeyDown($event, i)"
+      [id]="'otp-' + i"
+    />
+  </div>
+
+  <div class="error-message" *ngIf="errorMessage">
+    <span class="material-icons">error_outline</span>
+    {{ errorMessage }}
+  </div>
+
+  <button class="submit-btn" (click)="verifyOTP()" [disabled]="isLoading || otpDigits.join('').length < 6">
+    {{ isLoading ? 'Verifying...' : 'Verify Email' }}
+  </button>
+
+  <p class="resend-text">
+    Didn't receive a code?
+    <a (click)="resendOTP()" [class.disabled]="resendCooldown > 0 || isResending">
+      {{ resendCooldown > 0 ? 'Resend in ' + resendCooldown + 's' : (isResending ? 'Sending...' : 'Resend OTP') }}
+    </a>
+  </p>
+</div>

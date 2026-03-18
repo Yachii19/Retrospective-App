@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class AvatarColorPipe implements PipeTransform {
 
-  transform(username: string): string {
+  transform(username: string | null): string {
     const colors = [
         '#007aff',
         '#5856d6',
@@ -15,7 +15,7 @@ export class AvatarColorPipe implements PipeTransform {
         '#ff9500',
         '#ff6b6b',
     ];
-    const index = username.charCodeAt(0) % colors.length;
+    const index = username ? username.charCodeAt(0) % colors.length : 0;
     return colors[index];
   }
 }

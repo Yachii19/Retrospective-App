@@ -1,10 +1,23 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
+const PUBLIC_ROUTES = [
+  '/auth/register',
+  '/auth/login',
+  '/auth/verify-otp',
+  '/auth/resend-otp',
+  '/auth/forgot-password',
+  '/auth/reset-password'
+];
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  // Get token from localStorage
+  const isPublic = PUBLIC_ROUTES.some(route => req.url.includes(route));
+
+  if (isPublic) {
+    return next(req); // ← skip token for public routes
+  }
+
   const token = localStorage.getItem('token');
 
-  // If token exists, clone request and add Authorization header
   if (token) {
     const clonedRequest = req.clone({
       setHeaders: {
@@ -14,6 +27,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(clonedRequest);
   }
 
-  // If no token, proceed with original request
   return next(req);
 };

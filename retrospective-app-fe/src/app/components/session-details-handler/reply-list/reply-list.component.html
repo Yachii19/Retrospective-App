@@ -43,6 +43,7 @@
             rows="1">
         </textarea>
         <button class="reply-submit-btn" 
+                [disabled]="submissionInProgress"
                 (click)="sendReply()"
                 [class.has-content]="(replyInput.trim().length > 0)">
             <span class="material-symbols-outlined">send</span>

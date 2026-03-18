@@ -4,6 +4,8 @@ import { AuthService } from '../../services/auth.service';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { Router, RouterLink } from '@angular/router';
 import { RecentSessionCardsComponent } from '../../components/recent-session-cards/recent-session-cards.component';
+import { UserService } from '../../services/user.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,19 +15,21 @@ import { RecentSessionCardsComponent } from '../../components/recent-session-car
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent implements OnInit {
-  username: string | null = '';
+  username$!: Observable<string>;
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
+
+ 
 
   ngOnInit(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
       return;
     }
-
-    this.username = this.authService.getUsername();
+    this.username$ = this.userService.getUsername();
   }
 }

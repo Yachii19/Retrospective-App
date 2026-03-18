@@ -1,0 +1,485 @@
+.profile-container {
+    display: flex;
+    min-height: 100vh;
+    background: radial-gradient(1200px 600px at 10% -10%, rgba(0, 122, 255, 0.10), transparent 60%),
+                radial-gradient(900px 500px at 90% 0%, rgba(0, 122, 255, 0.06), transparent 55%),
+                var(--color-bg-gray);
+
+    .main-content {
+        flex: 1;
+        padding: 2.5rem 3rem 2.5rem 288px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+
+// ── Hero ──────────────────────────────────────────────────────────────────────
+.profile-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #ffffff 0%, #f3f7ff 100%);
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+    padding: 1.75rem 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+
+    .hero-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .hero-avatar {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.4rem;
+        font-weight: 700;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .hero-text {
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin: 0 0 0.2rem 0;
+            line-height: 1.2;
+        }
+        p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(0, 122, 255, 0.08);
+        color: var(--color-primary);
+        border: 1px solid rgba(0, 122, 255, 0.18);
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+
+        .material-symbols-outlined { font-size: 1rem; }
+    }
+}
+
+// ── Section Block ─────────────────────────────────────────────────────────────
+.section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-left: 0.25rem;
+
+    .section-icon-wrapper {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--color-primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .material-symbols-outlined {
+            font-size: 1.05rem;
+            color: var(--color-primary);
+        }
+    }
+
+    .section-title {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--color-text-dark);
+        line-height: 1.2;
+    }
+
+    .section-subtitle {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--color-text-muted);
+    }
+}
+
+// ── Profile Info Grid ─────────────────────────────────────────────────────────
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.info-card {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    padding: 1.25rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 6px 18px rgba(0, 122, 255, 0.08);
+        border-color: rgba(0, 122, 255, 0.2);
+    }
+
+    .info-card-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: var(--color-bg-gray);
+        border: 1px solid var(--color-border-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        .material-symbols-outlined {
+            font-size: 1.1rem;
+            color: var(--color-text-muted);
+        }
+    }
+
+    .info-card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        min-width: 0;
+    }
+
+    .info-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--color-text-muted);
+    }
+
+    .info-value {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-dark);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+// ── Settings Grid ─────────────────────────────────────────────────────────────
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
+.card {
+    background: var(--color-bg-white);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: box-shadow 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 8px 24px rgba(0, 122, 255, 0.07);
+    }
+}
+
+// ── Inputs — matching login-handler style ─────────────────────────────────────
+.input-1 {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 1rem;
+
+    label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--color-text-light);
+        margin-bottom: 0.4rem;
+    }
+
+    .input-icon-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input { padding-right: 2.75rem; }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            width: auto;
+            margin: 0;
+            transition: color 0.2s ease;
+
+            &:hover { color: var(--color-primary); }
+            &:hover:not(:disabled) {
+                transform: none;
+                box-shadow: none;
+                background: none;
+            }
+
+            .material-icons { font-size: 1.1rem; }
+        }
+    }
+
+    input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid var(--color-border);
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        color: var(--color-text-dark);
+        background: var(--color-bg-white);
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+
+        &::placeholder { color: var(--color-text-muted); }
+
+        &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-light);
+        }
+
+        &:disabled {
+            background: var(--color-bg-gray);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    }
+}
+
+// ── Hint ──────────────────────────────────────────────────────────────────────
+.hint {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    margin-bottom: 0.75rem;
+
+    .material-symbols-outlined { font-size: 0.9rem; opacity: 0.7; }
+}
+
+// ── Password Strength ─────────────────────────────────────────────────────────
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+
+    .strength-bars {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+
+        .bar {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--color-border);
+            transition: background 0.3s ease;
+
+            &.active {
+                &.weak   { background: #e74c3c; }
+                &.fair   { background: #f39c12; }
+                &.strong { background: #1e8e5a; }
+                background: var(--color-border);
+            }
+        }
+    }
+
+    .strength-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        min-width: 40px;
+        text-align: right;
+
+        &.weak   { color: #e74c3c; }
+        &.fair   { color: #f39c12; }
+        &.strong { color: #1e8e5a; }
+    }
+}
+
+// ── Card Actions ──────────────────────────────────────────────────────────────
+.card-actions {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+// ── Primary Button — matching login-handler style ─────────────────────────────
+.primary-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.8rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    justify-content: center;
+
+    .material-symbols-outlined { font-size: 1rem; }
+
+    &:hover:not(:disabled) {
+        background: var(--color-primary-dark);
+        box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) { transform: translateY(0); }
+
+    &:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+// ── Status Messages ───────────────────────────────────────────────────────────
+.status-message {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.875rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.6rem 0.875rem;
+    border-radius: 8px;
+
+    .material-symbols-outlined { font-size: 0.9rem; }
+
+    &.success {
+        color: #1e8e5a;
+        background: #f0fdf7;
+        border: 1px solid #a7f3d0;
+    }
+
+    &.error {
+        color: #e74c3c;
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+    }
+}
+
+// ─── Large Desktop (1700px+) ───────────────────────────────────────────────────
+@media (min-width: 1700px) {
+    .profile-container .main-content {
+        padding: 3rem 4rem 3rem 308px;
+    }
+}
+
+// ─── Small Desktop / Laptop (1025px–1366px) ────────────────────────────────────
+@media (min-width: 1025px) and (max-width: 1366px) {
+    .profile-container .main-content {
+        padding: 2rem 2rem 2rem 288px;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+// ─── Nest Hub (769px–1024px) ───────────────────────────────────────────────────
+@media (min-width: 769px) and (max-width: 1024px) {
+    .profile-container .main-content {
+        padding: 1.5rem 1.5rem 1.5rem 96px;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ─── Tablet (481px–768px) ──────────────────────────────────────────────────────
+@media (min-width: 481px) and (max-width: 768px) {
+    .profile-container .main-content {
+        padding: 5rem 1.25rem 5rem 1.25rem;
+    }
+
+    .profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// ─── Mobile (≤480px) ──────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+    .profile-container .main-content {
+        padding: 4.5rem 1rem 5rem 1rem;
+    }
+
+    .profile-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.875rem;
+        padding: 1.25rem;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+}

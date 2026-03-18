@@ -25,6 +25,7 @@ export class ReplyListComponent {
   showReplies: boolean = false;
   isFocused: boolean = false;
 
+  submissionInProgress: boolean = false;
 
   @Input() feedbackId!: string
 
@@ -72,6 +73,10 @@ export class ReplyListComponent {
   sendReply(event?: Event): void {
     if (event) event.preventDefault();
 
+    if (this.submissionInProgress) return;
+
+    this.submissionInProgress = true;
+
     if(!this.replyInput.trim()) {
       this.showError = true;
       this.errorMessage = 'Please provide a message reply!';
@@ -89,7 +94,8 @@ export class ReplyListComponent {
       error: (err) => {
         this.showError = true;
         this.errorMessage = 'Please provide a message reply!'
-      }
+      },
+      complete: () => this.submissionInProgress = false
     });
   }
 }

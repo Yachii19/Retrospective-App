@@ -4,7 +4,7 @@
         <span>Retrospect App</span>
     </div>
     <div class="mobile-header-right">
-        <span class="mobile-username">{{ username }}</span>
+        <span class="mobile-username">{{ username$ | async }}</span>
         <button class="mobile-logout-btn" (click)="logout()">
             <span class="material-symbols-outlined">exit_to_app</span>
         </button>
@@ -21,7 +21,7 @@
         <span class="material-symbols-outlined">
             account_circle
         </span>
-        <p class="username">{{ username }}</p>
+        <p class="username">{{ username$ | async }}</p>
     </div>
 
     <nav class="sidebar-nav">
@@ -49,6 +49,10 @@
                     workspaces
                 </span>
                 <span>My Contributions</span>
+            </li>
+            <li [routerLink]="['/profile']" routerLinkActive="active">
+                <span class="material-symbols-outlined">manage_accounts</span>
+                <span>Profile</span>
             </li>
         </ul>
     </nav>

@@ -1,0 +1,205 @@
+<div class="profile-container">
+  <app-sidebar/>
+
+  <div class="main-content" *ngIf="currentUser$ | async as user">
+
+    <!-- Hero Header -->
+    <header class="profile-hero">
+      <div class="hero-left">
+        <div class="hero-avatar" [style.background]="user.username | avatarColor">
+          {{ user.username?.charAt(0)?.toUpperCase() }}
+        </div>
+        <div class="hero-text">
+          <h1>{{ user.username || 'Your Profile' }}</h1>
+          <p>{{ user.email }}</p>
+        </div>
+      </div>
+      <div class="hero-badge">
+        <span class="material-symbols-outlined">verified_user</span>
+        <span>Account Settings</span>
+      </div>
+    </header>
+
+    <!-- Profile Info Section -->
+    <section class="section-block">
+      <div class="section-label">
+        <div class="section-icon-wrapper">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+        <div>
+          <span class="section-title">Profile Information</span>
+          <span class="section-subtitle">Your account details at a glance</span>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="info-card-icon">
+            <span class="material-symbols-outlined">badge</span>
+          </div>
+          <div class="info-card-content">
+            <span class="info-label">Username</span>
+            <span class="info-value">{{ user.username || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon">
+            <span class="material-symbols-outlined">mail</span>
+          </div>
+          <div class="info-card-content">
+            <span class="info-label">Email Address</span>
+            <span class="info-value">{{ user.email || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-icon">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </div>
+          <div class="info-card-content">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">{{ user.createdAt | date: 'MMMM d, yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Grid -->
+    <div class="settings-grid">
+
+      <!-- Change Username -->
+      <section class="section-block">
+        <div class="section-label">
+          <div class="section-icon-wrapper">
+            <span class="material-symbols-outlined">edit</span>
+          </div>
+          <div>
+            <span class="section-title">Public Profile</span>
+            <span class="section-subtitle">Update your display name</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="input-1">
+            <label for="username-input">Username</label>
+            <input
+              type="text"
+              id="username-input"
+              [(ngModel)]="usernameInput"
+              (ngModelChange)="usernameError = ''; usernameSuccess = ''"
+              placeholder="Enter new username"
+              (keydown.enter)="resetUsername()"
+              [disabled]="savingUsername"
+            />
+          </div>
+          <p class="hint">
+            <span class="material-symbols-outlined">info</span>
+            This name appears on sessions, feedback, and replies.
+          </p>
+
+          <div class="card-actions">
+            <button
+              class="primary-btn"
+              (click)="resetUsername()"
+            >
+              <span class="material-symbols-outlined">save</span>
+              {{ savingUsername ? 'Saving...' : 'Save Username' }}
+            </button>
+          </div>
+
+          <div class="status-message success" *ngIf="usernameSuccess">
+            <span class="material-symbols-outlined">check_circle</span>
+            {{ usernameSuccess }}
+          </div>
+          <div class="status-message error" *ngIf="usernameError">
+            <span class="material-symbols-outlined">error_outline</span>
+            {{ usernameError }}
+          </div>
+        </div>
+      </section>
+
+      <!-- Change Password -->
+      <section class="section-block">
+        <div class="section-label">
+          <div class="section-icon-wrapper">
+            <span class="material-symbols-outlined">lock</span>
+          </div>
+          <div>
+            <span class="section-title">Security</span>
+            <span class="section-subtitle">Update your password</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="input-1">
+            <label for="new-pass">New Password</label>
+            <div class="input-icon-wrapper">
+              <input
+                [type]="showNew ? 'text' : 'password'"
+                id="new-pass"
+                (ngModelChange)="passwordError = ''; passwordSuccess = ''"
+                (keydown.enter)="resetPassword()"
+                [(ngModel)]="newPassword"
+                placeholder="At least 8 characters"
+                [disabled]="savingPassword"
+              />
+              <button class="toggle-password" type="button" (click)="showNew = !showNew" tabindex="-1">
+                <span class="material-icons">{{ showNew ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="input-1">
+            <label for="confirm-pass">Confirm New Password</label>
+            <div class="input-icon-wrapper">
+              <input
+                [type]="showConfirm ? 'text' : 'password'"
+                id="confirm-pass"
+                [(ngModel)]="confirmPassword"
+                placeholder="Re-enter new password"
+                [disabled]="savingPassword"
+                (keydown.enter)="resetPassword()"
+                (ngModelChange)="passwordError = ''; passwordSuccess = ''"
+              />
+              <button class="toggle-password" type="button" (click)="showConfirm = !showConfirm" tabindex="-1">
+                <span class="material-icons">{{ showConfirm ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Password strength indicator -->
+          <div class="password-strength" *ngIf="newPassword.length > 0">
+            <div class="strength-bars">
+              <div class="bar" [class.active]="newPassword.length >= 1" [class.weak]="passwordStrength === 'weak'"></div>
+              <div class="bar" [class.active]="newPassword.length >= 6" [class.fair]="passwordStrength === 'fair'"></div>
+              <div class="bar" [class.active]="newPassword.length >= 8" [class.strong]="passwordStrength === 'strong'"></div>
+              <div class="bar" [class.active]="newPassword.length >= 12" [class.strong]="passwordStrength === 'strong'"></div>
+            </div>
+            <span class="strength-label" [class]="passwordStrength">{{ passwordStrength | titlecase }}</span>
+          </div>
+
+          <div class="card-actions">
+            <button
+              class="primary-btn"
+              (click)="resetPassword()"
+            >
+              <span class="material-symbols-outlined">lock_reset</span>
+              {{ savingPassword ? 'Updating...' : 'Update Password' }}
+            </button>
+          </div>
+
+          <div class="status-message success" *ngIf="passwordSuccess">
+            <span class="material-symbols-outlined">check_circle</span>
+            {{ passwordSuccess }}
+          </div>
+          <div class="status-message error" *ngIf="passwordError">
+            <span class="material-symbols-outlined">error_outline</span>
+            {{ passwordError }}
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
