@@ -4,11 +4,13 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { RetroSession } from '../../models/session.model';
 import { SessionService } from '../../services/session.service';
 import { AuthService } from '../../services/auth.service';
+import { NzModalService, NzModalRef } from 'ng-zorro-antd/modal';
+import { JoinSessionModalComponent } from '../shared/join-session-modal/join-session-modal.component';
 
 @Component({
   selector: 'app-recent-session-cards',
   standalone: true,
-  imports: [CommonModule, RouterLink, DatePipe],
+  imports: [CommonModule, RouterLink, DatePipe, JoinSessionModalComponent],
   templateUrl: './recent-session-cards.component.html',
   styleUrl: './recent-session-cards.component.scss'
 })
@@ -19,7 +21,8 @@ export class RecentSessionCardsComponent {
   constructor(
       private authService: AuthService,
       private sessionService: SessionService,
-      private router: Router
+      private router: Router,
+      private modal: NzModalService,
     ) {}
   
   ngOnInit(): void {
@@ -48,30 +51,35 @@ export class RecentSessionCardsComponent {
      
   }
 
-  viewSession(sessionId: string): void {
-    const email = this.authService.getEmail();
-    const username = this.authService.getUsername();
-
-    if (!email || !username) {
-      console.error('User not logged in');
-      this.router.navigate(['/']);
-      return;
+  viewSession(session: RetroSession): void {
+    const user = this.authService.getUser();
+    if (!user) {
+        this.router.navigate(['/']);
+        return;
     }
 
-    this.joiningSessionId = sessionId;
+    const isAlreadyMember = session.members.some(
+      (m: any) => (m.sessionMember?._id || m.sessionMember) === user._id
+    );
 
-     this.sessionService.joinSession(sessionId).subscribe({
-      next: (response) => {
-        this.joiningSessionId = null;
-        this.router.navigate(['/session', sessionId]);
-      },
-      error: (err) => {
-        // User might already be in the session, that's okay
-        if (err.error?.message?.includes('already joined')) {
-          console.log('User already in session, proceeding...');
-        }
-        this.joiningSessionId = null;
-        this.router.navigate(['/session', sessionId]);
+    if (isAlreadyMember) {
+      this.router.navigate(['/session', session._id]);
+      return;
+    }
+    const modalRef: NzModalRef = this.modal.create({
+      nzTitle: '',
+      nzFooter: null,
+      nzClosable: false,
+      nzMaskClosable: true,
+      nzCentered: true,
+      nzWidth: 400,
+      nzContent: JoinSessionModalComponent,
+      nzData: { session }
+    });
+
+    modalRef.afterClose.subscribe((result) => {
+      if (result === 'joined') {
+        this.router.navigate(['/session', session._id]);
       }
     });
   }

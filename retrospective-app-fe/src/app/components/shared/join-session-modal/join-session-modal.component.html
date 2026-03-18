@@ -1,0 +1,36 @@
+<div class="join-modal">
+  <div class="join-modal-icon">
+    <span class="material-symbols-outlined">group_add</span>
+  </div>
+
+  <h2>Join Session?</h2>
+  <p class="join-subtitle">
+    You're about to join <strong>{{ data.session.sessionName }}</strong> by
+    <strong>{{ data.session.createdBy.username }}</strong>.
+  </p>
+
+  <div class="session-info">
+    <div class="info-chip">
+      <span class="material-symbols-outlined">business</span>
+      {{ data.session.team }}
+    </div>
+    <div class="info-chip">
+      <span class="material-symbols-outlined">group</span>
+      {{ data.session.members.length }} {{ data.session.members.length === 1 ? 'member' : 'members' }}
+    </div>
+    <div class="info-chip">
+      <span class="material-symbols-outlined">list</span>
+      {{ data.session.sections.length }} {{ data.session.sections.length === 1 ? 'section' : 'sections' }}
+    </div>
+  </div>
+
+  <div class="modal-actions">
+    <button class="cancel-btn" (click)="cancel()" [disabled]="isLoading">
+      Cancel
+    </button>
+    <button class="join-btn" (click)="confirm()" [disabled]="isLoading">
+      <span class="material-symbols-outlined">login</span>
+      {{ isLoading ? 'Joining...' : 'Join Session' }}
+    </button>
+  </div>
+</div>

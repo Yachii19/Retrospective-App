@@ -23,18 +23,23 @@ export class ForgotPasswordModalComponent {
   ) {}
 
   submit(): void {
-    if (!this.email.trim()) return;
+    if (!this.email.trim()) {
+        this.errorMessage = 'Please enter your email address';
+        return;
+    }
 
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.forgotPassword(this.email).subscribe({
       next: () => {
+        console.log(this.email);
         this.isLoading = false;
         this.isSuccess = true;
       },
       error: (err) => {
         this.isLoading = false;
+        this.isSuccess = false;
         this.errorMessage = err.error?.message || 'Something went wrong. Please try again.';
       }
     });

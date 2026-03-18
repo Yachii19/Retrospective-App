@@ -1,6 +1,6 @@
 <div class="sessions-grid" *ngIf="recentSessions.length > 0; else noSessions">
     <div class="session-card" *ngFor="let session of recentSessions"
-            (click)="viewSession(session._id)">
+            (click)="viewSession(session)">
         <div class="card-header">
             <h3>{{ session.sessionName }}</h3>
             <span class="team-badge">

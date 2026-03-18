@@ -4,7 +4,7 @@ import { RetroFeedback } from '../../models/feedback.model';
 import { CommonModule } from '@angular/common';
 import { RetroSession } from '../../models/session.model';
 import { SessionService } from '../../services/session.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ReplyListComponent } from './reply-list/reply-list.component';
@@ -32,6 +32,8 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
   currentUserId: string = '';
   isSessionCreator: boolean = false;
+  isMember: boolean = false;
+  joinInProgress: boolean = false;
 
   sectionKeyToDelete: string = '';
   showDeleteModal: boolean = false;
@@ -58,7 +60,8 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     private feedbackService: FeedbackService,
     private sessionService: SessionService,
     private authService: AuthService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -82,6 +85,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       next: (response: any) => {
         this.session = response.data;
         this.isSessionCreator = this.authService.isCreator(this.session?.createdBy._id);
+        this.ensureMembership();
         this.loadSessionFeedbacks();
       },
       error: (err) => {
@@ -139,7 +143,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error adding feedback:', err);
-        this.sectionErrors[sectionKey] = 'Failed to add feedback. Please try again.';
+        this.sectionErrors[sectionKey] =  err?.error?.message || 'Failed to add feedback. Please try again.';
         this.submissionInProgress[sectionKey] = false;
       },
       complete: () => {
@@ -281,5 +285,36 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     } else {
       this.notification.error('Error', message);
     }
+  }
+
+  private ensureMembership(): void {
+    const userId = this.currentUserId;
+    const members = this.session?.members ?? [];
+    const memberIds = members
+      .map((m: any) => m?.sessionMember?._id ?? m?.sessionMember)
+      .filter(Boolean);
+
+    if (memberIds.includes(userId)) {
+      this.isMember = true;
+      return;
+    }
+
+    this.joinInProgress = true;
+    this.sessionService.joinSession(this.sessionId).subscribe({
+      next: () => {
+        this.isMember = true;
+        this.joinInProgress = false;
+        this.loadSession(); // or just reload feedbacks if you prefer
+      },
+      error: (err) => {
+        this.joinInProgress = false;
+        if (err.status === 401) {
+          // redirect to login with returnUrl
+          this.router.navigate(['/'], { queryParams: { returnUrl: this.router.url } });
+          return;
+        }
+        this.sectionErrors['__join__'] = err?.error?.message || 'Failed to join session';
+      }
+    });
   }
 }

@@ -6,7 +6,7 @@
         </h2>
         <div class="sessions-grid">
             <div class="session-card" *ngFor="let session of mysTeamSessions" 
-                 (click)="viewSession(session._id)">
+                 (click)="viewSession(session)">
                 <div class="card-header">
                     <h3>{{ session.sessionName }}</h3>
                     <span class="team-badge mys-team">{{ session.team }}</span>
@@ -50,7 +50,7 @@
         </h2>
         <div class="sessions-grid">
             <div class="session-card" *ngFor="let session of csmTeamSessions" 
-                 (click)="viewSession(session._id)">
+                 (click)="viewSession(session)">
                 <div class="card-header">
                     <h3>{{ session.sessionName }}</h3>
                     <span class="team-badge csm-team">{{ session.team }}</span>
