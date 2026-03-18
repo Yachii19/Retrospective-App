@@ -41,3 +41,24 @@ export interface JoinSessionResponse {
   message: string;
   data: RetroSession;
 }
+
+export type MaterialIcon =
+  | 'assignment'
+  | 'play_circle'
+  | 'favorite'
+  | 'mood'
+  | 'sailing'
+  | 'edit_note';
+
+export interface TemplateSection {
+  key: string,
+  title: string
+}
+
+export interface SessionTemplate {
+  id: string;
+  name: string;
+  description: string;
+  icon: MaterialIcon;
+  sections: RetroSection[]
+}

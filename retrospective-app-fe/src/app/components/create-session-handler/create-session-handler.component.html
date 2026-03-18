@@ -9,6 +9,48 @@
 
     <div class="form-container">
         <div class="form-group">
+            <label>
+                <span class="material-icons">auto_awesome</span>
+                Start with a Template
+            </label>
+            <div class="templates-grid">
+                <div class="template-card"
+                    *ngFor="let template of templates"
+                    [class.selected]="selectedTemplate?.id === template.id"
+                    (click)="selectTemplate(template)">
+                    
+                    <div class="template-icon">
+                        <span class="material-icons">{{ template.icon }}</span>
+                    </div>
+
+                    <div class="template-info">
+                        <span class="template-name">{{ template.name }}</span>
+                        <span class="template-desc">{{ template.description }}</span>
+                    </div>
+
+                    <div class="template-check" *ngIf="selectedTemplate?.id === template.id">
+                        <span class="material-icons">check_circle</span>
+                    </div>
+                </div>
+
+                <div class="template-card"
+                    [class.selected]="selectedTemplate === null"
+                    (click)="selectTemplate(null)">
+                    <div class="template-icon blank">
+                        <span class="material-icons">edit_note</span>
+                    </div>
+                    <div class="template-info">
+                        <span class="template-name">Custom</span>
+                        <span class="template-desc">Start from scratch</span>
+                    </div>
+                    <div class="template-check" *ngIf="selectedTemplate === null">
+                        <span class="material-icons">check_circle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="sessionName">
                 <span class="material-icons">event_note</span>
                 Session Name

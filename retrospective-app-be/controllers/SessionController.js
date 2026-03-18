@@ -1,4 +1,6 @@
 const Session = require("../models/Sessions");
+const Reply = require("../models/Reply");
+const Feedback = require("../models/Feedbacks");
 
 exports.getAllSessions = async (req, res) => {
     try {
@@ -319,6 +321,21 @@ exports.deleteSectionBySessionId = async (req, res) => {
                 message: `Section with key: ${key} not found!`
             });
         }
+
+        const feedbacks = await Feedback.find({
+            feedbackSession: sessionId,
+            'sections.key': key
+        });
+        const feedbackIds = feedbacks.map(f => f._id);
+
+        if (feedbackIds.length > 0) {
+            await Reply.deleteMany({ feedback: { $in: feedbackIds }});
+        }
+
+        await Feedback.deleteMany({
+            feedbackSession: sessionId,
+            'sections.key': key
+        })
 
         specificSession.sections.splice(sectionIndex, 1);
         await specificSession.save();

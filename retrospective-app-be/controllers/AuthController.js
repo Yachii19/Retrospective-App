@@ -202,8 +202,8 @@ exports.forgotPassword = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user || !user.isVerified) {
-            return res.status(200).send({
-                message: "If that email exists, a reset link has been sent."
+            return res.status(404).send({
+                message: "No registered account found with that email address" 
             });
         }
 

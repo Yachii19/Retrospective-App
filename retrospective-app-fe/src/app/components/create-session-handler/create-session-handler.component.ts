@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SessionService } from '../../services/session.service';
 import { AuthService } from '../../services/auth.service';
-import { RetroSection } from '../../models/session.model';
+import { RetroSection, SessionTemplate } from '../../models/session.model';
 
 
 @Component({
@@ -27,6 +27,67 @@ export class CreateSessionHandlerComponent {
   errorMessage: string = '';
   isLoading: boolean = false;
   joiningSessionId: string | null = '';
+  selectedTemplate: SessionTemplate | null = null;
+
+  templates: SessionTemplate[] = [
+    {
+      id: 'standard',
+      name: 'Standard Retro',
+      description: 'Went Well, Needs Improvement, Action Items',
+      icon: 'assignment',
+      sections: [
+        { key: 'went-well', title: 'Went Well' },
+        { key: 'needs-improvement', title: 'Needs Improvement' },
+        { key: 'action-items', title: 'Action Items' }
+      ]
+    },
+    {
+      id: 'start-stop-continue',
+      name: 'Start / Stop / Continue',
+      description: 'What to start, stop, and keep doing',
+      icon: 'play_circle',
+      sections: [
+        { key: 'start', title: 'Start' },
+        { key: 'stop', title: 'Stop' },
+        { key: 'continue', title: 'Continue' }
+      ]
+    },
+    {
+      id: '4ls',
+      name: '4 L\'s Retro',
+      description: 'Liked, Learned, Lacked, Longed For',
+      icon: 'favorite',
+      sections: [
+        { key: 'liked', title: 'Liked' },
+        { key: 'learned', title: 'Learned' },
+        { key: 'lacked', title: 'Lacked' },
+        { key: 'longed-for', title: 'Longed For' }
+      ]
+    },
+    {
+      id: 'mad-sad-glad',
+      name: 'Mad / Sad / Glad',
+      description: 'Team emotions and feelings check-in',
+      icon: 'mood',
+      sections: [
+        { key: 'mad', title: 'Mad' },
+        { key: 'sad', title: 'Sad' },
+        { key: 'glad', title: 'Glad' }
+      ]
+    },
+    {
+      id: 'sailboat',
+      name: 'Sailboat',
+      description: 'Wind, Anchors, Rocks, Islands',
+      icon: 'sailing',
+      sections: [
+        { key: 'wind', title: '💨 Wind (What\'s helping us)' },
+        { key: 'anchors', title: '⚓ Anchors (What\'s slowing us)' },
+        { key: 'rocks', title: '🪨 Rocks (Risks ahead)' },
+        { key: 'island', title: '🏝️ Island (Our goal)' }
+      ]
+    }
+  ]
 
   constructor(
     private sessionService: SessionService,
@@ -36,6 +97,16 @@ export class CreateSessionHandlerComponent {
 
   ngOnInit(): void {
     this.username = this.authService.getUsername();
+    this.selectTemplate(this.templates[0]);
+  }
+
+  selectTemplate(template: SessionTemplate | null): void {
+    this.selectedTemplate = template;
+    if (template) {
+      this.sections = [...template.sections];
+    } else {
+      this.sections = [];
+    }
   }
 
   onInputChange():void {
@@ -104,6 +175,8 @@ export class CreateSessionHandlerComponent {
       this.errorMessage = 'Section already exists';
       return;
     }
+    
+    this.selectedTemplate = null;
 
     this.sections.push({
       key: key,
@@ -117,6 +190,7 @@ export class CreateSessionHandlerComponent {
 
   removeSection(index: number): void {
     this.sections.splice(index, 1);
+    this.selectedTemplate = null;
   }
 
   closeModal(): void {
