@@ -1,28 +1,17 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns"); // ← add this
 require("dotenv").config();
 
-dns.setDefaultResultOrder('ipv4first'); // ← force IPv4 before IPv6
 
-const userMail = process.env.EMAIL_USER;
-const password = process.env.EMAIL_PASS;
-
-// ← replace the transporter with this
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',  // ← explicit host instead of service: 'gmail'
-    port: 587,               // ← 587 instead of 465
-    secure: false,           // ← false for port 587
-    family: 4,               // ← force IPv4 only
-    auth: { 
-        user: userMail, 
-        pass: password 
-    },
-    tls: {
-        rejectUnauthorized: false
+    host: 'smtp-relay.brevo.com',
+    port: 587,
+    secure: false,
+    auth: {
+        user: process.env.BREVO_USER,  
+        pass: process.env.BREVO_PASS 
     }
 });
 
-// ← add this to verify on startup
 transporter.verify((error, success) => {
     if (error) {
         console.error('Mailer connection failed:', error.message);
@@ -31,11 +20,12 @@ transporter.verify((error, success) => {
     }
 });
 
-// everything below stays exactly the same
+const senderEmail = process.env.EMAIL_USER;
+
 exports.sendEmail = async ({ to, subject, html }) => {
     if (!to) throw new Error("Email 'to' is required");
     return transporter.sendMail({
-        from: `"RetroFlow" <${userMail}>`,
+        from: `"RetroFlow" <${senderEmail}>`,
         to,
         subject,
         html,
