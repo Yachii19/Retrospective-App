@@ -12,7 +12,5 @@ router.post("/:sessionId", verifyToken, feedbackController.addFeedbackBySection)
 
 router.patch("/:feedbackId/vote", verifyToken, feedbackController.voteByFeedbackId);
 router.patch("/:feedbackId/unvote", verifyToken, feedbackController.unvoteByFeedbackId);
-router.patch("/:feedbackId/toggle-visibility", verifyToken, feedbackController.toggleFeedbackVisibilitykById);
-router.patch("/:feedbackId/action-items", verifyToken, feedbackController.updateActionItems);
 
 module.exports = router;

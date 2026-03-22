@@ -1,10 +1,10 @@
-
-<div class="session-grid-inner">
+<div class="session-grid-inner" *ngIf="session">
     <div class="session-grid"
-    [class.grid-fluid]="sectionCount <= 3"
-     [class.grid-fixed]="sectionCount > 3">
+        [class.grid-fluid]="sectionCount <= 3"
+        [class.grid-fixed]="sectionCount > 3">
+
         <div class="session-content" *ngFor="let section of session?.sections">
-            
+
             <!-- Section Header -->
             <div class="section-header">
                 <div class="section-title">
@@ -24,7 +24,7 @@
                         {{ sessionFeedbacks[section.key].length }} 
                         {{ sessionFeedbacks[section.key].length === 1 ? 'entry' : 'entries' }}
                     </span>
-                    <button class="delete-btn" *ngIf="isSessionCreator" 
+                    <button class="delete-btn" *ngIf="isSessionCreator"
                             (click)="showDeleteSectionModal(section.key)">
                         <span class="material-symbols-rounded">delete</span>
                     </button>
@@ -33,7 +33,7 @@
 
             <!-- Feedback List -->
             <div class="feedback-list">
-                <div class="feedback-item" 
+                <div class="feedback-item"
                     *ngFor="let feedback of sessionFeedbacks[section.key]">
 
                     <!-- Feedback Header -->
@@ -44,13 +44,14 @@
                             </div>
                             <div class="poster-details">
                                 <span class="username">{{feedback.feedbackPoster.username}}</span>
-                                <span class="timestamp">{{feedback.createdAt | timeAgo }}</span>
+                                <span class="timestamp">{{feedback.createdAt | timeAgo}}</span>
                             </div>
                         </div>
 
-                        <div class="vote-btn" 
-                            (click)="addVote(feedback._id, section.key)" 
-                            [class.voted]="hasUserVoted(feedback)">
+                        <div class="vote-btn"
+                            (click)="addVote(feedback._id, section.key)"
+                            [class.voted]="hasUserVoted(feedback)"
+                            [class.voting]="votingInProgress[feedback._id]">
                             <span class="material-icons">
                                 {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
                             </span>
@@ -84,7 +85,7 @@
                 </div>
 
                 <!-- No feedback -->
-                <div class="no-feedback" 
+                <div class="no-feedback"
                     *ngIf="!sessionFeedbacks[section.key] || sessionFeedbacks[section.key].length === 0">
                     <div class="no-feedback-icon">
                         <span class="material-icons">forum</span>
@@ -102,10 +103,10 @@
                         [name]="'feedback_input_' + section.key"
                         [(ngModel)]="feedbackInputs[section.key]"
                         placeholder="Share your thoughts..."
-                        (keydown.enter)="addFeedback(section.key , $event)"
+                        (keydown.enter)="addFeedback(section.key, $event)"
                         (input)="onInputChange(section.key)"></textarea>
-                    <button 
-                        class="submit-btn" 
+                    <button
+                        class="submit-btn"
                         (click)="addFeedback(section.key)"
                         [disabled]="submissionInProgress[section.key]">
                         <span class="material-symbols-outlined">send</span>
@@ -162,7 +163,6 @@
             <h3>Add New Section</h3>
             <p>Create a custom section to collect targeted feedback from your team.</p>
         </div>
-
         <div class="modal-field">
             <label for="section-title-input">Section Title</label>
             <input
@@ -173,7 +173,6 @@
                 id="section-title-input"
                 placeholder="e.g. Went Well" />
         </div>
-
         <div class="modal-actions">
             <button (click)="cancelAddSection()" class="cancel-btn">Cancel</button>
             <button (click)="confirmAddSection()" class="confirm-btn">

@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { Reply } from '../../../../models/reply.model';
 import { AuthService } from '../../../../services/auth.service';
 import { AvatarColorPipe } from '../../../../pipes/avatar-color.pipe';
+import { Subscription } from 'rxjs';
+import { SocketService } from '../../../../services/socket.service';
 
 @Component({
   selector: 'app-reply-list',
@@ -27,10 +29,13 @@ export class ReplyListComponent {
 
   submissionInProgress: boolean = false;
 
+  private socketSubs: Subscription[] = [];
+
   @Input() feedbackId!: string
 
   constructor(
     private authService: AuthService,
+    private socketService: SocketService,
     private replyService: ReplyService
   ) {}
 
@@ -38,9 +43,28 @@ export class ReplyListComponent {
     this.loadReplies();
     const user = this.authService.getUser();
     this.currentUserInitial = user.username.charAt(0).toUpperCase();
-    this.currentUsername = user.username
+    this.currentUsername = user.username;
+    this.initSocketListeners();
   }
 
+  ngOnDestroy(): void {
+    this.socketSubs.forEach(s => s.unsubscribe());
+  }
+
+  private initSocketListeners(): void {
+    this.socketSubs.push(
+      this.socketService.onReplyAdded().subscribe((data) => {
+        if (data.data.feedback !== this.feedbackId) return;
+        if (!this.replies) this.replies = [];
+        
+        const exists = this.replies.some(r => r._id === data.data._id);
+
+        if(!exists) {
+          this.replies = [data.data, ...this.replies];
+        }
+      })
+    )
+  }
 
   loadReplies(): void {
     if (!this.feedbackId) return
@@ -85,7 +109,6 @@ export class ReplyListComponent {
 
     this.replyService.createReply(this.feedbackId, this.replyInput).subscribe({
       next: (response) => {
-        this.loadReplies();
         this.replyInput = '';
         this.showError = false;
         this.errorMessage = '';

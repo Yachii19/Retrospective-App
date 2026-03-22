@@ -1,5 +1,6 @@
 const Reply = require('../models/Reply');
 const Feedback = require("../models/Feedbacks");
+const { getIO } = require("../socket");
 
 exports.createReplyByFeedbackId = async (req, res) => {
     try {
@@ -27,6 +28,18 @@ exports.createReplyByFeedbackId = async (req, res) => {
         });
 
         const savedReply = await newReply.save();
+
+        const populatedReply = await Reply.findById(savedReply._id)
+        .populate('createdBy', 'username email');
+
+        try {
+            getIO().to(specificFeedback.feedbackSession.toString()).emit("reply:created", {
+                message: "A new reply has been added!",
+                data: populatedReply
+            });
+        } catch (socketErr) {
+            console.warn("Socket emit failed (reply:created):", socketErr.message);
+        }
 
         res.status(201).send({
             message: "Reply created successfully!",

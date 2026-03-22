@@ -2,7 +2,7 @@ const Feedback = require("../models/Feedbacks");
 const Session = require("../models/Sessions");
 const User = require("../models/Users");
 const mongoose = require('mongoose');
-
+const { getIO } = require("../socket");
 
 exports.getFeedbackBySessionId = async (req, res) => {
     try {
@@ -332,8 +332,13 @@ exports.addFeedbackBySection = async (req, res) => {
         const populatedFeedback = await Feedback.findById(newFeedback._id)
             .populate('feedbackPoster', 'username email');
 
+        getIO().to(sessionId).emit("feedback:added", {
+            sectionKey,
+            feedback: populatedFeedback
+        });
+
         return res.status(201).send({
-            message: `Feedback created successfully`,
+            message: "Feedback created successfully",
             data: populatedFeedback
         });
 
@@ -372,7 +377,17 @@ exports.voteByFeedbackId = async (req, res) => {
         specificFeedback.votes += 1;
 
         await specificFeedback.save();
-
+        const populatedFeedback = await Feedback.findById(feedbackId)
+            .populate('votedBy', 'username email');
+        try {
+            getIO().to(populatedFeedback.feedbackSession.toString()).emit("feedback:voted", {
+                feedbackId: populatedFeedback._id,
+                votes: populatedFeedback.votes,
+                votedBy: populatedFeedback.votedBy
+            });
+        } catch (socketErr) {
+            console.warn("Socket emit failed (feedback:voted):", socketErr.message);
+        }
         return res.status(200).send({
             message: "Successfully voted!",
             data: specificFeedback
@@ -417,6 +432,19 @@ exports.unvoteByFeedbackId = async (req, res) => {
 
         await specificFeedback.save();
 
+        const populatedFeedback = await Feedback.findById(feedbackId)
+            .populate('votedBy', 'username email');
+
+        try {
+            getIO().to(populatedFeedback.feedbackSession.toString()).emit("feedback:voted", {
+                feedbackId: populatedFeedback._id,
+                votes: populatedFeedback.votes,
+                votedBy: populatedFeedback.votedBy
+            });
+        } catch (socketErr) {
+            console.warn("Socket emit failed (feedback:voted):", socketErr.message);
+        }
+
         return res.status(200).send({
             message: "Successfully unvoted!",
             data: specificFeedback
@@ -425,151 +453,6 @@ exports.unvoteByFeedbackId = async (req, res) => {
         console.log(`Error unvoting on feedback: ${err}`);
         return res.status(500).send({
             message: "Server error when unvoting on feedback"
-        });
-    }
-}
-
-exports.toggleFeedbackVisibilitykById = async (req, res) => {
-    try {
-        const feedbackId = req.params.feedbackId;
-        const { key } = req.body;
-        const userId = req.user.id;
-
-        if (!key) {
-            return res.status(400).send({
-                message: "Section key is required"
-            });
-        }
-
-        const feedback = await Feedback.findById(feedbackId);
-        if (!feedback) {
-            return res.status(404).send({
-                message: `No Feedback with ID: ${feedbackId}`
-            });
-        }
-
-        const session = await Session.findById(feedback.feedbackSession);
-        if (!session) {
-            return res.status(404).send({
-                message: "Session not found"
-            });
-        }
-
-        const isSessionOwner = session.createdBy.toString() === userId;
-        if (!isSessionOwner) {
-            return res.status(403).send({
-                message: "Only the session owner can toggle feedback visibility"
-            });
-        }
-
-        const section = feedback.sections.find(s => s.key === key);
-        if (!section) {
-            return res.status(404).send({
-                message: `Section with key '${key}' not found in this feedback`
-            });
-        }
-
-        // Fix: Changed actionItem to actionItems
-        if (!section.actionItems) {
-            section.actionItems = {};
-        }
-        
-        if (section.actionItems.status === "Open") {
-            section.actionItems.status = "Closed"
-        } else {
-            section.actionItems.status = "Open"
-        }
-
-        section.actionItems.updatedAt = Date.now();
-        await feedback.save();
-
-        return res.status(200).send({
-            message: `Feedback section visibility toggled to ${section.actionItems.status}`,
-            data: feedback
-        });
-    } catch (err) {
-        console.log(`Error toggling feedback visibility: ${err}`);
-        return res.status(500).send({
-            message: "Server error when toggling feedback visibility"
-        });
-    }
-}
-
-exports.updateActionItems = async (req, res) => {
-    try {
-        const feedbackId = req.params.feedbackId;
-        const { key, assignee, dueDate } = req.body;
-        const userId = req.user.id;
-
-        if (!key) {
-            return res.status(400).send({
-                message: "Section key is required"
-            });
-        }
-
-        const feedback = await Feedback.findById(feedbackId);
-        if (!feedback) {
-            return res.status(404).send({
-                message: `No Feedback with ID: ${feedbackId}`
-            });
-        }
-
-        const session = await Session.findById(feedback.feedbackSession);
-        if (!session) {
-            return res.status(404).send({
-                message: "Session not found"
-            });
-        }
-
-        const isSessionOwner = session.createdBy.toString() === userId;
-        if (!isSessionOwner) {
-            return res.status(403).send({
-                message: "Only the session creator can update action items"
-            });
-        }
-
-        const section = feedback.sections.find(s => s.key === key);
-        if (!section) {
-            return res.status(404).send({
-                message: `Section with key '${key}' not found in this feedback`
-            });
-        }
-
-        if (!section.actionItems) {
-            section.actionItems = {
-                status: "Closed",
-                assignee: null,
-                dueDate: null,
-                updatedAt: Date.now()
-            };
-        }
-
-        // Update assignee if provided
-        if (assignee !== undefined) {
-            section.actionItems.assignee = assignee;
-        }
-
-        // Update dueDate if provided
-        if (dueDate !== undefined) {
-            section.actionItems.dueDate = dueDate ? new Date(dueDate) : null;
-        }
-
-        section.actionItems.updatedAt = Date.now();
-        await feedback.save();
-
-        // Populate the feedback for response
-        const populatedFeedback = await Feedback.findById(feedbackId)
-            .populate('feedbackPoster', 'email username')
-            .populate('votedBy', 'email username');
-
-        return res.status(200).send({
-            message: "Action items updated successfully",
-            data: populatedFeedback
-        });
-    } catch (err) {
-        console.log(`Error updating action items: ${err}`);
-        return res.status(500).send({
-            message: "Server error when updating action items"
         });
     }
 }

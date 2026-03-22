@@ -11,6 +11,8 @@ import { ReplyListComponent } from './reply-list/reply-list.component';
 import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AvatarColorPipe } from '../../../pipes/avatar-color.pipe';
+import { SocketService } from '../../../services/socket.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-session-details-handler',
@@ -27,7 +29,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   sessionId: string = '';
   sessionFeedbacks: { [key: string]: RetroFeedback[] } = {};
   feedbackInputs: { [key: string]: string } = {};
-
   sectionErrors: { [key: string]: string } = {};
 
   currentUserId: string = '';
@@ -43,6 +44,9 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   newSectionKey: string = '';
 
   submissionInProgress: { [key: string]: boolean } = {};
+  votingInProgress: { [feedbackId: string]: boolean } = {};
+
+  private socketSubs: Subscription[] = [];
 
   get sectionCount(): number {
     const sections = this.session?.sections?.length ?? 0;
@@ -60,6 +64,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     private feedbackService: FeedbackService,
     private sessionService: SessionService,
     private authService: AuthService,
+    private socketService: SocketService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
@@ -72,10 +77,74 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     const user = this.authService.getUser();
     this.currentUserId = user._id;
     this.loadSession();
+    this.initSocketListeners();
   }
 
   ngOnDestroy(): void {
     document.body.style.overflow = '';
+    this.socketService.leaveSession(this.sessionId);
+    this.socketSubs.forEach(sub => sub.unsubscribe());
+  }
+
+  // ── Socket Listeners ──────────────────────────────────────────────────────
+
+  private initSocketListeners(): void {
+    this.socketService.joinSession(this.sessionId);
+
+    // Live feedback
+    this.socketSubs.push(
+      this.socketService.onFeedbackAdded().subscribe(({ sectionKey, feedback }) => {
+        if (!this.sessionFeedbacks[sectionKey]) {
+          this.sessionFeedbacks[sectionKey] = [];
+        }
+        const exists = this.sessionFeedbacks[sectionKey].some(f => f._id === feedback._id);
+        if (!exists) {
+          this.sessionFeedbacks[sectionKey] = [
+            ...this.sessionFeedbacks[sectionKey],
+            feedback
+          ];
+        }
+      })
+    );
+
+    // Live votes
+    this.socketSubs.push(
+      this.socketService.onFeedbackVoted().subscribe(({ feedbackId, votes, votedBy }) => {
+        for (const key of Object.keys(this.sessionFeedbacks)) {
+          const index = this.sessionFeedbacks[key]?.findIndex(f => f._id === feedbackId);
+          if (index !== undefined && index !== -1) {
+            this.sessionFeedbacks[key][index] = {
+              ...this.sessionFeedbacks[key][index],
+              votes,
+              votedBy
+            };
+            this.sessionFeedbacks[key] = [...this.sessionFeedbacks[key]];
+            this.votingInProgress[feedbackId] = false; // ← unlock after socket confirms
+            break;
+          }
+        }
+      })
+    );
+
+    // Live section added
+    this.socketSubs.push(
+      this.socketService.onSectionAdded().subscribe(({ section }) => {
+        if (this.session && !this.session.sections.some(s => s.key === section.key)) {
+          this.session.sections = [...this.session.sections, section];
+          this.sessionFeedbacks[section.key] = [];
+        }
+      })
+    );
+
+    // Live section deleted
+    this.socketSubs.push(
+      this.socketService.onSectionDeleted().subscribe(({ key }) => {
+        if (this.session) {
+          this.session.sections = this.session.sections.filter(s => s.key !== key);
+          delete this.sessionFeedbacks[key];
+        }
+      })
+    );
   }
 
   // ── Session ───────────────────────────────────────────────────────────────
@@ -119,8 +188,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   }
 
   addFeedback(sectionKey: string, event?: Event): void {
-    if  (event) event.preventDefault();
-
+    if (event) event.preventDefault();
     if (this.submissionInProgress[sectionKey]) return;
 
     const feedbackText = this.feedbackInputs[sectionKey] || '';
@@ -132,19 +200,14 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
     this.submissionInProgress[sectionKey] = true;
 
-    const feedbackData = { sectionKey, feedbackText };
-
-    this.feedbackService.addFeedback(this.sessionId, feedbackData).subscribe({
+    this.feedbackService.addFeedback(this.sessionId, { sectionKey, feedbackText }).subscribe({
       next: () => {
         this.feedbackInputs[sectionKey] = '';
         this.sectionErrors[sectionKey] = '';
-        this.reloadSectionFeedbacks(sectionKey);
-        this.submissionInProgress[sectionKey] = false;
       },
       error: (err) => {
         console.error('Error adding feedback:', err);
-        this.sectionErrors[sectionKey] =  err?.error?.message || 'Failed to add feedback. Please try again.';
-        this.submissionInProgress[sectionKey] = false;
+        this.sectionErrors[sectionKey] = err?.error?.message || 'Failed to add feedback. Please try again.';
       },
       complete: () => {
         this.submissionInProgress[sectionKey] = false;
@@ -152,40 +215,39 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private reloadSectionFeedbacks(sectionKey: string): void {
-    this.feedbackService.getFeedbackBySection(this.sessionId, sectionKey).subscribe({
-      next: (response) => {
-        this.sessionFeedbacks[sectionKey] = response.data;
-      },
-      error: (err) => {
-        console.error(`Error reloading feedbacks for ${sectionKey}:`, err);
-      }
-    });
-  }
-
   // ── Voting ────────────────────────────────────────────────────────────────
 
   hasUserVoted(feedback: RetroFeedback): boolean {
-    return feedback.votedBy.some(voter => voter._id === this.currentUserId);
+    return feedback.votedBy.some((voter: any) => voter._id === this.currentUserId);
   }
 
   addVote(feedbackId: string, sectionKey: string): void {
-    const feedback = this.sessionFeedbacks[sectionKey]?.find(f => f._id === feedbackId);
-    if (!feedback) return;
+    if (this.votingInProgress[feedbackId]) return; // ← prevent double click
 
-    const action$ = this.hasUserVoted(feedback)
+    const feedbacks = this.sessionFeedbacks[sectionKey];
+    const index = feedbacks?.findIndex(f => f._id === feedbackId);
+    if (index === undefined || index === -1) return;
+
+    const feedback = feedbacks[index];
+    const hasVoted = this.hasUserVoted(feedback);
+
+    this.votingInProgress[feedbackId] = true; // ← lock button
+
+    const action$ = hasVoted
       ? this.feedbackService.unvoteFeedback(feedbackId)
       : this.feedbackService.voteFeedback(feedbackId);
 
     action$.subscribe({
-      next: () => this.reloadSectionFeedbacks(sectionKey),
+      // socket handles UI update for everyone including current user
       error: (error) => {
+        this.votingInProgress[feedbackId] = false; // ← unlock on error
         this.sectionErrors[sectionKey] = error.error?.message || 'Failed to update vote';
       }
     });
   }
 
   // ── Section helpers ───────────────────────────────────────────────────────
+
   onSectionTitleChange(): void {
     this.newSectionKey = this.newSectionTitle
       .toLowerCase()
@@ -226,7 +288,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       next: () => {
         this.showNotification('Section deleted successfully', true);
         this.cancelDeleteSection();
-        this.loadSession();
       },
       error: () => {
         this.showNotification('Failed to delete section', false);
@@ -268,7 +329,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     this.sessionService.addSection(this.session._id, this.newSectionTitle, this.newSectionKey).subscribe({
       next: () => {
         this.cancelAddSection();
-        this.loadSession();
         this.showNotification('Section added successfully', true);
       },
       error: () => {
@@ -287,6 +347,8 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ── Membership ────────────────────────────────────────────────────────────
+
   private ensureMembership(): void {
     const userId = this.currentUserId;
     const members = this.session?.members ?? [];
@@ -304,12 +366,11 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       next: () => {
         this.isMember = true;
         this.joinInProgress = false;
-        this.loadSession(); // or just reload feedbacks if you prefer
+        this.loadSession();
       },
       error: (err) => {
         this.joinInProgress = false;
         if (err.status === 401) {
-          // redirect to login with returnUrl
           this.router.navigate(['/'], { queryParams: { returnUrl: this.router.url } });
           return;
         }

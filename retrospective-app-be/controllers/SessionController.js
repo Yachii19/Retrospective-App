@@ -1,6 +1,7 @@
 const Session = require("../models/Sessions");
 const Reply = require("../models/Reply");
 const Feedback = require("../models/Feedbacks");
+const { getIO } = require("../socket");
 
 exports.getAllSessions = async (req, res) => {
     try {
@@ -61,6 +62,7 @@ exports.getSessionById = async (req, res) => {
             .populate('members.sessionMember', 'username email')
             .populate('createdBy', 'username email');
 
+            
         if(!specificSession) {
             return res.status(404).send({
                 message: `Session with ID: ${sessionId} not found!`
@@ -246,6 +248,10 @@ exports.addSectionBySessionId = async (req, res) => {
         specificSession.sections.push({ title, key });
         await specificSession.save();
 
+        getIO().to(sessionId).emit("section:added", {
+            section: { title, key }
+        });
+
         return res.status(200).send({
             message: "Section added successfully",
             data: specificSession
@@ -282,6 +288,19 @@ exports.joinSession = async (req, res) => {
         });
 
         await specificSession.save();
+
+          // ← populate AFTER save, in the same scope
+        const updatedSession = await Session.findById(sessionId)
+            .populate('members.sessionMember', 'username email');
+
+        try {
+            getIO().to(sessionId).emit("member:joined", {
+                membersCount: updatedSession.members.length,
+                members: updatedSession.members
+            });
+        } catch (socketErr) {
+            console.warn("Socket emit failed (member:joined):", socketErr.message);
+        }
 
         return res.status(200).send({
             message: "Successfully joined session",
@@ -339,6 +358,8 @@ exports.deleteSectionBySessionId = async (req, res) => {
 
         specificSession.sections.splice(sectionIndex, 1);
         await specificSession.save();
+
+        getIO().to(sessionId).emit("section:deleted", { key });
 
         return res.status(200).send({
             message: "Section deleted successfully",

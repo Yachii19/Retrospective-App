@@ -1,10 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const http = require("http");
 const connectDB = require("./config/db");
 const mongoose = require("mongoose");
+const { initSocket } = require("./socket/index.js");
 require("dotenv").config();
 
 const app = express();
+const server = http.createServer(app);
+initSocket(server);
 
 connectDB();
 
@@ -37,7 +41,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 

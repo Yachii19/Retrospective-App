@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RetroSession } from '../../../models/session.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,7 +8,8 @@ import { User } from '../../../models/user.model';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { FeedbackService } from '../../../services/feedback.service';
-
+import { Subscription } from 'rxjs';
+import { SocketService } from '../../../services/socket.service';
 
 @Component({
   selector: 'app-session-details-header',
@@ -17,7 +18,7 @@ import { FeedbackService } from '../../../services/feedback.service';
   templateUrl: './session-details-header.component.html',
   styleUrl: './session-details-header.component.scss'
 })
-export class SessionDetailsHeaderComponent {
+export class SessionDetailsHeaderComponent implements OnInit, OnDestroy{
   session: RetroSession | null = null;
   sessionId: string = '';
   membersCount: number = 0;
@@ -26,11 +27,14 @@ export class SessionDetailsHeaderComponent {
   isScrolled: boolean = false;
   isHighlightsPage: boolean = false;
 
+  private socketSubs: Subscription[] = [];
+
   constructor(
     private router: Router,
     private authService: AuthService,
     private sessionService: SessionService,
     private feedbackService: FeedbackService,
+    private socketService: SocketService,
     private route: ActivatedRoute
   ) {};
 
@@ -42,6 +46,23 @@ export class SessionDetailsHeaderComponent {
     this.isHighlightsPage = this.router.url.includes('/highlight');
 
     this.loadSession();
+    this.initSocketListeners();
+  }
+
+  ngOnDestroy(): void {
+    this.socketSubs.forEach(s => s.unsubscribe());
+  }
+
+  private initSocketListeners(): void {
+    this.socketSubs.push(
+      this.socketService.onMemberJoined().subscribe(({ membersCount, members}) => {
+        this.membersCount = membersCount;
+
+        if (this.session) {
+          this.session = { ...this.session, members };
+        }
+      })
+    )
   }
 
   @HostListener('window:scroll', [])
@@ -81,21 +102,12 @@ export class SessionDetailsHeaderComponent {
     }
   }
 
-  // Replace your existing export() method with this section-organized version
-
-  // Enhanced version with custom visual indicators (no emojis, uses shapes and text)
-
-// Replace your existing export() method with this version (using text symbols instead of emojis)
-
 export(): void {
   this.feedbackService.getSessionFeedbacks(this.sessionId).subscribe({
     next: (response: any) => {
       const feedbacks = response.data;
       const doc = new jsPDF();
-      
-      // ========================================
-      // HEADER SECTION
-      // ========================================
+  
       doc.setFillColor(41, 98, 255);
       doc.rect(0, 0, 210, 50, 'F');
       
@@ -111,9 +123,6 @@ export(): void {
       doc.setFontSize(9);
       doc.text(`Exported by: ${this.user?.username || 'Unknown'} | ${new Date().toLocaleString()}`, 105, 40, { align: 'center' });
       
-      // ========================================
-      // SESSION SUMMARY TABLE
-      // ========================================
       const summaryData = [
         ['Session Name', this.session?.sessionName || 'N/A'],
         ['Total Feedbacks', feedbacks.length.toString()],
@@ -145,11 +154,7 @@ export(): void {
       
       let currentY = (doc as any).lastAutoTable.finalY + 20;
       
-      // ========================================
-      // ORGANIZE FEEDBACKS BY SECTION
-      // ========================================
-      
-      // Group all feedback items by section
+
       const sectionMap = new Map<string, Array<{
         poster: string;
         items: string[];
