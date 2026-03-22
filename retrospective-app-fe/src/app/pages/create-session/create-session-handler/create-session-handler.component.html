@@ -1,0 +1,190 @@
+<div class="create-session-wrapper">
+    <div class="header">
+        <div class="header-icon">
+            <span class="material-icons">add_circle</span>
+        </div>
+        <h1>Create New Session</h1>
+        <p>Start a new retrospective session for your team</p>
+    </div>
+
+    <div class="form-container">
+
+        <!-- ── Mode Toggle ─────────────────────────────────────────────────── -->
+        <div class="mode-toggle">
+            <label class="mode-option" [class.active]="selectedMode === 'standardTemplate'">
+                <input
+                    type="radio"
+                    name="group"
+                    value="standardTemplate"
+                    [(ngModel)]="selectedMode">
+                <div class="mode-option-inner">
+                    <span class="material-icons">bolt</span>
+                    <span class="mode-label">Standard</span>
+                    <span class="mode-desc">Default 3 sections</span>
+                </div>
+            </label>
+
+            <label class="mode-option" [class.active]="selectedMode === 'showTemplate'">
+                <input
+                    type="radio"
+                    name="group"
+                    value="showTemplate"
+                    [(ngModel)]="selectedMode">
+                <div class="mode-option-inner">
+                    <span class="material-icons">auto_awesome</span>
+                    <span class="mode-label">Use Template</span>
+                    <span class="mode-desc">Pick a preset</span>
+                </div>
+            </label>
+        </div>
+
+        <!-- ── Templates Grid ──────────────────────────────────────────────── -->
+        <div class="form-group template-group" *ngIf="selectedMode === 'showTemplate'">
+            <div class="field-label">
+                <span class="material-icons">style</span>
+                Choose a Template
+            </div>
+            <div class="templates-grid">
+                <div class="template-card"
+                    *ngFor="let template of templates"
+                    [class.selected]="selectedTemplate?.id === template.id"
+                    (click)="selectTemplate(template)">
+                    <div class="template-icon">
+                        <span class="material-icons">{{ template.icon }}</span>
+                    </div>
+                    <div class="template-info">
+                        <span class="template-name">{{ template.name }}</span>
+                        <span class="template-desc">{{ template.description }}</span>
+                    </div>
+                    <span class="template-check material-icons" *ngIf="selectedTemplate?.id === template.id">
+                        check_circle
+                    </span>
+                </div>
+
+                <div class="template-card"
+                    [class.selected]="selectedTemplate === null"
+                    (click)="selectTemplate(null)">
+                    <div class="template-icon blank">
+                        <span class="material-icons">edit_note</span>
+                    </div>
+                    <div class="template-info">
+                        <span class="template-name">Custom</span>
+                        <span class="template-desc">Start from scratch</span>
+                    </div>
+                    <span class="template-check material-icons" *ngIf="selectedTemplate === null">
+                        check_circle
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Divider ─────────────────────────────────────────────────────── -->
+        <div class="form-divider"></div>
+
+        <!-- ── Session Name ────────────────────────────────────────────────── -->
+        <div class="form-group">
+            <div class="field-label">
+                <span class="material-icons">event_note</span>
+                Session Name
+            </div>
+            <input
+                type="text"
+                id="sessionName"
+                name="sessionName"
+                [(ngModel)]="sessionName"
+                placeholder="e.g. Sprint 24 Retrospective"
+                (input)="onInputChange()"
+                (keyup.enter)="createSession()">
+        </div>
+
+        <!-- ── Team ────────────────────────────────────────────────────────── -->
+        <div class="form-group">
+            <div class="field-label">
+                <span class="material-icons">group</span>
+                Team
+            </div>
+            <select id="team" name="team" [(ngModel)]="team">
+                <option value="MYS Team">MYS Team</option>
+                <option value="CSM Team">CSM Team</option>
+            </select>
+        </div>
+
+        <!-- ── Sections ────────────────────────────────────────────────────── -->
+        <div class="form-group">
+            <div class="field-label-row">
+                <div class="field-label">
+                    <span class="material-icons">view_list</span>
+                    Sections
+                </div>
+                <span class="field-hint">Optional — defaults used if empty</span>
+            </div>
+
+            <div class="section-list" *ngIf="sections.length > 0; else noCustomSections">
+                <div class="section-item" *ngFor="let section of sections; let i = index">
+                    <div class="section-info">
+                        <span class="drag-handle material-icons">drag_indicator</span>
+                        <span class="section-title">{{ section.title }}</span>
+                    </div>
+                    <button class="remove-btn" type="button" (click)="removeSection(i)">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+            </div>
+
+            <ng-template #noCustomSections>
+                <div class="empty-sections">
+                    <span class="material-icons">inbox</span>
+                    <p>No custom sections added</p>
+                    <small>Went Well, Needs Improvement & Action Items will be used</small>
+                </div>
+            </ng-template>
+
+            <div class="add-section-row">
+                <input
+                    type="text"
+                    id="newSectionTitle"
+                    name="newSectionTitle"
+                    [(ngModel)]="newSectionTitle"
+                    placeholder="Add a section title..."
+                    (keyup.enter)="addSection()"
+                    (input)="onInputChange()">
+                <button class="add-btn" (click)="addSection()">
+                    <span class="material-icons">add</span>
+                </button>
+            </div>
+
+            <div class="error-msg" *ngIf="showError">
+                <span class="material-icons">error_outline</span>
+                {{ errorMessage }}
+            </div>
+        </div>
+
+        <!-- ── Actions ─────────────────────────────────────────────────────── -->
+        <div class="form-actions">
+            <button class="btn-cancel" type="button" (click)="cancel()">
+                Cancel
+            </button>
+            <button class="btn-create" type="button" (click)="createSession()" [disabled]="isLoading">
+                <span class="material-icons">check_circle</span>
+                {{ isLoading ? 'Creating...' : 'Create Session' }}
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Success Modal ───────────────────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-success-icon">
+            <span class="material-icons">check</span>
+        </div>
+        <h2>Session Created!</h2>
+        <p>Your retrospective session has been successfully created.</p>
+        <strong>{{ createdSessionName }}</strong>
+        <button (click)="closeModal()">
+            <span class="material-icons">arrow_forward</span>
+            Go to Session
+        </button>
+    </div>
+</div>

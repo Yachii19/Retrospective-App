@@ -22,7 +22,11 @@ export class SidebarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.username$ = this.userService.getUsername();
+    this.username$ = this.userService.username$;
+
+    if (!this.userService.getCurrentUsername()) {
+      this.userService.getUserProfile().subscribe();
+    }
   }
 
   logout(): void {

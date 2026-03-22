@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs'; // ← add tap
 import { UpdatePasswordResponse, UpdateUsernameResponse, UserProfileResponse } from '../models/user.model';
 
 @Injectable({
@@ -9,11 +9,19 @@ import { UpdatePasswordResponse, UpdateUsernameResponse, UserProfileResponse } f
 })
 export class UserService {
   private apiUrl = `${environment.apiBaseUrl}/users`;
+  private usernameSubject = new BehaviorSubject<string>('');
+  username$ = this.usernameSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
+  getCurrentUsername(): string {
+    return this.usernameSubject.getValue();
+  }
+
   updateUsername(newUsername: string): Observable<UpdateUsernameResponse> {
-    return this.http.patch<UpdateUsernameResponse>(`${this.apiUrl}/profile/username`, { username: newUsername });
+    return this.http.patch<UpdateUsernameResponse>(`${this.apiUrl}/profile/username`, { username: newUsername }).pipe(
+      tap(() => this.usernameSubject.next(newUsername)) //
+    );
   }
 
   updatePassword(newPassword: string): Observable<UpdatePasswordResponse> {
@@ -21,11 +29,13 @@ export class UserService {
   }
 
   getUserProfile(): Observable<UserProfileResponse> {
-    return this.http.get<UserProfileResponse>(`${this.apiUrl}/profile`);
+    return this.http.get<UserProfileResponse>(`${this.apiUrl}/profile`).pipe(
+      tap(res => this.usernameSubject.next(res.user.username))
+    );
   }
 
   getUsername(): Observable<string> {
-  return this.getUserProfile().pipe(
+    return this.getUserProfile().pipe(
       map(res => res.user.username)
     );
   }

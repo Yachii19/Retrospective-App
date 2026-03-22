@@ -2,9 +2,10 @@ import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { RetroFeedback } from '../../models/feedback.model';
 import { RetroSession } from '../../models/session.model';
-import { SessionDetailsHeaderComponent } from '../../components/session-details-header/session-details-header.component';
-import { SessionDetailsHandlerComponent } from '../../components/session-details-handler/session-details-handler.component';
+
 import { Router } from '@angular/router';
+import { SessionDetailsHeaderComponent } from './session-details-header/session-details-header.component';
+import { SessionDetailsHandlerComponent } from './session-details-handler/session-details-handler.component';
 
 @Component({
   selector: 'app-session-details',

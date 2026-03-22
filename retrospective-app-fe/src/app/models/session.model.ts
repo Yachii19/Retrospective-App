@@ -48,7 +48,10 @@ export type MaterialIcon =
   | 'favorite'
   | 'mood'
   | 'sailing'
-  | 'edit_note';
+  | 'edit_note'
+  | 'tune'
+  | 'local_florist'
+  | 'stars';
 
 export interface TemplateSection {
   key: string,

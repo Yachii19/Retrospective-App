@@ -1,11 +1,11 @@
 import { Component, input, Input } from '@angular/core';
-import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
-import { ReplyService } from '../../../services/reply.service';
+import { TimeAgoPipe } from '../../../../pipes/time-ago.pipe';
+import { ReplyService } from '../../../../services/reply.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Reply } from '../../../models/reply.model';
-import { AuthService } from '../../../services/auth.service';
-import { AvatarColorPipe } from '../../../pipes/avatar-color.pipe';
+import { Reply } from '../../../../models/reply.model';
+import { AuthService } from '../../../../services/auth.service';
+import { AvatarColorPipe } from '../../../../pipes/avatar-color.pipe';
 
 @Component({
   selector: 'app-reply-list',

@@ -23,13 +23,15 @@ export class DashboardComponent implements OnInit {
     private router: Router
   ) {}
 
- 
-
   ngOnInit(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
       return;
     }
-    this.username$ = this.userService.getUsername();
+    this.username$ = this.userService.username$;
+
+    if (!this.userService.getCurrentUsername()) {
+      this.userService.getUserProfile().subscribe();
+    }
   }
 }

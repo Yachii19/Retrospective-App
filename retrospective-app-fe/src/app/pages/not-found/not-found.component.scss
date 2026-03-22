@@ -1,0 +1,181 @@
+.not-found-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(0, 122, 255, 0.10), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(0, 122, 255, 0.06), transparent 55%),
+        var(--color-bg-gray);
+}
+
+.not-found-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: center;
+    height: 100vh;
+    width: 100%;
+    padding: 3rem 10rem;
+    background: var(--color-bg-white);
+
+    .left-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .right-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding-inline: 5rem;
+        gap: 10px;
+    }
+
+}
+
+// ── 404 number ────────────────────────────────────────────────────────────────
+.error-code {
+    font-size: 12rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -4px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, rgba(0, 122, 255, 0.4) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    user-select: none;
+
+    @media (max-width: 480px) {
+        font-size: 4rem;
+        letter-spacing: -3px;
+    }
+}
+
+// ── Heading ───────────────────────────────────────────────────────────────────
+h1 {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    letter-spacing: -0.3px;
+
+    @media (max-width: 480px) {
+        font-size: 1.2rem;
+    }
+}
+
+.title {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 40px;
+    text-align: start;
+    width: 100%;
+    color: var(--color-primary);
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    width: 100%;
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    text-align: start;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.625rem;
+    width: 100%;
+    margin-bottom: 1.75rem;
+
+    button {
+        width: 100%;
+        padding: 0.8rem 1.25rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+
+        .material-symbols-outlined { font-size: 1.1rem; }
+    }
+
+    .primary-btn {
+        background: var(--color-primary);
+        color: white;
+        border: none;
+
+        .material-symbols-outlined {
+            color: white;
+        }
+
+        &:hover {
+            background: var(--color-primary-dark);
+            box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+            transform: translateY(-1px);
+        }
+
+        &:active { transform: translateY(0); }
+    }
+
+    .ghost-btn {
+        background: var(--color-bg-gray);
+        color: var(--color-text-medium);
+        border: 1.5px solid var(--color-border);
+
+        &:hover {
+            background: var(--color-border-light);
+            color: var(--color-text-dark);
+        }
+    }
+}
+
+// ── Help links ────────────────────────────────────────────────────────────────
+.help-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    flex-wrap: wrap;
+    justify-content: start;
+    width: 100%;
+
+    a {
+        color: var(--color-primary);
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: opacity 0.2s ease;
+
+        &:hover { opacity: 0.7; text-decoration: underline; }
+    }
+
+    .dot {
+        color: var(--color-border);
+    }
+}
+
+// ── Animation ─────────────────────────────────────────────────────────────────
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}

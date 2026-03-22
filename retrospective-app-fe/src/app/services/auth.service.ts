@@ -1,130 +1,148 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { AuthResponse } from '../models/user.model';
 import { environment } from '../../environments/environment.development';
 
-// Simple interfaces that match backend response
-
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService {
+export class AuthService implements OnDestroy {
   private apiUrl = `${environment.apiBaseUrl}/auth`;
+  private logoutTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
+    // Schedule auto logout on service init (page refresh)
+    this.scheduleAutoLogout();
   }
 
-  // Register new user
+  ngOnDestroy(): void {
+    if (this.logoutTimer) clearTimeout(this.logoutTimer);
+  }
+
+  // ── Auth ──────────────────────────────────────────────────────────────────
+
   register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, { 
-      username, 
-      email, 
-      password,
-    });
+    return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password });
   }
 
   verifyOTP(email: string, otp: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/verify-otp`, { 
-      email, 
-      otp,
-    }).pipe(
+    return this.http.post<any>(`${this.apiUrl}/verify-otp`, { email, otp }).pipe(
       tap(response => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
+        this.scheduleAutoLogout(); // ← start timer after OTP verify
       })
     );
   }
 
   resendOTP(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/resend-otp`, { 
-      email, 
-    });
+    return this.http.post<any>(`${this.apiUrl}/resend-otp`, { email });
   }
 
   forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { 
-      email, 
-    });
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
   }
 
-  resetPassword = (email: string, token: string, newPassword: string): Observable<any> => {
-    return this.http.post<any>(`${this.apiUrl}/reset-password`, {
-      email,
-      token,
-      newPassword
-    });
+  resetPassword(email: string, token: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, { email, token, newPassword });
   }
- 
-  // Login existing user
+
   login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { 
-      email, 
-      password 
-    }).pipe(
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap(response => {
-        // Save token and user data to localStorage
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
+        this.scheduleAutoLogout(); // ← start timer after login
       })
     );
   }
 
-  // Get current user from localStorage
+  logout(): void {
+    if (this.logoutTimer) {
+      clearTimeout(this.logoutTimer);
+      this.logoutTimer = null;
+    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.router.navigate(['/']);
+  }
+
+  // ── Token helpers ─────────────────────────────────────────────────────────
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  isLoggedIn(): boolean {
+    return !this.isTokenExpired();
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+    const expMs = this.getTokenExpiryMs(token);
+    if (!expMs) return true;
+    return Date.now() >= expMs;
+  }
+
+  scheduleAutoLogout(): void {
+    const token = this.getToken();
+    if (!token) return;
+
+    const expMs = this.getTokenExpiryMs(token);
+    if (!expMs) return;
+
+    const delay = expMs - Date.now();
+
+    if (delay <= 0) {
+      this.logout();
+      return;
+    }
+
+    if (this.logoutTimer) clearTimeout(this.logoutTimer);
+
+    this.logoutTimer = setTimeout(() => {
+      this.logout();
+    }, delay);
+  }
+
+  private getTokenExpiryMs(token: string): number | null {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload?.exp ? payload.exp * 1000 : null;
+    } catch {
+      return null;
+    }
+  }
+
+  // ── User helpers ──────────────────────────────────────────────────────────
+
   getUser() {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   }
 
-  // Get username
   getUsername(): string | null {
-    const user = this.getUser();
-    return user ? user.username : null;
+    return this.getUser()?.username ?? null;
   }
 
-  // Get email
   getEmail(): string | null {
-    const user = this.getUser();
-    return user ? user.email : null;
+    return this.getUser()?.email ?? null;
   }
 
-  // Get token
-  getToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
-  // Get authorization headers with token
   getAuthHeaders(): HttpHeaders {
-    const token = this.getToken();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${this.getToken()}`,
       'Content-Type': 'application/json'
     });
   }
 
-  // Check if user is logged in
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-
-  // Check user sessions ID
   isCreator(creatorId: string | undefined): boolean {
-    const user = this.getUser();
-    if(user._id === creatorId) {
-      return true;
-    } else {
-      return false
-    }
-  }
-
-  // Logout user
-  logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    this.router.navigate(['/login']);
+    return this.getUser()?._id === creatorId;
   }
 }

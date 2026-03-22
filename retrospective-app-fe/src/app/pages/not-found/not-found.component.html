@@ -1,1 +1,35 @@
-<p>not-found works!</p>
+<div class="not-found-page">
+    <div class="not-found-card">
+        <section class="left-section">
+            <div class="error-code">404</div>
+            <h1>PAGE NOT FOUND</h1>
+        </section>
+
+        <section class="right-section">
+            <h1 class="title">
+                Where did it go?
+            </h1>
+             <p class="subtitle">
+                The page you are looking for doesn’t exist or has been moved. Try going back home or check the URL for mistakes.
+            </p>
+
+            <div class="actions">
+                <button class="primary-btn" (click)="goHome()">
+                    <span class="material-symbols-outlined">home</span>
+                    Back to Dashboard
+                </button>
+                <button class="ghost-btn" (click)="goBack()">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Go Back
+                </button>
+            </div>
+
+            <div class="help-links">
+                <span>Looking for something?</span>
+                <a (click)="goHome()">Dashboard</a>
+                <span class="dot">·</span>
+                <a (click)="goToSessions()">Sessions</a>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { LoginHandlerComponent } from '../../components/login-handler/login-handler.component';
+import { LoginHandlerComponent } from './login-handler/login-handler.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';

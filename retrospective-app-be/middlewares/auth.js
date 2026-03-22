@@ -3,6 +3,11 @@ const User = require("../models/Users.js");
 require("dotenv").config();
 
 const secret = `${process.env.ACCESS_TOKEN_SECRET}`;
+const getEndOfDayExpiring = () => {
+  const end = new Date();
+  end.setHours(23, 59, 59, 999);
+  return Math.floor((end.getTime() - Date.now()) / 1000)
+}
 
 module.exports.createAccessToken = (user) => {
   const data = {
@@ -10,7 +15,8 @@ module.exports.createAccessToken = (user) => {
     email: user.email,
     username: user.username
   };
-  return jwt.sign(data, secret, { expiresIn: "24h" });
+
+  return jwt.sign(data, secret, { expiresIn: getEndOfDayExpiring() });
 };
 
 module.exports.verifyToken = async (req, res, next) => {

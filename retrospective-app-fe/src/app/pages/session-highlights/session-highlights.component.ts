@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { SessionDetailsHeaderComponent } from '../../components/session-details-header/session-details-header.component';
+import { SessionDetailsHeaderComponent } from '../session-details/session-details-header/session-details-header.component'
 import { FeedbackCarouselCardComponent } from '../../components/feedback-carousel-card/feedback-carousel-card.component';
 import { FeedbackService } from '../../services/feedback.service';
 import { SessionService } from '../../services/session.service';
