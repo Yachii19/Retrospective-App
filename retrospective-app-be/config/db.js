@@ -16,7 +16,7 @@ const connectDB = async () => {
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
     console.log('Continuing without MongoDB connection...');
-    // Don't exit - allow app to continue with file-based storage
+
   }
 };
 

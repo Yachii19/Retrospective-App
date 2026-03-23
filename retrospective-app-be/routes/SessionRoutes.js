@@ -4,9 +4,9 @@ const sessionController = require("../controllers/SessionController");
 const { verifyToken } = require("../middlewares/auth");
 
 
-router.get("/", sessionController.getAllSessions);
-router.get("/recent", sessionController.getRecentSession);
-router.get("/:sessionId", sessionController.getSessionById);
+router.get("/", verifyToken, sessionController.getAllSessions);
+router.get("/recent", verifyToken, sessionController.getRecentSession);
+router.get("/:sessionId", verifyToken, sessionController.getSessionById);
 router.get("/team/:team", sessionController.getSessionByTeam);
 router.get("/:sessionId/members", sessionController.getSessionMembers);
 router.get("/user/sessions", verifyToken, sessionController.getUserSessions);

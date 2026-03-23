@@ -61,7 +61,8 @@ exports.registerUser = async (req, res) => {
             user: {
                 _id: newUser._id,
                 username: newUser.username,
-                email: newUser.email
+                email: newUser.email,
+                role: newUser.role,
             }
         });
     } catch (err) {
@@ -93,7 +94,8 @@ exports.loginUser = async (req, res) => {
             user: {
                 _id: user._id,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                role: user.role
             }
         });
     } catch (err) {

@@ -5,19 +5,24 @@ import { FormsModule } from '@angular/forms';
 import { SessionService } from '../../../services/session.service';
 import { AuthService } from '../../../services/auth.service';
 import { RetroSection, SessionTemplate } from '../../../models/session.model';
+import { UserService } from '../../../services/user.service';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 
 
 @Component({
   selector: 'app-create-session-handler',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NzSelectModule],
   templateUrl: './create-session-handler.component.html',
   styleUrl: './create-session-handler.component.scss'
 })
 export class CreateSessionHandlerComponent {
   username: string | null = '';
   sessionName: string = '';
-  team: string = 'MYS Team';
+  team: string = '';
+  userTeams: string[] = [];
+  loadingTeams: boolean = false;
+
   showSuccessModal: boolean = false;
   createdSessionName: string = '';
   createdSessionId: string = '';
@@ -118,12 +123,30 @@ export class CreateSessionHandlerComponent {
   constructor(
     private sessionService: SessionService,
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.username = this.authService.getUsername();
     this.selectTemplate(this.templates[0]);
+    this.loadUserTeams();
+  }
+
+  loadUserTeams(): void {
+    this.loadingTeams = true;
+    this.userService.getUserTeams().subscribe({
+      next: (teams) => {
+        console.log(teams);
+        this.userTeams = teams;
+        this.team = teams[0] ?? '';
+        this.loadingTeams = false;
+      },
+      error: (error) => {
+        console.error('Error loading user teams:', error);
+        this.loadingTeams = false;
+      }
+    });
   }
 
   selectTemplate(template: SessionTemplate | null): void {

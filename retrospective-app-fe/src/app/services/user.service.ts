@@ -49,4 +49,16 @@ export class UserService {
       map(res => res.user.email)
     );
   }
+
+  getUserTeams(): Observable<string[]> {
+    return this.getUserProfile().pipe(
+      map(res => res.user.teams ?? [])
+    );
+  }
+  
+  searchUsers(query: string): Observable<{ _id: string; username: string; email: string }[]> {
+  return this.http.get<any>(`${this.apiUrl}/search?q=${query}`).pipe(
+    map(res => res.users ?? [])
+  );
+}
 }

@@ -1,10 +1,24 @@
 <div class="session-details-container">
-    <div class="main-content">
-        <app-session-details-header/>
-        <div class="session-grid-border">
-            <div class="session-grid-wrapper" [class.modal-open]="isModalOpen">
-                <app-session-details-handler (modalStateChange)="isModalOpen = $event"/>
-            </div>
-        </div>
+
+  <div class="access-denied" *ngIf="isAccessDenied">
+    <div class="access-denied-card">
+      <span class="material-icons">lock</span>
+      <h2>Access Denied</h2>
+      <p>You are not a member of this session's team and do not have permission to view this page.</p>
+      <button (click)="navigateToDashboard()">
+        <span class="material-icons">arrow_back</span>
+        Back to Dashboard
+      </button>
     </div>
+  </div>
+
+  <div class="main-content" *ngIf="!isAccessDenied">
+    <app-session-details-header/>
+    <div class="session-grid-border">
+      <div class="session-grid-wrapper" [class.modal-open]="isModalOpen">
+        <app-session-details-handler (modalStateChange)="isModalOpen = $event"/>
+      </div>
+    </div>
+  </div>
+
 </div>

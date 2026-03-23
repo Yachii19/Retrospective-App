@@ -14,6 +14,7 @@ import { UserService } from '../../services/user.service';
 })
 export class SidebarComponent implements OnInit {
   username$!: Observable<string>;
+  isAdmin: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -27,6 +28,10 @@ export class SidebarComponent implements OnInit {
     if (!this.userService.getCurrentUsername()) {
       this.userService.getUserProfile().subscribe();
     }
+
+    const user = this.authService.getUser();
+    console.log(user);
+    this.isAdmin = user?.role === 'admin';
   }
 
   logout(): void {

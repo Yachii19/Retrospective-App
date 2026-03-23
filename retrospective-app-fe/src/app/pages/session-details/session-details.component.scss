@@ -54,6 +54,86 @@
     }
 }
 
+// ─── Access Checking ───────────────────────────────────────────────────────────
+.access-checking {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #f5f7fa;
+
+    span {
+        font-size: 0.9rem;
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+}
+
+// ─── Access Denied ─────────────────────────────────────────────────────────────
+.access-denied {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh; // ✅ changed from height to min-height so it works inside container
+
+    .access-denied-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        text-align: center;
+        padding: 2.5rem 2rem;
+        background: var(--color-bg-white);
+        border: 1px solid var(--color-border);
+        border-radius: 20px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        max-width: 400px;
+        width: 100%;
+
+        .material-icons {
+            font-size: 3rem;
+            color: #e74c3c;
+            background: #fef2f2;
+            padding: 1rem;
+            border-radius: 50%;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--color-text-dark);
+            margin: 0;
+        }
+
+        p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        button {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            .material-icons { font-size: 1rem; color: white; background: none; padding: 0; border-radius: 0; }
+            &:hover { background: var(--color-primary-dark); transform: translateY(-1px); }
+        }
+    }
+}
+
 // ─── Large Desktop (1700px+) ───────────────────────────────────────────────────
 @media (min-width: 1700px) {
     .session-details-container .main-content {

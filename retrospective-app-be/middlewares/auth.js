@@ -13,7 +13,9 @@ module.exports.createAccessToken = (user) => {
   const data = {
     id: user._id,
     email: user.email,
-    username: user.username
+    username: user.username,
+    teams: user.teams,
+    role: user.role
   };
 
   return jwt.sign(data, secret, { expiresIn: getEndOfDayExpiring() });
@@ -55,4 +57,15 @@ module.exports.verifyToken = async (req, res, next) => {
       message: "Server error during token verification",
     });
   }
+};
+
+module.exports.authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).send({
+        message: "Access denied: Insufficient privileges",
+      });
+    }
+    next();
+  };
 };

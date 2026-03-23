@@ -1,11 +1,14 @@
 const Session = require("../models/Sessions");
 const Reply = require("../models/Reply");
 const Feedback = require("../models/Feedbacks");
+const User = require("../models/Users");
+const Team = require("../models/Teams");
 const { getIO } = require("../socket");
 
 exports.getAllSessions = async (req, res) => {
     try {
-        const sessions = await Session.find({})
+        const user = await User.findById(req.user.id);
+        const sessions = await Session.find({team: { $in: user.teams}})
             .populate('members.sessionMember', 'username email')
             .populate('createdBy', 'username email');
 
@@ -29,8 +32,9 @@ exports.getAllSessions = async (req, res) => {
 }
 
 exports.getRecentSession = async (req, res) => {
-    try {
-        const recentSessions = await Session.find({})
+    try { 
+        const user = await User.findById(req.user.id)
+        const recentSessions = await Session.find({ team: { $in: user.teams } })
             .populate('members.sessionMember', 'username email')
             .populate('createdBy', 'username email')
             .sort({ createdAt: -1 })
@@ -66,6 +70,20 @@ exports.getSessionById = async (req, res) => {
         if(!specificSession) {
             return res.status(404).send({
                 message: `Session with ID: ${sessionId} not found!`
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+        if(!user) {
+            return res.status(401).send({
+                message: `User not found!`,
+            })
+        }
+
+        const isMember = user.teams.includes(specificSession.team);
+        if (!isMember) {
+            return res.status(403).send({
+                message: "Access denied. You are not a member of this session's team."
             });
         }
 
@@ -184,11 +202,24 @@ exports.addSession = async (req, res) => {
             sections
         } = req.body
 
-        const validTeams = ['MYS Team', 'CSM Team'];
-        if (!validTeams.includes(team)) {
+        const teamExists = await Team.findOne({teamName: team});
+        if(!teamExists) {
             return res.status(400).send({
-                message: 'Invalid team. Must be either "MYS Team" or "CSM Team"'
-            });
+                message: `Team doesn't exist. Please choose an existing team`
+            })
+        }
+
+        const user = await User.findById(req.user.id);
+        if(!user) {
+            return res.status(401).send({
+                message: `User not found!`,
+            })
+        }
+
+        if(!user.teams.includes(team)) {
+            return res.status(403).send({
+                message: `You are not a member of this team!`
+            })
         }
 
         let defaultSections =  [
@@ -273,6 +304,19 @@ exports.joinSession = async (req, res) => {
             return res.status(404).send({
                 message: `Session with ID: ${sessionId} not found!`
             });
+        }
+
+        const user = await User.findById(req.user.id);
+        if(!user) {
+            return res.status(401).send({
+                message: `User not found!`,
+            })
+        }
+
+        if(!user.teams.includes(specificSession.team)) {
+            return res.status(400).send({
+                message: `You are not a member of this session's team`
+            })
         }
 
         const isMember = specificSession.members.some(member => member.sessionMember.toString() === req.user.id);

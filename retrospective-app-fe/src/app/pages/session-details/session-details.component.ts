@@ -3,14 +3,18 @@ import { AuthService } from '../../services/auth.service';
 import { RetroFeedback } from '../../models/feedback.model';
 import { RetroSession } from '../../models/session.model';
 
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SessionDetailsHeaderComponent } from './session-details-header/session-details-header.component';
 import { SessionDetailsHandlerComponent } from './session-details-handler/session-details-handler.component';
+import { UserService } from '../../services/user.service';
+import { SessionService } from '../../services/session.service';
+import { forkJoin } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [SessionDetailsHeaderComponent, SessionDetailsHandlerComponent],
+  imports: [SessionDetailsHeaderComponent, SessionDetailsHandlerComponent, CommonModule],
   templateUrl: './session-details.component.html',
   styleUrl: './session-details.component.scss'
 })
@@ -19,6 +23,8 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   sessionFeedbacks: RetroFeedback[] = [];
   session: RetroSession | null = null;
   isModalOpen: boolean = false;
+
+  isAccessDenied: boolean = false;
 
   private isDragging = false;
   private startX = 0;
@@ -32,6 +38,9 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
 
   constructor(
     private authService: AuthService,
+    private sessionService: SessionService,
+    private userService: UserService,
+    private route: ActivatedRoute,
     private router: Router,
   ) {}
 
@@ -40,6 +49,10 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
       this.router.navigate(['/']);
       return;
     }
+
+    this.sessionId = this.route.snapshot.paramMap.get('id') || '';
+
+    this.checkAccess();
   }
 
   ngAfterViewInit(): void {
@@ -64,6 +77,32 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
       this.wrapperEl.removeEventListener('mouseleave', this.boundMouseUp);
     }
     this.resizeObserver?.disconnect();
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  private checkAccess(): void {
+    forkJoin({
+      session: this.sessionService.getSessionById(this.sessionId),
+      teams: this.userService.getUserTeams()
+    }).subscribe({
+      next: ({ session, teams }) => {
+        const sessionData = session.data as RetroSession;
+        const sessionTeam = sessionData.team;
+        const isMember = teams.includes(sessionTeam);
+
+        if (!isMember) {
+          console.warn('Access denied: not a member of this session\'s team');
+          this.isAccessDenied = true;
+        }
+      },
+      error: (err) => {
+        console.error('Access check failed:', err);
+        this.isAccessDenied = true;
+      }
+    })
   }
 
   private onMouseDown(e: MouseEvent): void {

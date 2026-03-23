@@ -148,3 +148,16 @@ exports.changePin = async (req, res) => {
         });
     }
 }
+
+exports.searchUsers = async (req, res) => {
+    try {
+        const query = req.query.q || '';
+        const users = await User.find({
+            email: { $regex: query, $options: 'i' }
+        }).select('username email').limit(10);
+
+        return res.status(200).send({ users });
+    } catch (err) {
+        return res.status(500).send({ message: 'Server error' });
+    }
+}

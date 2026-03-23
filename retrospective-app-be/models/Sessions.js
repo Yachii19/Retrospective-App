@@ -27,7 +27,6 @@ const sessionSchema = new mongoose.Schema(
         team: {
             type: String,
             required: [true, "Team is required"],
-            enum: ["MYS Team", "CSM Team"],
             trim: true
         },
         sections: {

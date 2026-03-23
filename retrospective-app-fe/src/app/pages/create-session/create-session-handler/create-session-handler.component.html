@@ -103,10 +103,14 @@
                 <span class="material-icons">group</span>
                 Team
             </div>
-            <select id="team" name="team" [(ngModel)]="team">
-                <option value="MYS Team">MYS Team</option>
-                <option value="CSM Team">CSM Team</option>
-            </select>
+            <nz-select
+                [(ngModel)]="team"
+                [nzDisabled]="userTeams.length === 0"
+                [nzLoading]="loadingTeams"
+                nzPlaceHolder="Select a team"
+                class="team-select">
+                <nz-option *ngFor="let t of userTeams" [nzValue]="t" [nzLabel]="t"></nz-option>
+            </nz-select>
         </div>
 
         <!-- ── Sections ────────────────────────────────────────────────────── -->

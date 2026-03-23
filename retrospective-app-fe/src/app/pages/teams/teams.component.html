@@ -1,0 +1,141 @@
+<div class="teams-container">
+  <app-sidebar/>
+
+  <div class="main-content">
+
+    <!-- Hero Header -->
+    <header class="teams-hero">
+      <div class="hero-left">
+        <div class="hero-icon">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+        <div class="hero-text">
+          <h1>Teams</h1>
+          <p>Manage your teams and members</p>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-badge">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Admin Panel</span>
+        </div>
+        <button class="btn-create" (click)="showCreateModal()">
+          <span class="material-symbols-outlined">add</span>
+          Create Team
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Row -->
+    <div class="stats-row" *ngIf="!isLoading && teams.length > 0">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ teams.length }}</span>
+          <span class="stat-label">Total Teams</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">person</span>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ getTotalMembers() }}</span>
+          <span class="stat-label">Total Members</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <span class="material-symbols-outlined spinning">sync</span>
+        <p>Loading teams...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="!isLoading && teams.length === 0">
+      <div class="empty-icon">
+        <span class="material-symbols-outlined">group_off</span>
+      </div>
+      <h3>No teams yet</h3>
+      <p>Create your first team to get started</p>
+      <button class="btn-create" (click)="showCreateModal()">
+        <span class="material-symbols-outlined">add</span>
+        Create Team
+      </button>
+    </div>
+
+    <!-- Teams Grid -->
+    <section class="section-block" *ngIf="!isLoading && teams.length > 0">
+      <div class="section-label">
+        <div class="section-icon-wrapper">
+          <span class="material-symbols-outlined">group</span>
+        </div>
+        <div class="section-label-text">
+          <span class="section-title">All Teams</span>
+          <span class="section-subtitle">{{ teams.length }} team{{ teams.length !== 1 ? 's' : '' }} total</span>
+        </div>
+      </div>
+
+      <div class="teams-grid">
+        <div class="team-card" *ngFor="let team of teams">
+
+          <div class="team-card-header">
+            <div class="team-icon">
+              <span class="material-symbols-outlined">group</span>
+            </div>
+            <div class="team-info">
+              <h3>{{ team.teamName }}</h3>
+              <span class="team-created">Created by {{ team.createdBy.username }}</span>
+            </div>
+            <button class="manage-btn" (click)="showManageModal(team)">
+              <span class="material-symbols-outlined">settings</span>
+            </button>
+          </div>
+
+          <div class="team-card-body">
+            <div class="members-count">
+              <span class="material-symbols-outlined">person</span>
+              <span>{{ team.members.length }} member{{ team.members.length !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="member-avatars">
+              <div class="avatar"
+                *ngFor="let member of team.members.slice(0, 4)"
+                [title]="member.username">
+                {{ member.username.charAt(0).toUpperCase() }}
+              </div>
+              <div class="avatar avatar-more" *ngIf="team.members.length > 4">
+                +{{ team.members.length - 4 }}
+              </div>
+            </div>
+          </div>
+
+          <div class="team-card-footer">
+            <button class="btn-manage" (click)="showManageModal(team)">
+              <span class="material-symbols-outlined">settings</span>
+              Manage Team
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<app-create-team-modal
+    [(isVisible)]="isCreateModalVisible"
+    (teamCreated)="onTeamCreated()">
+</app-create-team-modal>
+
+<app-manage-team-modal
+    [(isVisible)]="isManageModalVisible"
+    [team]="selectedTeam"
+    (teamUpdated)="onTeamUpdated()"
+    (teamDeleted)="onTeamDeleted()">
+</app-manage-team-modal>

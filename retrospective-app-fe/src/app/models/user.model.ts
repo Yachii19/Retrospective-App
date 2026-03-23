@@ -1,8 +1,11 @@
 export interface User {
-  id: number;
+  _id: string;
   username: string;
   email: string;
   createdAt: string;
+  updatedAt: string;
+  teams?: string[];
+  role: string; // ✅ add this
 }
 
 export interface AuthResponse {
@@ -12,20 +15,14 @@ export interface AuthResponse {
     _id: string;
     username: string;
     email: string;
+    teams?: string[];
+    role: string;
   };
 }
 
-export interface User {
-  _id: string;
-  username: string;
-  email: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 export interface UserProfileResponse {
-  success: boolean;
-  user: User;
+  message: string;
+  user: User; // ✅ now includes role
 }
 
 export interface UpdateUsernameResponse {

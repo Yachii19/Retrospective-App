@@ -1,0 +1,106 @@
+<nz-modal
+  [(nzVisible)]="isVisible"
+  [nzTitle]="team?.teamName + ' — Manage'"
+  [nzFooter]="null"
+  (nzOnCancel)="close()"
+  nzWidth="560px"
+  nzCentered>
+
+  <ng-container *nzModalContent>
+    <div class="manage-modal" *ngIf="team">
+
+      <!-- Add Members -->
+      <div class="manage-section">
+        <div class="manage-section-label">
+          <div class="manage-section-icon">
+            <span class="material-symbols-outlined">person_add</span>
+          </div>
+          <div>
+            <span class="manage-section-title">Add Members</span>
+            <span class="manage-section-sub">Search and add users by email</span>
+          </div>
+        </div>
+        <form [formGroup]="addMembersForm" class="add-members-form">
+          <nz-select
+            formControlName="emails"
+            nzMode="multiple"
+            nzPlaceHolder="Search by name or email..."
+            [nzShowSearch]="true"
+            [nzLoading]="isSearching"
+            [nzFilterOption]="nzFilterOption"
+            (nzOnSearch)="onSearch($event)"
+            style="width: 100%">
+            <nz-option
+              *ngFor="let option of memberOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label">
+            </nz-option>
+          </nz-select>
+          <button
+            class="btn-add-members"
+            type="button"
+            (click)="submitAddMembers()"
+            [disabled]="isAddingMembers || addMembersForm.invalid">
+            <span class="material-symbols-outlined">add</span>
+            {{ isAddingMembers ? 'Adding...' : 'Add' }}
+          </button>
+        </form>
+      </div>
+
+      <div class="manage-divider"></div>
+
+      <!-- Members List -->
+      <div class="manage-section">
+        <div class="manage-section-label">
+          <div class="manage-section-icon">
+            <span class="material-symbols-outlined">people</span>
+          </div>
+          <div>
+            <span class="manage-section-title">Members</span>
+            <span class="manage-section-sub">{{ team.members.length }} member{{ team.members.length !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+
+        <div class="members-list">
+          <div class="member-row" *ngFor="let member of team.members">
+            <div class="member-left">
+              <div class="member-avatar">{{ member.username.charAt(0).toUpperCase() }}</div>
+              <div class="member-details">
+                <span class="member-name">{{ member.username }}</span>
+                <span class="member-email">{{ member.email }}</span>
+              </div>
+            </div>
+            <button class="btn-remove" (click)="removeMember(member._id)" [disabled]="isRemovingMember === member._id">
+              <span class="material-symbols-outlined">
+                {{ isRemovingMember === member._id ? 'sync' : 'person_remove' }}
+              </span>
+            </button>
+          </div>
+
+          <div class="no-members" *ngIf="team.members.length === 0">
+            <span class="material-symbols-outlined">person_off</span>
+            <p>No members yet</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="manage-divider"></div>
+
+      <!-- Danger Zone -->
+      <div class="danger-zone">
+        <div class="danger-zone-label">
+          <span class="material-symbols-outlined">warning</span>
+          <div>
+            <span class="danger-title">Delete Team</span>
+            <span class="danger-sub">This action cannot be undone</span>
+          </div>
+        </div>
+        <button class="btn-delete-team" (click)="deleteTeam()">
+          <span class="material-symbols-outlined">delete_forever</span>
+          Delete Team
+        </button>
+      </div>
+
+    </div>
+  </ng-container>
+</nz-modal>

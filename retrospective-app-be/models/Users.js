@@ -28,8 +28,16 @@ const userSchema = new mongoose.Schema(
         recoveryPin: {
             type: String,
             default: null  
+        },
+        role: {
+            type: String,
+            enum: ['user', 'admin'],
+            default: 'user'
+        },
+        teams: {
+            type: [String],
+            default: []
         }
-       
     },
     {
         timestamps: true

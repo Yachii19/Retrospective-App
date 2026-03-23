@@ -18,39 +18,36 @@
     </div>
 
     <div class="user-info">
-        <span class="material-symbols-outlined">
-            account_circle
-        </span>
+        <span class="material-symbols-outlined">account_circle</span>
         <p class="username">{{ username$ | async }}</p>
     </div>
 
     <nav class="sidebar-nav">
         <ul>
-            <li [routerLink]="['/dashboard']" routerLinkActive="active">
-                <span class="material-symbols-outlined">
-                    dashboard
-                </span>
+            <li [routerLink]="['/dashboard']" routerLinkActive="active" data-tooltip="Dashboard">
+                <span class="material-symbols-outlined">dashboard</span>
                 <span>Dashboard</span>
             </li>
-            <li [routerLink]="['/all-sessions']" routerLinkActive="active">
-                <span class="material-symbols-outlined">
-                    list_alt
-                </span>
+            <li [routerLink]="['/all-sessions']" routerLinkActive="active" data-tooltip="All Sessions">
+                <span class="material-symbols-outlined">list_alt</span>
                 <span>All Sessions</span>
             </li>
-            <li [routerLink]="['/create-session']" routerLinkActive="active">
-                <span class="material-symbols-outlined">
-                    add_2
-                </span>
+            <li [routerLink]="['/create-session']" routerLinkActive="active" data-tooltip="Create Session">
+                <span class="material-symbols-outlined">add_2</span>
                 <span>Create Session</span>
             </li>
-            <li [routerLink]="['/my-contribution']" routerLinkActive="active">
-                <span class="material-symbols-outlined">
-                    workspaces
-                </span>
+            <li [routerLink]="['/my-contribution']" routerLinkActive="active" data-tooltip="My Contributions">
+                <span class="material-symbols-outlined">workspaces</span>
                 <span>My Contributions</span>
             </li>
-            <li [routerLink]="['/profile']" routerLinkActive="active">
+
+            <!-- ✅ Admin only -->
+            <li *ngIf="isAdmin" [routerLink]="['/teams']" routerLinkActive="active" data-tooltip="Teams">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Teams</span>
+            </li>
+
+            <li [routerLink]="['/profile']" routerLinkActive="active" data-tooltip="Profile">
                 <span class="material-symbols-outlined">manage_accounts</span>
                 <span>Profile</span>
             </li>
@@ -59,9 +56,7 @@
 
     <div class="sidebar-footer">
         <button (click)="logout()" class="logout-btn">
-            <span class="material-symbols-outlined">
-            exit_to_app
-            </span>
+            <span class="material-symbols-outlined">exit_to_app</span>
             <span>Logout</span>
         </button>
     </div>

@@ -1,0 +1,50 @@
+<nz-modal
+  [(nzVisible)]="isVisible"
+  nzTitle="Create New Team"
+  [nzFooter]="null"
+  (nzOnCancel)="close()"
+  nzWidth="520px"
+  nzCentered>
+
+  <ng-container *nzModalContent>
+    <form [formGroup]="form" class="modal-form">
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Team Name</nz-form-label>
+        <nz-form-control nzErrorTip="Team name is required (3–50 characters)">
+          <input nz-input formControlName="teamName" placeholder="e.g. MYS Team"/>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Add Members</nz-form-label>
+        <nz-form-control nzErrorTip="Please add at least one member">
+          <nz-select
+            formControlName="emails"
+            nzMode="multiple"
+            nzPlaceHolder="Search by name or email..."
+            [nzShowSearch]="true"
+            [nzLoading]="isSearching"
+            [nzFilterOption]="nzFilterOption"
+            (nzOnSearch)="onSearch($event)"
+            style="width: 100%">
+            <nz-option
+              *ngFor="let option of memberOptions"
+              [nzValue]="option.value"
+              [nzLabel]="option.label">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" type="button" (click)="close()">Cancel</button>
+        <button class="btn-submit" type="button" (click)="submit()" [disabled]="isSubmitting">
+          <span class="material-symbols-outlined">add</span>
+          {{ isSubmitting ? 'Creating...' : 'Create Team' }}
+        </button>
+      </div>
+
+    </form>
+  </ng-container>
+</nz-modal>

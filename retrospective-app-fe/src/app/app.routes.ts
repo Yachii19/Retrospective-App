@@ -73,6 +73,15 @@ export const routes: Routes = [
         }
     },
     {
+        path: 'teams',
+        pathMatch: 'full',
+        loadComponent: () => {
+            return import('./pages/teams/teams.component').then(
+                (m) => m.TeamsComponent
+            )
+        }
+    },
+    {
         path: '**',
         pathMatch: 'full',
         loadComponent: () => {
