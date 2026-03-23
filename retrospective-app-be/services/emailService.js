@@ -23,6 +23,7 @@ transporter.verify((error, success) => {
 const senderEmail = process.env.EMAIL_USER;
 
 exports.sendEmail = async ({ to, subject, html }) => {
+    console.log(senderEmail);
     if (!to) throw new Error("Email 'to' is required");
     return transporter.sendMail({
         from: `"RetroFlow" <${senderEmail}>`,
