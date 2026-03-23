@@ -21,28 +21,15 @@ const userSchema = new mongoose.Schema(
             required: [true, "Password is required"],
             default: null
         },
-
         isVerified: {
             type: Boolean,
-            default: false
+            default: true 
         },
-        otp: {
+        recoveryPin: {
             type: String,
-            default: null
-        },
-        otpExpiry: {
-            type: Date,
-            default: null
-        },
-
-        resetToken: {
-            type: String,
-            default: null
-        },
-        resetTokenExpiry: {
-            type: Date,
-            default: null
+            default: null  
         }
+       
     },
     {
         timestamps: true

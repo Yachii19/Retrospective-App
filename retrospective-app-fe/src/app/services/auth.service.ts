@@ -16,7 +16,6 @@ export class AuthService implements OnDestroy {
     private http: HttpClient,
     private router: Router
   ) {
-    // Schedule auto logout on service init (page refresh)
     this.scheduleAutoLogout();
   }
 
@@ -26,38 +25,22 @@ export class AuthService implements OnDestroy {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
 
-  register(username: string, email: string, password: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password });
-  }
-
-  verifyOTP(email: string, otp: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/verify-otp`, { email, otp }).pipe(
+  register(username: string, email: string, password: string, recoveryPin: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, { username, email, password, recoveryPin }).pipe(
       tap(response => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        this.scheduleAutoLogout(); // ← start timer after OTP verify
+        this.scheduleAutoLogout();
       })
     );
   }
 
-  resendOTP(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/resend-otp`, { email });
-  }
-
-  forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email });
-  }
-
-  resetPassword(email: string, token: string, newPassword: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/reset-password`, { email, token, newPassword });
-  }
-
-  login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
       tap(response => {
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
-        this.scheduleAutoLogout(); // ← start timer after login
+        this.scheduleAutoLogout();
       })
     );
   }
@@ -70,6 +53,14 @@ export class AuthService implements OnDestroy {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     this.router.navigate(['/']);
+  }
+
+  setupPin(pin: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/setup-pin`, { pin });
+  }
+
+  resetPassword(email: string, recoveryPin: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, { email, recoveryPin, newPassword, confirmPassword });
   }
 
   // ── Token helpers ─────────────────────────────────────────────────────────

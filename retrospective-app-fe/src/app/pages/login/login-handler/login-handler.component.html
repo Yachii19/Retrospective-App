@@ -4,68 +4,253 @@
         <span class="brand-name">RetroFlow</span>
     </div>
 
-    <h2>{{ isLoginMode ? 'Welcome back' : 'Create account' }}</h2>
-    <p class="subtitle">
-        {{ isLoginMode ? 'Sign in to your Retrospect workspace' : 'Get started with Retrospect today' }}
-    </p>
+    <!-- ── Login / Register Mode ── -->
+    <ng-container *ngIf="!isForgotMode && !isPinSetupMode">
+        <h2>{{ isLoginMode ? 'Welcome back' : 'Create account' }}</h2>
+        <p class="subtitle">
+            {{ isLoginMode ? 'Sign in to your Retrospect workspace' : 'Get started with Retrospect today' }}
+        </p>
 
-    <div class="input-1" *ngIf="!isLoginMode">
-        <label for="username">Username</label>
-        <input type="text"
-            placeholder="Enter your username"
-            id="username"
-            [(ngModel)]="username"
-            (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()"
-            [disabled]="isLoading">
-    </div>
-
-    <div class="input-1">
-        <label for="email">Email</label>
-        <input type="email"
-            placeholder="Enter your email"
-            id="email"
-            [(ngModel)]="email"
-            (keyup.enter)="handleSubmit()"
-            (input)="onInputChange()"
-            [disabled]="isLoading">
-    </div>
-
-    <div class="input-1">
-        <label for="password">Password</label>
-        <div class="input-icon-wrapper">
-            <input
-                [type]="showPassword ? 'text' : 'password'"
-                placeholder="Enter your password"
-                id="password"
-                [(ngModel)]="password"
+        <div class="input-1" *ngIf="!isLoginMode">
+            <label for="username">Username</label>
+            <input type="text"
+                placeholder="Enter your username"
+                id="username"
+                [(ngModel)]="username"
                 (keyup.enter)="handleSubmit()"
                 (input)="onInputChange()"
                 [disabled]="isLoading">
-            <button class="toggle-password" type="button" (click)="showPassword = !showPassword" tabindex="-1">
-                <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
-            </button>
         </div>
-    </div>
 
-    <!-- Forgot password link — only in login mode -->
-    <div class="forgot-password" *ngIf="isLoginMode">
-        <a (click)="openForgotPasswordModal()">Forgot password?</a>
-    </div>
+        <div class="input-1">
+            <label for="email">Email</label>
+            <input type="email"
+                placeholder="Enter your email"
+                id="email"
+                [(ngModel)]="email"
+                (keyup.enter)="handleSubmit()"
+                (input)="onInputChange()"
+                [disabled]="isLoading">
+        </div>
 
-    <span class="error-message" *ngIf="showError">
-        <span class="material-icons" style="font-size: 0.9rem;">error_outline</span>
-        {{ errorMessage }}
-    </span>
+        <div class="input-1">
+            <label for="password">Password</label>
+            <div class="input-icon-wrapper">
+                <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    placeholder="Enter your password"
+                    id="password"
+                    [(ngModel)]="password"
+                    (keyup.enter)="handleSubmit()"
+                    (input)="onInputChange()"
+                    [disabled]="isLoading">
+                <button class="toggle-password" type="button" (click)="showPassword = !showPassword" tabindex="-1">
+                    <span class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</span>
+                </button>
+            </div>
+        </div>
 
-    <button (click)="handleSubmit()" [disabled]="isLoading">
-        {{ isLoading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Sign Up') }}
-    </button>
+        <!-- Recovery PIN — register only -->
+        <div class="input-1" *ngIf="!isLoginMode">
+            <label for="recovery-pin">
+                Recovery PIN
+                <span class="pin-hint">6 digits — used to reset your password</span>
+            </label>
+            <input
+                type="password"
+                placeholder="e.g. 123456"
+                id="recovery-pin"
+                [(ngModel)]="recoveryPin"
+                (keyup.enter)="handleSubmit()"
+                (input)="onInputChange()"
+                maxlength="6"
+                inputmode="numeric"
+                [disabled]="isLoading">
+        </div>
 
-    <p class="toggle-mode">
-        {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
-        <a (click)="toggleMode()" *ngIf="!isLoading">
-            {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
-        </a>
-    </p>
+        <div class="forgot-password" *ngIf="isLoginMode">
+            <a (click)="openForgotMode()">Forgot password?</a>
+        </div>
+
+        <span class="error-message" *ngIf="showError">
+            <span class="material-icons" style="font-size: 0.9rem;">error_outline</span>
+            {{ errorMessage }}
+        </span>
+
+        <button (click)="handleSubmit()" [disabled]="isLoading">
+            {{ isLoading ? 'Processing...' : (isLoginMode ? 'Sign In' : 'Sign Up') }}
+        </button>
+
+        <p class="toggle-mode">
+            {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }}
+            <a (click)="toggleMode()" *ngIf="!isLoading">
+                {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
+            </a>
+        </p>
+    </ng-container>
+
+    <!-- ── Forgot Password Mode ── -->
+    <ng-container *ngIf="isForgotMode">
+
+        <!-- Success state -->
+        <ng-container *ngIf="resetSuccess">
+            <div class="success-icon">
+                <span class="material-icons">check_circle</span>
+            </div>
+            <h2>Password updated!</h2>
+            <p class="subtitle">Your password has been changed successfully.</p>
+            <button (click)="closeForgotMode()">Back to Sign In</button>
+        </ng-container>
+
+        <!-- Form state -->
+        <ng-container *ngIf="!resetSuccess">
+            <h2>Reset password</h2>
+            <p class="subtitle">Enter your email and 6-digit recovery PIN to set a new password.</p>
+
+            <div class="input-1">
+                <label for="reset-email">Email</label>
+                <input type="email"
+                    placeholder="Enter your email"
+                    id="reset-email"
+                    [(ngModel)]="resetEmail"
+                    (input)="onInputChange()"
+                    (keyup.enter)="handleSubmit()"
+                    [disabled]="isLoading">
+            </div>
+
+            <div class="input-1">
+                <label for="reset-pin">Recovery PIN</label>
+                <input
+                    type="password"
+                    placeholder="Enter your 6-digit PIN"
+                    id="reset-pin"
+                    [(ngModel)]="resetPin"
+                    (input)="onInputChange()"
+                    (keyup.enter)="handleSubmit()"
+                    maxlength="6"
+                    inputmode="numeric"
+                    [disabled]="isLoading">
+            </div>
+
+            <div class="input-1">
+                <label for="new-password">New Password</label>
+                <div class="input-icon-wrapper">
+                    <input
+                        [type]="showNewPassword ? 'text' : 'password'"
+                        placeholder="At least 8 characters"
+                        id="new-password"
+                        [(ngModel)]="newPassword"
+                        (input)="onInputChange()"
+                        (keyup.enter)="handleSubmit()"
+                        [disabled]="isLoading">
+                    <button class="toggle-password" type="button" (click)="showNewPassword = !showNewPassword" tabindex="-1">
+                        <span class="material-icons">{{ showNewPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Password strength -->
+            <div class="password-strength" *ngIf="newPassword.length > 0">
+                <div class="strength-bars">
+                    <div class="bar" [class.active]="newPassword.length >= 1"  [class.weak]="passwordStrength === 'weak'"></div>
+                    <div class="bar" [class.active]="newPassword.length >= 6"  [class.fair]="passwordStrength === 'fair'"></div>
+                    <div class="bar" [class.active]="newPassword.length >= 8"  [class.strong]="passwordStrength === 'strong'"></div>
+                    <div class="bar" [class.active]="newPassword.length >= 12" [class.strong]="passwordStrength === 'strong'"></div>
+                </div>
+                <span class="strength-label" [class]="passwordStrength">{{ passwordStrength | titlecase }}</span>
+            </div>
+
+            <div class="input-1">
+                <label for="confirm-password">Confirm New Password</label>
+                <div class="input-icon-wrapper">
+                    <input
+                        [type]="showConfirmPassword ? 'text' : 'password'"
+                        placeholder="Re-enter new password"
+                        id="confirm-password"
+                        [(ngModel)]="confirmPassword"
+                        (input)="onInputChange()"
+                        (keyup.enter)="handleSubmit()"
+                        [disabled]="isLoading">
+                    <button class="toggle-password" type="button" (click)="showConfirmPassword = !showConfirmPassword" tabindex="-1">
+                        <span class="material-icons">{{ showConfirmPassword ? 'visibility_off' : 'visibility' }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <span class="error-message" *ngIf="showError">
+                <span class="material-icons" style="font-size: 0.9rem;">error_outline</span>
+                {{ errorMessage }}
+            </span>
+
+            <button (click)="handleSubmit()" [disabled]="isLoading">
+                {{ isLoading ? 'Updating...' : 'Reset Password' }}
+            </button>
+
+            <p class="toggle-mode">
+                <a (click)="closeForgotMode()">Back to Sign In</a>
+            </p>
+        </ng-container>
+    </ng-container>
+
+    <!-- ── PIN Setup Mode (existing users) ── -->
+    <ng-container *ngIf="isPinSetupMode">
+
+        <!-- Success state -->
+        <ng-container *ngIf="pinSetupSuccess">
+            <div class="success-icon">
+                <span class="material-icons">check_circle</span>
+            </div>
+            <h2>PIN set!</h2>
+            <p class="subtitle">Your recovery PIN has been saved. You can now access your dashboard.</p>
+            <button (click)="goToDashboard()">Go to Dashboard</button>
+        </ng-container>
+
+        <!-- Form state -->
+        <ng-container *ngIf="!pinSetupSuccess">
+            <div class="pin-setup-icon">
+                <span class="material-icons">pin</span>
+            </div>
+            <h2>Set recovery PIN</h2>
+            <p class="subtitle">
+                We've added a new security feature. Set your 6-digit PIN — you'll need it to reset your password in the future.
+            </p>
+
+            <div class="input-1">
+                <label for="setup-pin">Recovery PIN</label>
+                <input
+                    type="password"
+                    placeholder="Enter 6-digit PIN"
+                    id="setup-pin"
+                    [(ngModel)]="setupPinValue"
+                    (input)="onInputChange()"
+                    (keyup.enter)="handleSubmit()"
+                    maxlength="6"
+                    inputmode="numeric"
+                    [disabled]="isLoading">
+            </div>
+
+            <div class="input-1">
+                <label for="setup-pin-confirm">Confirm PIN</label>
+                <input
+                    type="password"
+                    placeholder="Re-enter PIN"
+                    id="setup-pin-confirm"
+                    [(ngModel)]="setupPinConfirm"
+                    (input)="onInputChange()"
+                    (keyup.enter)="handleSubmit()"
+                    maxlength="6"
+                    inputmode="numeric"
+                    [disabled]="isLoading">
+            </div>
+
+            <span class="error-message" *ngIf="showError">
+                <span class="material-icons" style="font-size: 0.9rem;">error_outline</span>
+                {{ errorMessage }}
+            </span>
+
+            <button (click)="handleSubmit()" [disabled]="isLoading">
+                {{ isLoading ? 'Saving...' : 'Save PIN' }}
+            </button>
+        </ng-container>
+    </ng-container>
 </div>

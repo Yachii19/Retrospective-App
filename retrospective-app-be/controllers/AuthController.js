@@ -1,15 +1,11 @@
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
 const { createAccessToken } = require("../middlewares/auth");
 const User = require("../models/Users");
-const { sendOTPEmail, sendMagicLinkEmail } = require("../services/emailService");
 require("dotenv").config();
 
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000).toString();
-
-exports.initiateRegister = async (req, res) => {
+exports.registerUser = async (req, res) => {
     try {
-        const required = ["username", "email", "password"];
+        const required = ["username", "email", "password", "recoveryPin"];
         const missing = required.filter((f) => !req.body[f]);
 
         if (missing.length) {
@@ -19,7 +15,7 @@ exports.initiateRegister = async (req, res) => {
             });
         }
 
-        const { username, email, password } = req.body;
+        const { username, email, password, recoveryPin } = req.body;
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -30,18 +26,12 @@ exports.initiateRegister = async (req, res) => {
             return res.status(400).send({ message: "Password must be at least 8 characters" });
         }
 
+        if (!/^\d{6}$/.test(recoveryPin)) {
+            return res.status(400).send({ message: "Recovery PIN must be exactly 6 digits" });
+        }
+
         const existingEmail = await User.findOne({ email });
         if (existingEmail) {
-            if (!existingEmail.isVerified) {
-                const otp = generateOTP();
-                existingEmail.otp = otp;
-                existingEmail.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-                await existingEmail.save();
-                await sendOTPEmail(email, otp);
-                return res.status(200).send({
-                    message: "Account pending verification. A new OTP has been sent to your email."
-                });
-            }
             return res.status(409).send({ message: "Email already registered" });
         }
 
@@ -51,106 +41,32 @@ exports.initiateRegister = async (req, res) => {
         }
 
         const passwordHashed = await bcrypt.hash(password, 10);
-        const otp = generateOTP();
+        const pinHashed = await bcrypt.hash(recoveryPin, 10);
 
         const newUser = new User({
             username,
             email,
             password: passwordHashed,
-            isVerified: false,
-            otp,
-            otpExpiry: new Date(Date.now() + 10 * 60 * 1000) // 10 mins
+            recoveryPin: pinHashed,
+            isVerified: true
         });
 
         await newUser.save();
-        await sendOTPEmail(email, otp);
+
+        const token = createAccessToken(newUser);
 
         return res.status(201).send({
-            message: "Registration initiated. Please check your email for the OTP to verify your account.",
-            email
+            message: "Registration successful!",
+            token,
+            user: {
+                _id: newUser._id,
+                username: newUser.username,
+                email: newUser.email
+            }
         });
     } catch (err) {
         console.error(`Registration Error: ${err}`);
         return res.status(500).send({ message: "Server error during registration" });
-    }
-};
-
-exports.verifyOTP = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return res.status(400).send({ message: "Email and OTP are required" });
-        }
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(404).send({ message: "User not found" });
-        }
-
-        if (user.isVerified) {
-            return res.status(400).send({ message: "Account is already verified" });
-        }
-
-        if (!user.otp || user.otp !== otp) {
-            return res.status(400).send({ message: "Invalid OTP" });
-        }
-
-        if (user.otpExpiry < new Date()) {
-            return res.status(400).send({ message: "OTP has expired. Please request a new one." });
-        }
-
-        user.isVerified = true;
-        user.otp = null;
-        user.otpExpiry = null;
-        await user.save();
-
-        const token = createAccessToken(user);
-
-        return res.status(200).send({
-            message: `Welcome to Retrospect, ${user.username}!`,
-            token,
-            user: {
-                _id: user._id,
-                username: user.username,
-                email: user.email
-            }
-        });
-    } catch (err) {
-        console.error(`OTP Verification Error: ${err}`);
-        return res.status(500).send({ message: "Server error during OTP verification" });
-    }
-};
-
-exports.resendOTP = async (req, res) => {
-    try {
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).send({ message: "Email is required" });
-        }
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(404).send({ message: "User not found" });
-        }
-
-        if (user.isVerified) {
-            return res.status(400).send({ message: "Account is already verified" });
-        }
-
-        const otp = generateOTP();
-        user.otp = otp;
-        user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-        await user.save();
-        await sendOTPEmail(email, otp);
-
-        return res.status(200).send({ message: "A new OTP has been sent to your email." });
-    } catch (err) {
-        console.error(`Resend OTP Error: ${err}`);
-        return res.status(500).send({ message: "Server error during OTP resend" });
     }
 };
 
@@ -163,22 +79,17 @@ exports.loginUser = async (req, res) => {
             return res.status(400).send({ message: "Invalid email or password" });
         }
 
-        if (!user.isVerified) {
-            return res.status(403).send({
-                message: "Please verify your email before logging in.",
-                email
-            });
-        }
-
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         if (!isPasswordCorrect) {
             return res.status(401).send({ message: "Invalid email or password" });
         }
 
         const token = createAccessToken(user);
+
         return res.status(200).send({
             message: "Login successful",
             token,
+            requiresPinSetup: !user.recoveryPin, // ← flags existing users with no PIN
             user: {
                 _id: user._id,
                 username: user.username,
@@ -191,74 +102,81 @@ exports.loginUser = async (req, res) => {
     }
 };
 
-exports.forgotPassword = async (req, res) => {
+exports.setupPin = async (req, res) => {
     try {
-        const { email } = req.body;
+        const { pin } = req.body;
+        const userId = req.user.id;
 
-        if (!email) {
-            return res.status(400).send({ message: "Email is required" });
+        if (!pin) {
+            return res.status(400).send({ message: "PIN is required" });
         }
 
-        const user = await User.findOne({ email });
-
-        if (!user || !user.isVerified) {
-            return res.status(404).send({
-                message: "No registered account found with that email address" 
-            });
+        if (!/^\d{6}$/.test(pin)) {
+            return res.status(400).send({ message: "PIN must be exactly 6 digits" });
         }
 
-        const resetToken = crypto.randomBytes(32).toString("hex");
-        user.resetToken = resetToken;
-        user.resetTokenExpiry = new Date(Date.now() + 30 * 60 * 1000); // 30 mins
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send({ message: "User not found" });
+        }
+
+        if (user.recoveryPin) {
+            return res.status(400).send({ message: "PIN already set" });
+        }
+
+        user.recoveryPin = await bcrypt.hash(pin, 10);
         await user.save();
 
-        const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}&email=${email}`;
-        await sendMagicLinkEmail(email, resetLink);
-
-        return res.status(200).send({
-            message: "If that email exists, a reset link has been sent."
-        });
+        return res.status(200).send({ message: "Recovery PIN set successfully" });
     } catch (err) {
-        console.error(`Forgot Password Error: ${err}`);
-        return res.status(500).send({ message: "Server error during password reset request" });
+        console.error(`Setup PIN Error: ${err}`);
+        return res.status(500).send({ message: "Server error during PIN setup" });
     }
 };
 
 exports.resetPassword = async (req, res) => {
     try {
+        const { email, recoveryPin, newPassword, confirmPassword } = req.body;
 
-        const { email, token, newPassword } = req.body;
-      
-        if (!email || !token || !newPassword) {
-              console.log('Reset password body:', req.body);
-            return res.status(400).send({ message: "Email, token, and new password are required" });
+        if (!email || !recoveryPin || !newPassword || !confirmPassword) {
+            return res.status(400).send({ message: "All fields are required" });
+        }
+
+        if (!/^\d{6}$/.test(recoveryPin)) {
+            return res.status(400).send({ message: "Recovery PIN must be exactly 6 digits" });
         }
 
         if (newPassword.length < 8) {
-            return res.status(400).send({ message: "Password must be at least 8 characters" });
+            return res.status(400).send({ message: "New password must be at least 8 characters" });
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.status(400).send({ message: "Passwords do not match" });
         }
 
         const user = await User.findOne({ email });
-
-        if (!user || !user.resetToken || user.resetToken !== token) {
-            return res.status(400).send({ message: "Invalid or expired reset link" });
+        if (!user) {
+            return res.status(404).send({ message: "No account found with that email" });
         }
 
-        if (user.resetTokenExpiry < new Date()) {
-            return res.status(400).send({ message: "Reset link has expired. Please request a new one." });
+        if (!user.recoveryPin) {
+            return res.status(400).send({ message: "No recovery PIN set for this account" });
+        }
+
+        const isPinCorrect = await bcrypt.compare(recoveryPin, user.recoveryPin);
+        if (!isPinCorrect) {
+            return res.status(401).send({ message: "Incorrect recovery PIN" });
         }
 
         const isSamePassword = await bcrypt.compare(newPassword, user.password);
         if (isSamePassword) {
-            return res.status(400).send({ message: "New password must be different from your current one" });
+            return res.status(400).send({ message: "New password must be different from current password" });
         }
 
         user.password = await bcrypt.hash(newPassword, 10);
-        user.resetToken = null;
-        user.resetTokenExpiry = null;
         await user.save();
 
-        return res.status(200).send({ message: "Password reset successfully. You can now log in." });
+        return res.status(200).send({ message: "Password reset successfully" });
     } catch (err) {
         console.error(`Reset Password Error: ${err}`);
         return res.status(500).send({ message: "Server error during password reset" });

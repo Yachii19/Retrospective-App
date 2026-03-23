@@ -73,15 +73,6 @@ export const routes: Routes = [
         }
     },
     {
-        path: 'reset-password',
-        pathMatch: 'full',
-        loadComponent: () => {
-            return import('./pages/reset-password/reset-password.component').then(
-                (m) => m.ResetPasswordComponent
-            )
-        }
-    },
-    {
         path: '**',
         pathMatch: 'full',
         loadComponent: () => {

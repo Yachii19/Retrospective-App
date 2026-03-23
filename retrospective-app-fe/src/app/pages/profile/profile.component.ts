@@ -19,20 +19,30 @@ import { User } from '../../models/user.model';
 export class ProfileComponent implements OnInit {
   currentUser$!: Observable<User>;
 
+  // ── Username ──────────────────────────────────────────────────────────────
   usernameInput = '';
-  newPassword = '';
-  confirmPassword = '';
-
-  showNew = false;
-  showConfirm = false;
-
   savingUsername = false;
-  savingPassword = false;
-
   usernameSuccess = '';
   usernameError = '';
+
+  // ── Password ──────────────────────────────────────────────────────────────
+  newPassword = '';
+  confirmPassword = '';
+  showNew = false;
+  showConfirm = false;
+  savingPassword = false;
   passwordSuccess = '';
   passwordError = '';
+
+  // ── PIN ───────────────────────────────────────────────────────────────────
+  newPin = '';
+  confirmPin = '';
+  showCurrentPin = false;
+  showNewPin = false;
+  showConfirmPin = false;
+  savingPin = false;
+  pinSuccess = '';
+  pinError = '';
 
   constructor(
     private authService: AuthService,
@@ -51,10 +61,7 @@ export class ProfileComponent implements OnInit {
   }
 
   get isPasswordValid(): boolean {
-    return (
-      this.newPassword.length >= 8 &&
-      this.newPassword === this.confirmPassword
-    );
+    return this.newPassword.length >= 8 && this.newPassword === this.confirmPassword;
   }
 
   get passwordStrength(): 'weak' | 'fair' | 'strong' {
@@ -62,6 +69,8 @@ export class ProfileComponent implements OnInit {
     if (this.newPassword.length >= 8) return 'fair';
     return 'weak';
   }
+
+  // ── Actions ───────────────────────────────────────────────────────────────
 
   resetUsername(): void {
     if (!this.usernameInput.trim()) {
@@ -77,9 +86,7 @@ export class ProfileComponent implements OnInit {
       next: (response: any) => {
         this.savingUsername = false;
         this.usernameSuccess = response.message || 'Username updated successfully';
-        this.currentUser$ = this.userService.getUserProfile().pipe(
-          map(res => res.user)
-        );
+        this.currentUser$ = this.userService.getUserProfile().pipe(map(res => res.user));
       },
       error: (err) => {
         this.savingUsername = false;
@@ -114,6 +121,40 @@ export class ProfileComponent implements OnInit {
         this.savingPassword = false;
         this.passwordError = err?.error?.message || 'Failed to update password';
       }
+    });
+  }
+
+  resetPin(): void {
+    if (!this.newPin.trim() || !this.confirmPin.trim()) {
+        this.pinError = 'Please enter and confirm your new PIN';
+        return;
+    }
+
+    if (!/^\d{6}$/.test(this.newPin)) {
+        this.pinError = 'PIN must be exactly 6 digits';
+        return;
+    }
+
+    if (this.newPin !== this.confirmPin) {
+        this.pinError = 'PINs do not match';
+        return;
+    }
+
+    this.savingPin = true;
+    this.pinSuccess = '';
+    this.pinError = '';
+
+    this.userService.updatePin(String(this.newPin)).subscribe({
+        next: (response: any) => {
+            this.savingPin = false;
+            this.pinSuccess = response.message || 'Recovery PIN updated successfully';
+            this.newPin = '';
+            this.confirmPin = '';
+        },
+        error: (err) => {
+            this.savingPin = false;
+            this.pinError = err?.error?.message || 'Failed to update PIN';
+        }
     });
   }
 }

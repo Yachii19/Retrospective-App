@@ -109,3 +109,42 @@ exports.changePassword = async (req, res) => {
         });
     }
 }
+
+exports.changePin = async (req, res) => {
+    try {
+        const { pin } = req.body;
+        const userId = req.user.id;
+
+        if (!pin) {
+            return res.status(400).send({ 
+                message: "PIN is required" 
+            });
+        }
+
+        if (!/^\d{6}$/.test(pin)) {
+            return res.status(400).send({ 
+                message: "PIN must be exactly 6 digits" 
+            });
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(400).send({ 
+                message: "Invalid user!" 
+            });
+        }
+
+        user.recoveryPin = await bcrypt.hash(pin, 10);
+        await user.save();
+
+        return res.status(200).send({ 
+            message: "Recovery PIN updated successfully" 
+        });
+    } catch (err) {
+        console.error("Error changing PIN:", err);
+        res.status(500).send({
+           message: "Server error during PIN change"
+        });
+    }
+}

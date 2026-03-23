@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const authController = require('../controllers/AuthController');
+const { verifyToken } = require('../middlewares/auth');
 
-router.post('/register', authController.initiateRegister);
-router.post('/verify-otp', authController.verifyOTP);
-router.post('/resend-otp', authController.resendOTP);
+router.post('/register', authController.registerUser);
 router.post('/login', authController.loginUser);
-router.post('/forgot-password', authController.forgotPassword);
+router.post('/setup-pin', verifyToken, authController.setupPin);
 router.post('/reset-password', authController.resetPassword);
 
 module.exports = router;

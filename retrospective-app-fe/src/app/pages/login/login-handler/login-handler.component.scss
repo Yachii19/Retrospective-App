@@ -253,3 +253,72 @@
         h2 { font-size: 1.3rem; }
     }
 }
+
+.pin-hint {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    margin-left: 0.4rem;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.success-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    .material-icons {
+        font-size: 3rem;
+        color: #1e8e5a;
+    }
+}
+
+.pin-setup-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+    .material-icons {
+        font-size: 3rem;
+        color: var(--color-primary);
+    }
+}
+
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    margin-bottom: 1rem;
+
+    .strength-bars {
+        display: flex;
+        gap: 4px;
+        flex: 1;
+
+        .bar {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--color-border);
+            transition: background 0.3s ease;
+
+            &.active {
+                &.weak   { background: #e74c3c; }
+                &.fair   { background: #f39c12; }
+                &.strong { background: #1e8e5a; }
+            }
+        }
+    }
+
+    .strength-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        min-width: 40px;
+        text-align: right;
+        &.weak   { color: #e74c3c; }
+        &.fair   { color: #f39c12; }
+        &.strong { color: #1e8e5a; }
+    }
+}

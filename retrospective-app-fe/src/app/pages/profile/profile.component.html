@@ -99,10 +99,7 @@
           </p>
 
           <div class="card-actions">
-            <button
-              class="primary-btn"
-              (click)="resetUsername()"
-            >
+            <button class="primary-btn" (click)="resetUsername()" [disabled]="savingUsername">
               <span class="material-symbols-outlined">save</span>
               {{ savingUsername ? 'Saving...' : 'Save Username' }}
             </button>
@@ -115,6 +112,77 @@
           <div class="status-message error" *ngIf="usernameError">
             <span class="material-symbols-outlined">error_outline</span>
             {{ usernameError }}
+          </div>
+        </div>
+      </section>
+
+      <!-- Change Recovery PIN -->
+      <section class="section-block">
+        <div class="section-label">
+          <div class="section-icon-wrapper">
+            <span class="material-symbols-outlined">pin</span>
+          </div>
+          <div>
+            <span class="section-title">Recovery PIN</span>
+            <span class="section-subtitle">Used to reset your password</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="input-1">
+            <label for="new-pin">New PIN</label>
+            <div class="input-icon-wrapper">
+              <input
+                [type]="showNewPin ? 'text' : 'password'"
+                id="new-pin"
+                [(ngModel)]="newPin"
+                (ngModelChange)="pinError = ''; pinSuccess = ''"
+                placeholder="Enter new 6-digit PIN"
+                maxlength="6"
+                inputmode="numeric"
+                (keydown.enter)="resetPin()"
+                [disabled]="savingPin"
+              />
+              <button class="toggle-password" type="button" (click)="showNewPin = !showNewPin" tabindex="-1">
+                <span class="material-icons">{{ showNewPin ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="input-1">
+            <label for="confirm-pin">Confirm PIN</label>
+            <div class="input-icon-wrapper">
+              <input
+                [type]="showConfirmPin ? 'text' : 'password'"
+                id="confirm-pin"
+                [(ngModel)]="confirmPin"
+                (ngModelChange)="pinError = ''; pinSuccess = ''"
+                placeholder="Re-enter new 6-digit PIN"
+                maxlength="6"
+                inputmode="numeric"
+                (keydown.enter)="resetPin()"
+                [disabled]="savingPin"
+              />
+              <button class="toggle-password" type="button" (click)="showConfirmPin = !showConfirmPin" tabindex="-1">
+                <span class="material-icons">{{ showConfirmPin ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="primary-btn" (click)="resetPin()" [disabled]="savingPin">
+              <span class="material-symbols-outlined">lock_reset</span>
+              {{ savingPin ? 'Updating...' : 'Update PIN' }}
+            </button>
+          </div>
+
+          <div class="status-message success" *ngIf="pinSuccess">
+            <span class="material-symbols-outlined">check_circle</span>
+            {{ pinSuccess }}
+          </div>
+          <div class="status-message error" *ngIf="pinError">
+            <span class="material-symbols-outlined">error_outline</span>
+            {{ pinError }}
           </div>
         </div>
       </section>
@@ -168,7 +236,6 @@
             </div>
           </div>
 
-          <!-- Password strength indicator -->
           <div class="password-strength" *ngIf="newPassword.length > 0">
             <div class="strength-bars">
               <div class="bar" [class.active]="newPassword.length >= 1" [class.weak]="passwordStrength === 'weak'"></div>
@@ -180,10 +247,7 @@
           </div>
 
           <div class="card-actions">
-            <button
-              class="primary-btn"
-              (click)="resetPassword()"
-            >
+            <button class="primary-btn" (click)="resetPassword()" [disabled]="savingPassword">
               <span class="material-symbols-outlined">lock_reset</span>
               {{ savingPassword ? 'Updating...' : 'Update Password' }}
             </button>
