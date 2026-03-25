@@ -1,6 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { TeamService } from '../../services/team.service';
 import { Team } from '../../models/team.model';
 import { AuthService } from '../../services/auth.service';
@@ -9,31 +8,28 @@ import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { CreateTeamModalComponent } from '../../components/shared/create-team-modal/create-team-modal.component';
 import { ManageTeamModalComponent } from '../../components/shared/manage-team-modal/manage-team-modal.component';
 
-
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [
-    CommonModule,
-    SidebarComponent,
-    CreateTeamModalComponent,
-    ManageTeamModalComponent
-  ],
+  imports: [CommonModule, SidebarComponent, CreateTeamModalComponent, ManageTeamModalComponent],
   templateUrl: './teams.component.html',
   styleUrl: './teams.component.scss'
 })
 export class TeamsComponent implements OnInit {
-  teams: Team[] = [];
-  isLoading: boolean = false;
+  teams = signal<Team[]>([]);
+  isLoading = signal(false);
+  isCreateModalVisible = signal(false);
+  isManageModalVisible = signal(false);
+  selectedTeam = signal<Team | null>(null);
 
-  isCreateModalVisible: boolean = false;
-  isManageModalVisible: boolean = false;
-  selectedTeam: Team | null = null;
+  totalMembers = computed(() => {
+    const allIds = new Set(this.teams().flatMap(t => t.members.map(m => m._id)));
+    return allIds.size;
+  });
 
   constructor(
     private teamService: TeamService,
     private authService: AuthService,
-    private notification: NzNotificationService,
     private router: Router
   ) {}
 
@@ -53,63 +49,42 @@ export class TeamsComponent implements OnInit {
   }
 
   loadTeams(): void {
-    this.isLoading = true;
+    this.isLoading.set(true);
     this.teamService.getAllTeams().subscribe({
       next: (res) => {
-        this.teams = res.data as Team[];
-        this.isLoading = false;
+        this.teams.set(res.data as Team[]);
+        this.isLoading.set(false);
       },
       error: (err) => {
-        if (err.status === 404) {
-          this.teams = [];
-        }
-        this.isLoading = false;
+        if (err.status === 404) this.teams.set([]);
+        this.isLoading.set(false);
       }
     });
   }
 
-  // ── Modal triggers ────────────────────────────────────────────────────────
-
   showCreateModal(): void {
-    this.isCreateModalVisible = true;
+    this.isCreateModalVisible.set(true);
   }
 
   showManageModal(team: Team): void {
-    this.selectedTeam = team;
-    this.isManageModalVisible = true;
+    this.selectedTeam.set(team);
+    this.isManageModalVisible.set(true);
   }
 
-  // ── Event handlers from modal components ──────────────────────────────────
-
-  onTeamCreated(): void {
-    this.loadTeams();
+  onTeamCreated(newTeam: Team): void {
+    this.teams.update(teams => [...teams, newTeam]);
   }
 
-  onTeamUpdated(): void {
-    this.loadTeams();
-    // ✅ Refresh selected team so manage modal reflects latest data
-    this.teamService.getAllTeams().subscribe(res => {
-      this.selectedTeam = (res.data as Team[]).find(
-        t => t._id === this.selectedTeam?._id
-      ) || null;
-    });
+  onTeamUpdated(updatedTeam: Team): void {
+    this.teams.update(teams =>
+      teams.map(t => t._id === updatedTeam._id ? updatedTeam : t)
+    );
+    this.selectedTeam.set(updatedTeam);
   }
 
-  onTeamDeleted(): void {
-    this.selectedTeam = null;
-    this.isManageModalVisible = false;
-    this.loadTeams();
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
-
-  getMemberPreview(team: Team): string {
-    return team.members.slice(0, 3).map(m => m.username).join(', ')
-      + (team.members.length > 3 ? ` +${team.members.length - 3} more` : '');
-  }
-
-  getTotalMembers(): number {
-    const allIds = new Set(this.teams.flatMap(t => t.members.map(m => m._id)));
-    return allIds.size;
+  onTeamDeleted(teamId: string): void {
+    this.teams.update(teams => teams.filter(t => t._id !== teamId));
+    this.selectedTeam.set(null);
+    this.isManageModalVisible.set(false);
   }
 }

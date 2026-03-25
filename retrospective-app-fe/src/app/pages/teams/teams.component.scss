@@ -14,7 +14,6 @@
     }
 }
 
-// ── Hero ──────────────────────────────────────────────────────────────────────
 .teams-hero {
     display: flex;
     align-items: center;
@@ -85,7 +84,6 @@
     }
 }
 
-// ── Stats Row ─────────────────────────────────────────────────────────────────
 .stats-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -138,7 +136,6 @@
     }
 }
 
-// ── Buttons ───────────────────────────────────────────────────────────────────
 .btn-create {
     display: flex;
     align-items: center;
@@ -154,6 +151,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    outline: none;
 
     .material-symbols-outlined { font-size: 1.1rem; }
 
@@ -164,7 +162,6 @@
     }
 }
 
-// ── Loading & Empty ───────────────────────────────────────────────────────────
 .loading-state {
     display: flex;
     justify-content: center;
@@ -213,7 +210,6 @@
     p { font-size: 0.875rem; color: var(--color-text-muted); margin: 0 0 0.5rem 0; }
 }
 
-// ── Teams Grid ────────────────────────────────────────────────────────────────
 .teams-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -237,7 +233,6 @@
         transform: translateY(-2px);
     }
 
-    // ── Card Header ───────────────────────────────────────────────────────
     .team-card-header {
         display: flex;
         align-items: center;
@@ -276,7 +271,6 @@
         }
     }
 
-    // ── Card Body ─────────────────────────────────────────────────────────
     .team-card-body {
         display: flex;
         flex-direction: column;
@@ -323,7 +317,6 @@
         }
     }
 
-    // ── Card Footer ───────────────────────────────────────────────────────
     .team-card-footer {
         border-top: 1px solid var(--color-border-light);
         padding-top: 0.875rem;
@@ -342,6 +335,7 @@
             font-weight: 600;
             font-family: inherit;
             color: var(--color-text-medium);
+            outline: none;
             cursor: pointer;
             transition: all 0.2s ease;
 
@@ -356,7 +350,6 @@
     }
 }
 
-// ── Modal Shared ──────────────────────────────────────────────────────────────
 .modal-form {
     padding: 0.5rem 0;
 }
@@ -650,6 +643,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
+    outline: none;
 
     .material-symbols-outlined { font-size: 1.1rem; }
 
@@ -725,7 +719,6 @@
     }
 }
 
-// ── Animations ────────────────────────────────────────────────────────────────
 @keyframes spin {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }

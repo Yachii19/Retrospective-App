@@ -5,14 +5,12 @@
     align-items: start;
     padding-inline: 2rem;
 
-    // ── ≤ 3 sections: fluid, fills container, no scroll ───────────────────────
     &.grid-fluid {
         grid-template-columns: repeat(3, 1fr);
         width: 100%;
         grid-auto-flow: unset;
     }
 
-    // ── 4+ sections: fixed columns, draggable overflow ────────────────────────
     &.grid-fixed {
         grid-auto-flow: column;
         grid-auto-columns: 450px;
@@ -20,7 +18,6 @@
         min-width: 100%;
     }
 
-    // ── Session Card ──────────────────────────────────────────────────────────
     .session-content {
         background: var(--color-bg-white);
         border-radius: 16px;
@@ -36,7 +33,6 @@
             border-color: rgba(0, 122, 255, 0.3);
         }
 
-        // ── Section Header ────────────────────────────────────────────────────
         .section-header {
             display: flex;
             align-items: center;
@@ -114,7 +110,6 @@
             }
         }
 
-        // ── Feedback List ─────────────────────────────────────────────────────
         .feedback-list {
             display: flex;
             flex-direction: column;
@@ -130,7 +125,6 @@
 
                 &:hover { background: var(--color-bg-card); }
 
-                // ── Feedback Header ───────────────────────────────────────────
                 .feedback-header {
                     display: flex;
                     align-items: center;
@@ -216,14 +210,12 @@
                             .material-icons { animation: bounce 0.4s ease; }
                         }
 
-                        // ← added voting state
                         &.voting {
                             opacity: 0.6;
                             cursor: not-allowed;
                             pointer-events: none;
                         }
 
-                        // ── Voters Tooltip ────────────────────────────────────
                         .voters-tooltip {
                             position: absolute;
                             top: calc(100% + 0.5rem);
@@ -290,7 +282,6 @@
                     }
                 }
 
-                // ── Feedback Body ─────────────────────────────────────────────
                 .feedback-body {
                     ul {
                         list-style: none;
@@ -367,7 +358,6 @@
             }
         }
 
-        // ── Input Section ─────────────────────────────────────────────────────
         .input-section {
             padding: 1rem 1.5rem;
             border-top: 1px solid var(--color-border-light);
@@ -442,7 +432,6 @@
         }
     }
 
-    // ── Add Section Card ──────────────────────────────────────────────────────
     .add-section-card {
         border: 2px dashed var(--color-border);
         border-radius: 16px;
@@ -507,7 +496,6 @@
     }
 }
 
-// ── Shared Modal Base ─────────────────────────────────────────────────────────
 .delete-modal,
 .add-section-modal {
     position: fixed;

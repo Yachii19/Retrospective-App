@@ -54,7 +54,6 @@
     }
 }
 
-// ─── Access Checking ───────────────────────────────────────────────────────────
 .access-checking {
     display: flex;
     align-items: center;
@@ -69,12 +68,11 @@
     }
 }
 
-// ─── Access Denied ─────────────────────────────────────────────────────────────
 .access-denied {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 100vh; // ✅ changed from height to min-height so it works inside container
+    min-height: 100vh;
 
     .access-denied-card {
         display: flex;

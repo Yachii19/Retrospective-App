@@ -78,14 +78,12 @@ export class MyContributionsComponent {
     })
   }
 
-  // Calculate total feedback count from userFeedbacks
   private calculateTotalFeedbackCount(): number {
     return this.userFeedbacks.reduce((total, sessionGroup) => {
       return total + sessionGroup.feedbacks.length;
     }, 0);
   }
 
-  // Public getter (optional - you can use feedbackCount directly in template)
   getTotalFeedbackCount(): number {
     return this.feedbackCount;
   }
@@ -94,7 +92,6 @@ export class MyContributionsComponent {
     const sectionsMap = new Map<string, string>();
 
     sessionGroup.feedbacks.forEach(feedback => {
-      // REMOVED: Don't modify feedbackCount here during change detection
       feedback.sections.forEach(section => {
         if (!sectionsMap.has(section.key)) {
           sectionsMap.set(section.key, section.title);

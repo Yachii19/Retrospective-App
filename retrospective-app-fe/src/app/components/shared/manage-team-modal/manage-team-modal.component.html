@@ -1,8 +1,9 @@
 <nz-modal
-  [(nzVisible)]="isVisible"
-  [nzTitle]="team?.teamName + ' — Manage'"
+  [(nzVisible)]="internalVisible"
+  [nzTitle]="internalTeam()?.teamName + ' — Manage'"
   [nzFooter]="null"
   (nzOnCancel)="close()"
+  [nzAutofocus]="null"
   nzWidth="560px"
   nzCentered>
 

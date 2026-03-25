@@ -3,7 +3,6 @@
 
   <div class="main-content">
 
-    <!-- Hero Header -->
     <header class="teams-hero">
       <div class="hero-left">
         <div class="hero-icon">
@@ -26,14 +25,14 @@
       </div>
     </header>
 
-    <!-- Stats Row -->
-    <div class="stats-row" *ngIf="!isLoading && teams.length > 0">
+    <div class="stats-row" *ngIf="!isLoading() && teams(
+    ).length > 0">
       <div class="stat-card">
         <div class="stat-icon">
           <span class="material-symbols-outlined">groups</span>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ teams.length }}</span>
+          <span class="stat-value">{{ teams().length }}</span>
           <span class="stat-label">Total Teams</span>
         </div>
       </div>
@@ -42,22 +41,20 @@
           <span class="material-symbols-outlined">person</span>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ getTotalMembers() }}</span>
+          <span class="stat-value">{{ totalMembers() }}</span>
           <span class="stat-label">Total Members</span>
         </div>
       </div>
     </div>
 
-    <!-- Loading -->
-    <div class="loading-state" *ngIf="isLoading">
+    <div class="loading-state" *ngIf="isLoading()">
       <div class="loading-spinner">
         <span class="material-symbols-outlined spinning">sync</span>
         <p>Loading teams...</p>
       </div>
     </div>
 
-    <!-- Empty State -->
-    <div class="empty-state" *ngIf="!isLoading && teams.length === 0">
+    <div class="empty-state" *ngIf="!isLoading() && teams().length === 0">
       <div class="empty-icon">
         <span class="material-symbols-outlined">group_off</span>
       </div>
@@ -69,20 +66,19 @@
       </button>
     </div>
 
-    <!-- Teams Grid -->
-    <section class="section-block" *ngIf="!isLoading && teams.length > 0">
+    <section class="section-block" *ngIf="!isLoading() && teams().length > 0">
       <div class="section-label">
         <div class="section-icon-wrapper">
           <span class="material-symbols-outlined">group</span>
         </div>
         <div class="section-label-text">
           <span class="section-title">All Teams</span>
-          <span class="section-subtitle">{{ teams.length }} team{{ teams.length !== 1 ? 's' : '' }} total</span>
+          <span class="section-subtitle">{{ teams().length }} team{{ teams().length !== 1 ? 's' : '' }} total</span>
         </div>
       </div>
 
       <div class="teams-grid">
-        <div class="team-card" *ngFor="let team of teams">
+        <div class="team-card" *ngFor="let team of teams()">
 
           <div class="team-card-header">
             <div class="team-icon">
@@ -130,12 +126,12 @@
 
 <app-create-team-modal
     [(isVisible)]="isCreateModalVisible"
-    (teamCreated)="onTeamCreated()">
+    (teamCreated)="onTeamCreated($event)">
 </app-create-team-modal>
 
 <app-manage-team-modal
     [(isVisible)]="isManageModalVisible"
-    [team]="selectedTeam"
-    (teamUpdated)="onTeamUpdated()"
-    (teamDeleted)="onTeamDeleted()">
+    [team]="selectedTeam()"
+    (teamUpdated)="onTeamUpdated($event)"
+    (teamDeleted)="onTeamDeleted($event)">
 </app-manage-team-modal>

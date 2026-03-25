@@ -76,7 +76,6 @@
             box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
         }
 
-        // ─── Nest Hub ─────────────────────────────────────────────────────
         @media (min-width: 769px) and (max-width: 1024px) {
             margin-bottom: 1.5rem;
 
@@ -89,7 +88,6 @@
             }
         }
 
-        // ─── Tablet ───────────────────────────────────────────────────────
         @media (min-width: 481px) and (max-width: 768px) {
             margin-bottom: 1.25rem;
 
@@ -107,7 +105,6 @@
             }
         }
 
-        // ─── Mobile ───────────────────────────────────────────────────────
         @media (max-width: 480px) {
             margin-bottom: 1rem;
 
@@ -171,7 +168,6 @@
         }
     }
 
-    // disable lift on touch devices
     @media (max-width: 768px) {
         &:hover {
             transform: none;
@@ -211,7 +207,7 @@
 
             .user-details {
                 flex: 1;
-                min-width: 0; // enables text truncation in flex child
+                min-width: 0;
 
                 display: flex;
                 flex-direction: column;

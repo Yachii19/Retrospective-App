@@ -3,11 +3,10 @@
 
   <div class="main-content" *ngIf="currentUser$ | async as user">
 
-    <!-- Hero Header -->
     <header class="profile-hero">
       <div class="hero-left">
         <div class="hero-avatar" [style.background]="user.username | avatarColor">
-          {{ user.username?.charAt(0)?.toUpperCase() }}
+          {{ user.username.charAt(0).toUpperCase() }}
         </div>
         <div class="hero-text">
           <h1>{{ user.username || 'Your Profile' }}</h1>
@@ -20,7 +19,6 @@
       </div>
     </header>
 
-    <!-- Profile Info Section -->
     <section class="section-block">
       <div class="section-label">
         <div class="section-icon-wrapper">
@@ -65,10 +63,7 @@
       </div>
     </section>
 
-    <!-- Settings Grid -->
     <div class="settings-grid">
-
-      <!-- Change Username -->
       <section class="section-block">
         <div class="section-label">
           <div class="section-icon-wrapper">
@@ -116,7 +111,6 @@
         </div>
       </section>
 
-      <!-- Change Recovery PIN -->
       <section class="section-block">
         <div class="section-label">
           <div class="section-icon-wrapper">
@@ -187,7 +181,6 @@
         </div>
       </section>
 
-      <!-- Change Password -->
       <section class="section-block">
         <div class="section-label">
           <div class="section-icon-wrapper">

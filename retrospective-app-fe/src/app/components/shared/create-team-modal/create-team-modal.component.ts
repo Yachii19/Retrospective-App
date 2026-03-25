@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzModalModule } from 'ng-zorro-antd/modal';
@@ -9,6 +9,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { TeamService } from '../../../services/team.service';
 import { UserService } from '../../../services/user.service';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { Team } from '../../../models/team.model';
 
 @Component({
   selector: 'app-create-team-modal',
@@ -17,11 +18,12 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
   templateUrl: './create-team-modal.component.html',
   styleUrl: './create-team-modal.component.scss'
 })
-export class CreateTeamModalComponent implements OnInit {
+export class CreateTeamModalComponent implements OnInit, OnChanges {
   @Input() isVisible: boolean = false;
   @Output() isVisibleChange = new EventEmitter<boolean>();
-  @Output() teamCreated = new EventEmitter<void>();
+  @Output() teamCreated = new EventEmitter<Team>();
 
+  internalVisible: boolean = false;
   form!: FormGroup;
   isSubmitting: boolean = false;
   memberOptions: { label: string; value: string }[] = [];
@@ -35,6 +37,12 @@ export class CreateTeamModalComponent implements OnInit {
     private userService: UserService,
     private notification: NzNotificationService
   ) {}
+
+   ngOnChanges(changes: SimpleChanges): void {
+      if (changes['isVisible']?.currentValue === true) {
+        this.internalVisible = this.isVisible;
+      }
+    }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -62,11 +70,18 @@ export class CreateTeamModalComponent implements OnInit {
     if (query) this.searchSubject.next(query);
   }
 
+  onVisibleChange(visible: boolean): void {
+    if (!visible) {
+      this.close();
+    }
+  }
+
   close(): void {
-    this.isVisible = false;
+    this.internalVisible = false;
     this.isVisibleChange.emit(false);
     this.form.reset({ emails: [] });
     this.memberOptions = [];
+    this.isSubmitting = false;
   }
 
   submit(): void {
@@ -84,9 +99,8 @@ export class CreateTeamModalComponent implements OnInit {
         if (res.notFound?.length) {
           this.notification.warning('Warning', `Emails not found: ${res.notFound.join(', ')}`);
         }
-        this.isSubmitting = false;
-        this.teamCreated.emit();
         this.close();
+        this.teamCreated.emit(res.data as Team);
       },
       error: (err) => {
         this.notification.error('Error', err.error?.message || 'Failed to create team');

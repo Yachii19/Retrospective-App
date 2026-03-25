@@ -1,8 +1,10 @@
 <nz-modal
-  [(nzVisible)]="isVisible"
+  [nzVisible]="internalVisible"
   nzTitle="Create New Team"
   [nzFooter]="null"
   (nzOnCancel)="close()"
+  [nzAutofocus]="null"
+  (nzVisibleChange)="onVisibleChange($event)"
   nzWidth="520px"
   nzCentered>
 

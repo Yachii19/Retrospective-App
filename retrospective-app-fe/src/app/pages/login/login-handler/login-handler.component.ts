@@ -13,20 +13,16 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
   styleUrl: './login-handler.component.scss'
 })
 export class LoginHandlerComponent {
-
-  // ── Mode ──────────────────────────────────────────────────────────────────
   isLoginMode: boolean = true;
   isForgotMode: boolean = false;
   isPinSetupMode: boolean = false;
 
-  // ── Login / Register fields ───────────────────────────────────────────────
   username: string = '';
   email: string = '';
   password: string = '';
   recoveryPin: string = '';
   showPassword: boolean = false;
 
-  // ── Forgot password fields ────────────────────────────────────────────────
   resetEmail: string = '';
   resetPin: string = '';
   newPassword: string = '';
@@ -35,12 +31,10 @@ export class LoginHandlerComponent {
   showConfirmPassword: boolean = false;
   resetSuccess: boolean = false;
 
-  // ── PIN setup fields ──────────────────────────────────────────────────────
   setupPinValue: string = '';
   setupPinConfirm: string = '';
   pinSetupSuccess: boolean = false;
 
-  // ── UI state ──────────────────────────────────────────────────────────────
   showError: boolean = false;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -50,8 +44,6 @@ export class LoginHandlerComponent {
     private authService: AuthService,
     private notification: NzNotificationService
   ) {}
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   onInputChange(): void {
     this.showError = false;
@@ -106,8 +98,6 @@ export class LoginHandlerComponent {
     if (this.newPassword.length >= 8) return 'fair';
     return 'weak';
   }
-
-  // ── Auth actions ──────────────────────────────────────────────────────────
 
   signIn(): void {
     if (!this.email.trim() || !this.password.trim()) {

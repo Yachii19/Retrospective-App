@@ -86,12 +86,9 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     this.socketSubs.forEach(sub => sub.unsubscribe());
   }
 
-  // ── Socket Listeners ──────────────────────────────────────────────────────
-
   private initSocketListeners(): void {
     this.socketService.joinSession(this.sessionId);
 
-    // Live feedback
     this.socketSubs.push(
       this.socketService.onFeedbackAdded().subscribe(({ sectionKey, feedback }) => {
         if (!this.sessionFeedbacks[sectionKey]) {
@@ -107,7 +104,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Live votes
     this.socketSubs.push(
       this.socketService.onFeedbackVoted().subscribe(({ feedbackId, votes, votedBy }) => {
         for (const key of Object.keys(this.sessionFeedbacks)) {
@@ -119,14 +115,13 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
               votedBy
             };
             this.sessionFeedbacks[key] = [...this.sessionFeedbacks[key]];
-            this.votingInProgress[feedbackId] = false; // ← unlock after socket confirms
+            this.votingInProgress[feedbackId] = false; 
             break;
           }
         }
       })
     );
 
-    // Live section added
     this.socketSubs.push(
       this.socketService.onSectionAdded().subscribe(({ section }) => {
         if (this.session && !this.session.sections.some(s => s.key === section.key)) {
@@ -136,7 +131,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       })
     );
 
-    // Live section deleted
     this.socketSubs.push(
       this.socketService.onSectionDeleted().subscribe(({ key }) => {
         if (this.session) {
@@ -146,8 +140,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       })
     );
   }
-
-  // ── Session ───────────────────────────────────────────────────────────────
 
   loadSession(): void {
     this.sessionService.getSessionById(this.sessionId).subscribe({
@@ -181,8 +173,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Feedback ──────────────────────────────────────────────────────────────
-
   onInputChange(sectionKey: string): void {
     this.sectionErrors[sectionKey] = '';
   }
@@ -215,14 +205,12 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Voting ────────────────────────────────────────────────────────────────
-
   hasUserVoted(feedback: RetroFeedback): boolean {
     return feedback.votedBy.some((voter: any) => voter._id === this.currentUserId);
   }
 
   addVote(feedbackId: string, sectionKey: string): void {
-    if (this.votingInProgress[feedbackId]) return; // ← prevent double click
+    if (this.votingInProgress[feedbackId]) return;
 
     const feedbacks = this.sessionFeedbacks[sectionKey];
     const index = feedbacks?.findIndex(f => f._id === feedbackId);
@@ -231,22 +219,20 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     const feedback = feedbacks[index];
     const hasVoted = this.hasUserVoted(feedback);
 
-    this.votingInProgress[feedbackId] = true; // ← lock button
+    this.votingInProgress[feedbackId] = true;
 
     const action$ = hasVoted
       ? this.feedbackService.unvoteFeedback(feedbackId)
       : this.feedbackService.voteFeedback(feedbackId);
 
     action$.subscribe({
-      // socket handles UI update for everyone including current user
+    
       error: (error) => {
-        this.votingInProgress[feedbackId] = false; // ← unlock on error
+        this.votingInProgress[feedbackId] = false;
         this.sectionErrors[sectionKey] = error.error?.message || 'Failed to update vote';
       }
     });
   }
-
-  // ── Section helpers ───────────────────────────────────────────────────────
 
   onSectionTitleChange(): void {
     this.newSectionKey = this.newSectionTitle
@@ -264,8 +250,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     const section = feedback.sections.find(s => s.key === sectionKey);
     return section?.actionItems || null;
   }
-
-  // ── Delete section modal ──────────────────────────────────────────────────
 
   showDeleteSectionModal(sectionKey: string): void {
     this.sectionKeyToDelete = sectionKey;
@@ -294,8 +278,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  // ── Add section modal ─────────────────────────────────────────────────────
 
   showAddSectionModal(): void {
     this.showAddModal = true;
@@ -337,8 +319,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Notifications ─────────────────────────────────────────────────────────
-
   showNotification(message: string, success: boolean): void {
     if (success) {
       this.notification.success('Success', message);
@@ -346,8 +326,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
       this.notification.error('Error', message);
     }
   }
-
-  // ── Membership ────────────────────────────────────────────────────────────
 
   private ensureMembership(): void {
     const userId = this.currentUserId;

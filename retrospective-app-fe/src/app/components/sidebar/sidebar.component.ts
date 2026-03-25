@@ -30,7 +30,6 @@ export class SidebarComponent implements OnInit {
     }
 
     const user = this.authService.getUser();
-    console.log(user);
     this.isAdmin = user?.role === 'admin';
   }
 

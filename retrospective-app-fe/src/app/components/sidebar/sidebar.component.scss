@@ -1,6 +1,5 @@
-// ─── Mobile Top Header ────────────────────────────────────────────────────────
 .mobile-header {
-    display: none; // hidden on desktop by default
+    display: none;
 
     @media (max-width: 768px) {
         display: flex;
@@ -276,7 +275,6 @@
                 display: none;
             }
 
-            // Tooltip on hover for icon-only mode
             &:hover::after {
                 content: attr(data-tooltip);
                 position: absolute;

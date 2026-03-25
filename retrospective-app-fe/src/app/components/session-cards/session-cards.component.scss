@@ -184,7 +184,7 @@
 
     // ─── Nest Hub (769px – 1024px) ────────────────────────────────────────────
     @media (min-width: 769px) and (max-width: 1024px) {
-        grid-template-columns: 1fr; // stack teams vertically
+        grid-template-columns: 1fr;
         gap: 1.25rem;
 
         .team-section {
@@ -238,7 +238,7 @@
                     gap: 0.75rem;
 
                     &:hover {
-                        transform: none; // disable slide on touch devices
+                        transform: none;
                         box-shadow: 0 4px 16px rgba(0, 122, 255, 0.12);
                     }
 
@@ -257,7 +257,7 @@
                         font-size: 0.8rem;
 
                         .info-text {
-                            white-space: normal; // allow wrap on smaller screens
+                            white-space: normal;
                         }
                     }
 

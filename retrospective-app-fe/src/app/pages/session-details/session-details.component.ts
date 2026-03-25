@@ -64,7 +64,6 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     this.wrapperEl.addEventListener('mouseup',   this.boundMouseUp);
     this.wrapperEl.addEventListener('mouseleave', this.boundMouseUp);
 
-    // Watch for size changes and update cursor accordingly
     this.resizeObserver = new ResizeObserver(() => this.updateCursor());
     this.resizeObserver.observe(this.wrapperEl);
   }

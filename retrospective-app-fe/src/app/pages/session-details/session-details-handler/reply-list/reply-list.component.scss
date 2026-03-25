@@ -3,7 +3,6 @@
     padding-top: 0.875rem;
     border-top: 1px solid var(--color-border-light);
 
-    // ── Toggle button ─────────────────────────────────────────────────────────
     .view-replies-btn {
         width: 100%;
         background: none;
@@ -53,7 +52,6 @@
         }
     }
 
-    // ── Replies list ──────────────────────────────────────────────────────────
     .replies-list {
         display: flex;
         flex-direction: column;
@@ -138,7 +136,6 @@
         }
     }
 
-    // ── Reply input wrapper ───────────────────────────────────────────────────
     .reply-input-wrapper {
         display: flex;
         align-items: flex-end;
@@ -230,7 +227,6 @@
         }
     }
 
-    // ── Error ─────────────────────────────────────────────────────────────────
     .error-message {
         display: flex;
         align-items: center;

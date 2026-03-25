@@ -48,9 +48,13 @@ exports.createTeam = async (req, res) => {
             { $addToSet: { teams: teamName } }
         );
 
+        const populatedTeam = await Team.findById(newTeam._id)
+            .populate('members', 'username email')
+            .populate('createdBy', 'username email');
+
         return res.status(200).send({
             message: `Team created successfully`,
-            data: newTeam,
+            data: populatedTeam,
             notFound: notFound.length > 0 ? notFound : undefined
         });
 
@@ -117,8 +121,13 @@ exports.addMemberByTeam = async (req, res) => {
             await specificTeam.save();
         }
 
+        const populatedTeam = await Team.findById(teamId)
+            .populate('members', 'username email')
+            .populate('createdBy', 'username email');
+
         return res.status(200).send({
             message: `Members processed successfully`,
+            data: populatedTeam,
             added: toAdd.map(u => u.email),
             alreadyMembers,
             notFound
@@ -238,8 +247,13 @@ exports.removeMember = async (req, res) => {
             $pull: { teams: specificTeam.teamName }
         });
 
+        const populatedTeam = await Team.findById(teamId)
+            .populate('members', 'username email')
+            .populate('createdBy', 'username email');
+
         return res.status(200).send({
-            message: `Member removed successfully`
+            message: `Member removed successfully`,
+            data: populatedTeam
         });
 
     } catch (err) {
@@ -269,7 +283,7 @@ exports.deleteTeam = async (req, res) => {
         await Team.findByIdAndDelete(teamId);
 
         return res.status(200).send({
-            message: `Team deleted successfully`
+            message: `Team deleted successfully`,
         });
 
     } catch (err) {

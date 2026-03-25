@@ -29,7 +29,7 @@
         display: flex;
         align-items: center;
         gap: 1.5rem;
-        min-width: 0; // allows h1 to truncate
+        min-width: 0;
 
         .home-btn {
             display: flex;
@@ -400,7 +400,6 @@
         .header-right {
             gap: 0.6rem;
 
-            // hide button labels, show icons only
             .highlight-btn,
             .export-btn {
                 padding: 0.625rem;
@@ -423,7 +422,6 @@
                     font-size: 0.9rem;
                 }
 
-                // reposition tooltip so it doesn't go off screen
                 .header-tooltip {
                     left: auto;
                     right: 0;
@@ -471,7 +469,6 @@
                 flex: 1;
                 justify-content: center;
 
-                // tooltip goes upward on tablet to avoid overflow
                 .header-tooltip {
                     top: auto;
                     bottom: calc(100% + 1rem);

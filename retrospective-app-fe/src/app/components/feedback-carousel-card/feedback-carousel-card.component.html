@@ -1,14 +1,12 @@
 <div class="feedback-card-wrapper">
     <nz-card [nzTitle]="cardTitle" [nzExtra]="votesBadge" class="feedback-highlight-card">
-        <!-- Card Title Template -->
         <ng-template #cardTitle>
-            <!-- Display all section titles or just the first one -->
+
             <span class="section-name" *ngFor="let section of feedback.sections; let last = last">
                 {{ section.title }}<span *ngIf="!last">, </span>
             </span>
         </ng-template>
 
-        <!-- Votes Badge Template -->
         <ng-template #votesBadge>
             <nz-badge class="votes-badge">
                 <span class="material-icons">{{ feedback.votes > 0 ? 'thumb_up' : 'thumb_up_off_alt' }}</span>
@@ -16,7 +14,6 @@
             </nz-badge>
         </ng-template>
 
-        <!-- Feedback Content -->
         <div class="feedback-content">
             
             <div class="feedback-meta">
