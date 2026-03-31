@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse, UpdateActionItemsRequest } from '../models/feedback.model';
+import { FeedbackResponse, RetroFeedback, AddFeedbackRequest, ToggleVisibilityRequest, UserRetroFeedback, UserFeedbackResponse, UpdateActionItemsRequest, VoteFeedbackResponse } from '../models/feedback.model';
 import { environment } from '../../environments/environment.development';
 
 @Injectable({
@@ -32,11 +32,11 @@ export class FeedbackService {
     return this.http.get<FeedbackResponse>(`${this.apiUrl}/session/${sessionId}/filter/${memberId}`);
   }
 
-  voteFeedback(feedbackId: string): Observable<FeedbackResponse> {
-    return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/vote`, {});
+  voteFeedback(feedbackId: string): Observable<VoteFeedbackResponse> {
+    return this.http.patch<VoteFeedbackResponse>(`${this.apiUrl}/${feedbackId}/vote`, {});
   }
-  unvoteFeedback(feedbackId: string): Observable<FeedbackResponse> {
-    return this.http.patch<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}/unvote`, {});
+  unvoteFeedback(feedbackId: string): Observable<VoteFeedbackResponse> {
+    return this.http.patch<VoteFeedbackResponse>(`${this.apiUrl}/${feedbackId}/unvote`, {});
   }
 
   toggleFeedbackVisibility(feedbackId: string, data: ToggleVisibilityRequest): Observable<FeedbackResponse> {

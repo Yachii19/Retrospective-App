@@ -390,7 +390,7 @@ exports.voteByFeedbackId = async (req, res) => {
         }
         return res.status(200).send({
             message: "Successfully voted!",
-            data: specificFeedback
+            data: populatedFeedback
         })
 
     } catch (err) {
@@ -447,7 +447,7 @@ exports.unvoteByFeedbackId = async (req, res) => {
 
         return res.status(200).send({
             message: "Successfully unvoted!",
-            data: specificFeedback
+            data: populatedFeedback
         })
     } catch (err) {
         console.log(`Error unvoting on feedback: ${err}`);

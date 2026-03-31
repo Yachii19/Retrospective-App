@@ -67,3 +67,8 @@ export interface UpdateActionItemsRequest {
   assignee?: string | null;
   dueDate?: string | null;
 }
+
+export interface VoteFeedbackResponse {
+  message: string;
+  data: RetroFeedback;
+}

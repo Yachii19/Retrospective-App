@@ -1,6 +1,6 @@
 import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback.service';
-import { RetroFeedback } from '../../../models/feedback.model';
+import { RetroFeedback, VoteFeedbackResponse } from '../../../models/feedback.model';
 import { CommonModule } from '@angular/common';
 import { RetroSession } from '../../../models/session.model';
 import { SessionService } from '../../../services/session.service';
@@ -12,7 +12,7 @@ import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AvatarColorPipe } from '../../../pipes/avatar-color.pipe';
 import { SocketService } from '../../../services/socket.service';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-session-details-handler',
@@ -221,12 +221,23 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
     this.votingInProgress[feedbackId] = true;
 
-    const action$ = hasVoted
+    const action$: Observable<VoteFeedbackResponse> = hasVoted
       ? this.feedbackService.unvoteFeedback(feedbackId)
       : this.feedbackService.voteFeedback(feedbackId);
 
     action$.subscribe({
-    
+      next: (res) => {
+        const updated = res.data;
+        if (updated) {
+          this.sessionFeedbacks[sectionKey][index] = {
+            ...feedback,
+            votes: updated.votes,
+            votedBy: updated.votedBy
+          };
+          this.sessionFeedbacks[sectionKey] = [...this.sessionFeedbacks[sectionKey]];
+        }
+        this.votingInProgress[feedbackId] = false;
+      },
       error: (error) => {
         this.votingInProgress[feedbackId] = false;
         this.sectionErrors[sectionKey] = error.error?.message || 'Failed to update vote';
