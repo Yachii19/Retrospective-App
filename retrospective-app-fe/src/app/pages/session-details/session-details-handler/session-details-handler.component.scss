@@ -1,3 +1,14 @@
+:host {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.feedback-body li,
+app-reply-list {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 .session-grid {
     display: grid;
     gap: 1.5rem;

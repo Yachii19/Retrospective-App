@@ -1,3 +1,10 @@
+.reply-item {
+    .reply-content {
+        user-select: text;
+        -webkit-user-select: text;
+    }
+}
+
 .replies-section {
     margin-top: 1rem;
     padding-top: 0.875rem;
@@ -97,6 +104,7 @@
                 border: 1px solid rgba(0, 122, 255, 0.07);
                 min-width: 0;
                 transition: background 0.15s ease;
+                cursor: text;
 
                 &:hover { background: #e8efff; }
 

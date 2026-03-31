@@ -106,17 +106,26 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
 
   private onMouseDown(e: MouseEvent): void {
     if (!this.wrapperEl || this.wrapperEl.scrollWidth <= this.wrapperEl.clientWidth) return;
+
+    const target = e.target as HTMLElement;
+    if (target.closest('.feedback-body') || target.closest('.reply-item') || target.closest('textarea') || target.closest('input')) return;
+
     this.isDragging = true;
     this.startX = e.pageX - this.wrapperEl.offsetLeft;
     this.scrollLeft = this.wrapperEl.scrollLeft;
     this.wrapperEl.style.cursor = 'grabbing';
   }
 
-  private onMouseMove(e: MouseEvent): void {
+ private onMouseMove(e: MouseEvent): void {
     if (!this.isDragging || !this.wrapperEl) return;
-    e.preventDefault();
+
     const x = e.pageX - this.wrapperEl.offsetLeft;
-    this.wrapperEl.scrollLeft = this.scrollLeft - (x - this.startX);
+    const delta = x - this.startX;
+
+    if (Math.abs(delta) < 5) return;
+
+    e.preventDefault();
+    this.wrapperEl.scrollLeft = this.scrollLeft - delta;
   }
 
   private onMouseUp(): void {
