@@ -6,8 +6,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class TimeAgoPipe implements PipeTransform {
 
-  transform(value: string | Date): string {
-    const now = new Date();
+  transform(value: string | Date, nowRef?: Date): string {
+    const now = nowRef ?? new Date();
     const date = new Date(value);
     const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     const minutes = Math.floor(seconds / 60);

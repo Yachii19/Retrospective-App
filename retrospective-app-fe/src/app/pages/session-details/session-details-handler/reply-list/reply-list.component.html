@@ -21,7 +21,7 @@
                 <div class="reply-header">
                     <span class="reply-username">{{ reply.createdBy.username }}</span>
                     <span class="reply-dot">·</span>
-                    <span class="reply-time">{{ reply.createdAt | timeAgo }}</span>
+                    <span class="reply-time">{{ reply.createdAt | timeAgo: nowTick }}</span>
                 </div>
                 <p>{{ reply.content }}</p>
             </div>

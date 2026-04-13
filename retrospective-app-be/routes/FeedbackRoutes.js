@@ -9,6 +9,7 @@ router.get("/user/session-feedbacks", verifyToken, feedbackController.getFeedbac
 router.get("/session/:sessionId/filter/:memberId", feedbackController.filterFeedbacksByMember);
 
 router.post("/:sessionId", verifyToken, feedbackController.addFeedbackBySection);
+router.put("/:feedbackId", verifyToken, feedbackController.updateFeedbackById);
 
 router.patch("/:feedbackId/vote", verifyToken, feedbackController.voteByFeedbackId);
 router.patch("/:feedbackId/unvote", verifyToken, feedbackController.unvoteByFeedbackId);

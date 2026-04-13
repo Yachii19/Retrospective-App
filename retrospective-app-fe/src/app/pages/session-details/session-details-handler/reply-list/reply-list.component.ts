@@ -28,8 +28,10 @@ export class ReplyListComponent {
   isFocused: boolean = false;
 
   submissionInProgress: boolean = false;
+  nowTick: Date = new Date();
 
   private socketSubs: Subscription[] = [];
+  private timeAgoTimer?: ReturnType<typeof setInterval>;
 
   @Input() feedbackId!: string
 
@@ -44,11 +46,21 @@ export class ReplyListComponent {
     const user = this.authService.getUser();
     this.currentUserInitial = user.username.charAt(0).toUpperCase();
     this.currentUsername = user.username;
+    this.startTimeAgoTicker();
     this.initSocketListeners();
   }
 
   ngOnDestroy(): void {
     this.socketSubs.forEach(s => s.unsubscribe());
+    if (this.timeAgoTimer) {
+      clearInterval(this.timeAgoTimer);
+    }
+  }
+
+  private startTimeAgoTicker(): void {
+    this.timeAgoTimer = setInterval(() => {
+      this.nowTick = new Date();
+    }, 30000);
   }
 
   private initSocketListeners(): void {

@@ -1,39 +1,10 @@
 const mongoose = require("mongoose");
 
-const actionItemSchema = new mongoose.Schema(
-    {
-        status: {
-            type: String,
-            enum: ["Open", "Closed"],
-            default: "Closed"
-        },
-        assignee: {
-            type: String,
-            default: null
-        },
-        dueDate: {
-            type: Date,
-            default: null
-        },
-        updatedAt: {
-            type: Date,
-            default: Date.now
-        }
-    },
-    {
-        _id: false
-    }
-)
-
 const feedbackSectionSchema = new mongoose.Schema(
     {
         key: String,
         title: String,
-        items: [String],
-        actionItems: {
-            type: actionItemSchema,
-            default: () => ({})
-        }
+        items: [String]
     },
     {
         _id: false

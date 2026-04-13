@@ -45,8 +45,10 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
   submissionInProgress: { [key: string]: boolean } = {};
   votingInProgress: { [feedbackId: string]: boolean } = {};
+  nowTick: Date = new Date();
 
   private socketSubs: Subscription[] = [];
+  private timeAgoTimer?: ReturnType<typeof setInterval>;
 
   get sectionCount(): number {
     const sections = this.session?.sections?.length ?? 0;
@@ -76,6 +78,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
     const user = this.authService.getUser();
     this.currentUserId = user._id;
+    this.startTimeAgoTicker();
     this.loadSession();
     this.initSocketListeners();
   }
@@ -84,6 +87,15 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
     this.socketService.leaveSession(this.sessionId);
     this.socketSubs.forEach(sub => sub.unsubscribe());
+    if (this.timeAgoTimer) {
+      clearInterval(this.timeAgoTimer);
+    }
+  }
+
+  private startTimeAgoTicker(): void {
+    this.timeAgoTimer = setInterval(() => {
+      this.nowTick = new Date();
+    }, 30000);
   }
 
   private initSocketListeners(): void {

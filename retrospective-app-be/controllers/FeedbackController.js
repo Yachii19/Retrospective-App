@@ -22,8 +22,6 @@ exports.getFeedbackBySessionId = async (req, res) => {
             });
         }
 
-        const isSessionOwner = session.createdBy.toString() === userId;
-
         const feedbacks = await Feedback.find({ feedbackSession: sessionId })
             .populate('feedbackPoster', 'email username')
             .populate('votedBy', 'email username');
@@ -35,23 +33,9 @@ exports.getFeedbackBySessionId = async (req, res) => {
             });
         }
 
-        const filteredFeedbacks = feedbacks.map(feedback => {
-            const feedbackObj = feedback.toObject();
-            
-            feedbackObj.sections = feedbackObj.sections.map(section => {
-                if (section.actionItems?.status === "Closed" && !isSessionOwner) {
-                    const { actionItems, ...sectionWithoutActionItems } = section;
-                    return sectionWithoutActionItems; // Return section without actionItems property
-                }
-                return section;
-            });
-            
-            return feedbackObj;
-        });
-
         res.status(200).send({
             message: `Feedbacks List:`,
-            data: filteredFeedbacks
+            data: feedbacks
         });
     } catch (err) {
         console.log(`Error fetching session feedbacks: ${err}`);
@@ -79,9 +63,7 @@ exports.getFeedbackBySessionAndSection = async (req, res) => {
                 message: "Session not found"
             });
         }
-
-        const isSessionOwner = session.createdBy.toString() === userId;
-
+        
         const feedbacks = await Feedback.find({ feedbackSession: sessionId, 'sections.key': sectionKey })
             .populate('feedbackPoster', 'email username')
             .populate('votedBy', 'email username');
@@ -93,29 +75,9 @@ exports.getFeedbackBySessionAndSection = async (req, res) => {
             });
         }
 
-        // Filter action items based on visibility and user permissions
-        const filteredFeedbacks = feedbacks.map(feedback => {
-            const feedbackObj = feedback.toObject();
-            
-            feedbackObj.sections = feedbackObj.sections.map(section => {
-                if (section.key !== sectionKey) return section;
-                
-                // If status is closed and user is not session owner, remove action items
-                if (section.actionItems?.status === "Closed" && !isSessionOwner) {
-                    const { actionItems, ...sectionWithoutActionItems } = section;
-                    return sectionWithoutActionItems; // Return section without actionItems property
-                }
-                
-                // Otherwise show everything
-                return section;
-            });
-            
-            return feedbackObj;
-        });
-
         res.status(200).send({
             message: `Feedbacks list for ${sectionKey}`,
-            data: filteredFeedbacks
+            data: feedbacks
         });
     } catch (err) {
         console.log(`Error fetching session feedbacks: ${err}`);
@@ -350,6 +312,65 @@ exports.addFeedbackBySection = async (req, res) => {
     }
 }
 
+exports.updateFeedbackById = async (req, res) => {
+    try {
+        const { feedbackId } = req.params;
+        const userId = req.user.id;
+        const { newFeedback } = req.body;
+
+        const updatedText = (newFeedback).trim();
+
+        if (!updatedText) {
+            return res.status(400).send({
+                message: "Feedback text is required",
+            });
+        }
+
+        const specificFeedback = await Feedback.findById(feedbackId);
+        if (!specificFeedback) {
+            return res.status(404).send({
+                message: `No Feedback found with the ID: ${feedbackId}`
+            });
+        }
+
+        const isPoster = specificFeedback.feedbackPoster.toString() === userId;
+        if (!isPoster) {
+            return res.status(403).send({
+                message: `Unauthorized: You can't edit feedbacks that you didn't post.`
+            });
+        }
+
+        const editableSection = specificFeedback.sections.find(
+            section => Array.isArray(section.items) && section.items.length > 0
+        );
+
+        if (!editableSection) {
+            return res.status(400).send({
+                message: "Feedback has no editable content"
+            });
+        }
+
+        editableSection.items[0] = updatedText;
+        await specificFeedback.save();
+
+        const updatedFeedback = await Feedback.findById(specificFeedback._id)
+            .populate('feedbackPoster', 'username email');
+
+        getIO().to(updatedFeedback.feedbackSession.toString()).emit("feedback:updated", {
+            feedback: updatedFeedback
+        });
+
+        return res.status(200).send({
+            message: `Feedback updated successfully`,
+            data: updatedFeedback
+        })
+    } catch (err) {
+        console.log(`Error updating feedback: ${err}`);
+        return res.status(500).send({
+            message: "Server error when updating feedback"
+        });
+    }
+}
 
 exports.voteByFeedbackId = async (req, res) => {
     try {
