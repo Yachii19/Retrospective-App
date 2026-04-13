@@ -21,6 +21,7 @@ export class ReplyListComponent {
   replyInput: string = '';
   currentUserInitial: string = '';
   currentUsername: string = '';
+  currentUserId: string = '';
 
   showError: boolean = false;
   errorMessage: string = '';
@@ -30,6 +31,11 @@ export class ReplyListComponent {
   submissionInProgress: boolean = false;
   nowTick: Date = new Date();
 
+  isEditingReply: Record<string, boolean> = {};
+  editingReplyInput: Record<string, string> = {};
+  replySubmissionInProgress: Record<string, boolean> = {};
+  editReplyError: Record<string, string> = {};
+  
   private socketSubs: Subscription[] = [];
   private timeAgoTimer?: ReturnType<typeof setInterval>;
 
@@ -46,6 +52,7 @@ export class ReplyListComponent {
     const user = this.authService.getUser();
     this.currentUserInitial = user.username.charAt(0).toUpperCase();
     this.currentUsername = user.username;
+    this.currentUserId = user._id;
     this.startTimeAgoTicker();
     this.initSocketListeners();
   }
@@ -75,7 +82,20 @@ export class ReplyListComponent {
           this.replies = [data.data, ...this.replies];
         }
       })
-    )
+    );
+
+    this.socketSubs.push(
+      this.socketService.onReplyUpdated().subscribe((payload) => {
+        const updated = payload?.data;
+        if (!updated || updated.feedback !== this.feedbackId) return;
+
+        const index = this.replies.findIndex(r => r._id === updated._id);
+        if (index !== -1) {
+          Object.assign(this.replies[index], updated);
+          this.replies = [...this.replies];
+        }
+      })
+    );
   }
 
   loadReplies(): void {
@@ -131,6 +151,46 @@ export class ReplyListComponent {
         this.errorMessage = 'Please provide a message reply!'
       },
       complete: () => this.submissionInProgress = false
+    });
+  }
+
+  startEditingReply(reply: Reply): void {
+    this.isEditingReply[reply._id] = true;
+    this.editingReplyInput[reply._id] = reply.content;
+    this.editReplyError[reply._id] = '';
+  }
+
+  cancelEditingReply(replyId: string): void {
+    this.isEditingReply[replyId] = false;
+    this.editingReplyInput[replyId] = '';
+    this.editReplyError[replyId] = '';
+  }
+
+  onEditReplyInputChange(replyId: string): void {
+    this.editReplyError[replyId] = '';
+  }
+
+  updateReply(replyId: string): void {
+    if (this.replySubmissionInProgress[replyId]) return;
+
+    const nextValue = (this.editingReplyInput[replyId] ?? '').trim();
+    if (!nextValue) {
+      this.editReplyError[replyId] = 'Reply cannot be empty. Please provide an input!';
+      return;
+    }
+
+    this.replySubmissionInProgress[replyId] = true;
+
+    this.replyService.updateReply(replyId, nextValue).subscribe({
+      next: () => {
+        this.cancelEditingReply(replyId);
+      },
+      error: (err) => {
+        this.editReplyError[replyId] = err?.error?.message || 'Failed to update reply. Please try again.';
+      },
+      complete: () => {
+        this.replySubmissionInProgress[replyId] = false;
+      }
     });
   }
 }

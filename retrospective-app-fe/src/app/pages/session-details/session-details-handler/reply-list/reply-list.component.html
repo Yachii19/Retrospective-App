@@ -22,8 +22,43 @@
                     <span class="reply-username">{{ reply.createdBy.username }}</span>
                     <span class="reply-dot">·</span>
                     <span class="reply-time">{{ reply.createdAt | timeAgo: nowTick }}</span>
+
+                    <button 
+                        class="reply-edit-btn"
+                        *ngIf="reply.createdBy._id === currentUserId && !isEditingReply[reply._id]"
+                        (click)="startEditingReply(reply)"
+                    >
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
                 </div>
-                <p>{{ reply.content }}</p>
+
+                <p *ngIf="!isEditingReply[reply._id]">{{ reply.content }}</p>
+
+                <div class="reply-edit-mode" *ngIf="isEditingReply[reply._id]">
+                    <textarea
+                        [(ngModel)]="editingReplyInput[reply._id]"
+                        (input)="onEditReplyInputChange(reply._id)"
+                        rows="1"
+                        (keydown.enter)="updateReply(reply._id); $event.preventDefault()"
+                        placeholder="Edit your reply...">
+                    </textarea>
+                    <div class="reply-edit-actions">
+                        <button class="save-btn"
+                                (click)="updateReply(reply._id)"
+                                [disabled]="replySubmissionInProgress[reply._id]">
+                            <span class="material-symbols-outlined">save</span>
+                            {{ replySubmissionInProgress[reply._id] ? 'Saving...' : 'Save' }}
+                        </button>
+                        <button class="cancel-btn" (click)="cancelEditingReply(reply._id)" [disabled]="replySubmissionInProgress[reply._id]">
+                            <span class="material-symbols-outlined">cancel</span>
+                            Cancel
+                        </button>
+                    </div>
+                    <div class="error-message" *ngIf="editReplyError[reply._id]">
+                        <span class="material-icons">error_outline</span>
+                        {{ editReplyError[reply._id] }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

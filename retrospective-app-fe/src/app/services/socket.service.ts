@@ -86,6 +86,12 @@ export class SocketService implements OnDestroy {
     });
   }
 
+  onReplyUpdated(): Observable<{ message: string; data: any }> {
+    return new Observable(observer => {
+      this.socket.on('reply:updated', (data) => observer.next(data));
+    });
+  }
+  
   ngOnDestroy(): void {
     this.socket.disconnect();
   }

@@ -21,4 +21,8 @@ export class ReplyService {
   getRepliesByFeedbacks(feedbackId: string): Observable<ReplyResponse> {
     return this.http.get<ReplyResponse>(`${this.apiUrl}/${feedbackId}`)
   }
+
+  updateReply(replyId: string, newReply: string): Observable<ReplyResponse> {
+    return this.http.put<ReplyResponse>(`${this.apiUrl}/${replyId}`, { newReply });
+  }
 }

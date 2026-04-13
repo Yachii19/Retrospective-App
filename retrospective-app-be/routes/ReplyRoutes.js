@@ -7,4 +7,5 @@ router.get('/:feedbackId', verifyToken, replyController.getAllRepliesByFeedbackI
 
 router.post('/add-reply/:feedbackId', verifyToken, replyController.createReplyByFeedbackId);
 
+router.put('/:replyId',  verifyToken, replyController.updateReplyById);
 module.exports = router;

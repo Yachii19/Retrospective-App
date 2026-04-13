@@ -1,6 +1,6 @@
 export interface Reply {
     _id: string;
-    feedbackId: string;
+    feedback: string;
     content: string;
     createdBy: User;
     createdAt: string,
@@ -8,12 +8,12 @@ export interface Reply {
 }
 
 export interface User {
-  id: number;
+  _id: string;
   username: string;
   email: string;
 }
 
 export interface ReplyResponse {
     message: string;
-    data: Reply[];
+    data: Reply | Reply[];
 }
