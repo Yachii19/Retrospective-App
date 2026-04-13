@@ -20,6 +20,10 @@ export class FeedbackService {
     return this.http.post<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${sessionId}`, feedbackData);
   }
 
+  updateFeedback(feedbackId: string, feedbackData: string): Observable<FeedbackResponse> {
+    return this.http.put<{ message: string, data: RetroFeedback }>(`${this.apiUrl}/${feedbackId}`, { newFeedback: feedbackData });
+  }
+
   getSessionFeedbacks(sessionId: string): Observable<FeedbackResponse> {
     return this.http.get<FeedbackResponse>(`${this.apiUrl}/${sessionId}`);
   }

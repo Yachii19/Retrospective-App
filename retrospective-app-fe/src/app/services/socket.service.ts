@@ -50,6 +50,12 @@ export class SocketService implements OnDestroy {
     });
   }
 
+  onFeedbackUpdated(): Observable<{ sectionKey: string; feedback: any }> {
+    return new Observable(observer => {
+      this.socket.on('feedback:updated', (data) => observer.next(data));
+    });
+  }
+
   onFeedbackVoted(): Observable<{ feedbackId: string; votes: number; votedBy: any[] }> {
     return new Observable(observer => {
       this.socket.on('feedback:voted', (data) => observer.next(data));

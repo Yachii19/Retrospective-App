@@ -28,8 +28,12 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   session: RetroSession | null = null;
   sessionId: string = '';
   sessionFeedbacks: { [key: string]: RetroFeedback[] } = {};
-  feedbackInputs: { [key: string]: string } = {};
-  sectionErrors: { [key: string]: string } = {};
+  feedbackInputs: Record<string, string> = {};
+  sectionErrors: Record<string, string> = {};
+  feedbackErrors: Record<string, string> = {};
+
+  newFeedbackInput: string = '';
+  isFeedbackEditing: Record<string, boolean> = {};
 
   currentUserId: string = '';
   isSessionCreator: boolean = false;
@@ -43,8 +47,8 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   newSectionTitle: string = '';
   newSectionKey: string = '';
 
-  submissionInProgress: { [key: string]: boolean } = {};
-  votingInProgress: { [feedbackId: string]: boolean } = {};
+  submissionInProgress: Record<string, boolean> = {};
+  votingInProgress: Record<string, boolean> = {};
   nowTick: Date = new Date();
 
   private socketSubs: Subscription[] = [];
@@ -87,9 +91,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     document.body.style.overflow = '';
     this.socketService.leaveSession(this.sessionId);
     this.socketSubs.forEach(sub => sub.unsubscribe());
-    if (this.timeAgoTimer) {
-      clearInterval(this.timeAgoTimer);
-    }
+    if (this.timeAgoTimer) clearInterval(this.timeAgoTimer);
   }
 
   private startTimeAgoTicker(): void {
@@ -108,10 +110,24 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
         }
         const exists = this.sessionFeedbacks[sectionKey].some(f => f._id === feedback._id);
         if (!exists) {
-          this.sessionFeedbacks[sectionKey] = [
-            ...this.sessionFeedbacks[sectionKey],
-            feedback
-          ];
+          this.sessionFeedbacks[sectionKey] = [...this.sessionFeedbacks[sectionKey], feedback];
+        }
+      })
+    );
+
+    this.socketSubs.push(
+      this.socketService.onFeedbackUpdated().subscribe(({ feedback }) => {
+        const sectionKey = feedback.sections[0]?.key;
+        if (!sectionKey || !this.sessionFeedbacks[sectionKey]) return;
+
+        const index = this.sessionFeedbacks[sectionKey].findIndex(f => f._id === feedback._id);
+        if (index !== -1) {
+          this.sessionFeedbacks[sectionKey][index] = {
+            ...this.sessionFeedbacks[sectionKey][index],
+            sections: feedback.sections,
+            updatedAt: feedback.updatedAt
+          };
+          this.sessionFeedbacks[sectionKey] = [...this.sessionFeedbacks[sectionKey]];
         }
       })
     );
@@ -127,7 +143,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
               votedBy
             };
             this.sessionFeedbacks[key] = [...this.sessionFeedbacks[key]];
-            this.votingInProgress[feedbackId] = false; 
+            this.votingInProgress[feedbackId] = false;
             break;
           }
         }
@@ -172,16 +188,14 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     if (!this.session?.sections) return;
 
     this.session.sections.forEach(section => {
-      this.feedbackService
-        .getFeedbackBySection(this.sessionId, section.key)
-        .subscribe({
-          next: (response) => {
-            this.sessionFeedbacks[section.key] = response.data;
-          },
-          error: (err) => {
-            console.error(`Error loading feedbacks for ${section.key}:`, err);
-          }
-        });
+      this.feedbackService.getFeedbackBySection(this.sessionId, section.key).subscribe({
+        next: (response) => {
+          this.sessionFeedbacks[section.key] = response.data;
+        },
+        error: (err) => {
+          console.error(`Error loading feedbacks for ${section.key}:`, err);
+        }
+      });
     });
   }
 
@@ -194,7 +208,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     if (this.submissionInProgress[sectionKey]) return;
 
     const feedbackText = this.feedbackInputs[sectionKey] || '';
-
     if (!feedbackText.trim()) {
       this.sectionErrors[sectionKey] = 'Feedback input is empty. Please provide a feedback!';
       return;
@@ -217,6 +230,53 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
+  startFeedbackEditing(feedback: RetroFeedback): void {
+    this.newFeedbackInput = feedback.sections[0]?.items[0] ?? '';
+    this.isFeedbackEditing[feedback._id] = true;
+    this.feedbackErrors[feedback._id] = '';
+  }
+
+  cancelFeedbackEditing(feedbackId: string): void {
+    this.isFeedbackEditing[feedbackId] = false;
+    this.feedbackErrors[feedbackId] = '';
+    this.newFeedbackInput = '';
+  }
+
+  onEditInputChange(feedbackId: string): void {
+    this.feedbackErrors[feedbackId] = '';
+  }
+
+  trackByFeedbackId(index: number, feedback: RetroFeedback): string {
+    return feedback._id;
+  }
+
+  updateFeedback(feedbackId: string, newFeedback: string, event?: Event): void {
+    if (event) event.preventDefault();
+    if (this.submissionInProgress[feedbackId]) return;
+
+    if (!newFeedback?.trim()) {
+      this.feedbackErrors[feedbackId] = 'Feedback cannot be empty. Please provide a feedback!';
+      return;
+    }
+
+    this.submissionInProgress[feedbackId] = true;
+
+    this.feedbackService.updateFeedback(feedbackId, newFeedback).subscribe({
+      next: () => {
+        this.isFeedbackEditing[feedbackId] = false;
+        this.feedbackErrors[feedbackId] = '';
+        this.newFeedbackInput = '';
+      },
+      error: (err) => {
+        console.error('Error updating feedback:', err);
+        this.feedbackErrors[feedbackId] = err?.error?.message || 'Failed to update feedback. Please try again.';
+      },
+      complete: () => {
+        this.submissionInProgress[feedbackId] = false;
+      }
+    });
+  }
+
   hasUserVoted(feedback: RetroFeedback): boolean {
     return feedback.votedBy.some((voter: any) => voter._id === this.currentUserId);
   }
@@ -230,7 +290,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
     const feedback = feedbacks[index];
     const hasVoted = this.hasUserVoted(feedback);
-
     this.votingInProgress[feedbackId] = true;
 
     const action$: Observable<VoteFeedbackResponse> = hasVoted
@@ -257,13 +316,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSectionTitleChange(): void {
-    this.newSectionKey = this.newSectionTitle
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, '-');
-  }
-
   getSectionItems(feedback: RetroFeedback, sectionKey: string): string[] {
     const section = feedback.sections.find(s => s.key === sectionKey);
     return section?.items || [];
@@ -272,6 +324,10 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   getSectionActionItems(feedback: RetroFeedback, sectionKey: string): any | null {
     const section = feedback.sections.find(s => s.key === sectionKey);
     return section?.actionItems || null;
+  }
+
+  onSectionTitleChange(): void {
+    this.newSectionKey = this.newSectionTitle.toLowerCase().trim().replace(/\s+/g, '-');
   }
 
   showDeleteSectionModal(sectionKey: string): void {
@@ -290,7 +346,6 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
   confirmDeleteSection(): void {
     if (!this.session) return;
-
     this.sessionService.deleteSection(this.session._id, this.sectionKeyToDelete).subscribe({
       next: () => {
         this.showNotification('Section deleted successfully', true);
@@ -325,10 +380,7 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
     }
 
     if (!this.newSectionKey) {
-      this.newSectionKey = this.newSectionTitle
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, '-');
+      this.newSectionKey = this.newSectionTitle.toLowerCase().trim().replace(/\s+/g, '-');
     }
 
     this.sessionService.addSection(this.session._id, this.newSectionTitle, this.newSectionKey).subscribe({

@@ -34,7 +34,7 @@
             <!-- Feedback List -->
             <div class="feedback-list">
                 <div class="feedback-item"
-                    *ngFor="let feedback of sessionFeedbacks[section.key]">
+                    *ngFor="let feedback of sessionFeedbacks[section.key]; trackBy: trackByFeedbackId">
 
                     <!-- Feedback Header -->
                     <div class="feedback-header">
@@ -48,24 +48,30 @@
                             </div>
                         </div>
 
-                        <div class="vote-btn"
-                            (click)="addVote(feedback._id, section.key)"
-                            [class.voted]="hasUserVoted(feedback)"
-                            [class.voting]="votingInProgress[feedback._id]">
-                            <span class="material-icons">
-                                {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
-                            </span>
-                            <span class="vote-count">{{feedback.votes}}</span>
+                        <div class="feedback-actions">
+                            <button class="edit-btn"
+                                    *ngIf="feedback.feedbackPoster._id === currentUserId && !isFeedbackEditing[feedback._id]"
+                                    (click)="startFeedbackEditing(feedback)">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
 
-                            <!-- Voters tooltip -->
-                            <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
-                                <div class="tooltip-header">Voted by</div>
-                                <div class="voter-list">
-                                    <div class="voter-item" *ngFor="let voter of feedback.votedBy">
-                                        <span class="voter-avatar">
-                                            {{ voter.username.charAt(0).toUpperCase() }}
-                                        </span>
-                                        <span class="name">{{voter.username}}</span>
+                            <div class="vote-btn"
+                                (click)="addVote(feedback._id, section.key)"
+                                [class.voted]="hasUserVoted(feedback)"
+                                [class.voting]="votingInProgress[feedback._id]">
+                                <span class="material-icons">
+                                    {{ hasUserVoted(feedback) ? 'thumb_up' : 'thumb_up_off_alt' }}
+                                </span>
+                                <span class="vote-count">{{feedback.votes}}</span>
+                                <div class="voters-tooltip" *ngIf="feedback.votedBy.length > 0">
+                                    <div class="tooltip-header">Voted by</div>
+                                    <div class="voter-list">
+                                        <div class="voter-item" *ngFor="let voter of feedback.votedBy">
+                                            <span class="voter-avatar">
+                                                {{ voter.username.charAt(0).toUpperCase() }}
+                                            </span>
+                                            <span class="name">{{voter.username}}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -74,14 +80,39 @@
 
                     <!-- Feedback Body -->
                     <div class="feedback-body">
-                        <ul>
+                        <ul *ngIf="!isFeedbackEditing[feedback._id]">
                             <li *ngFor="let item of getSectionItems(feedback, section.key)">
                                 <span>{{item.trim()}}</span>
                             </li>
                         </ul>
+
+                        <!-- Edit Mode -->
+                        <div class="edit-mode" *ngIf="isFeedbackEditing[feedback._id]">
+                            <textarea 
+                            [(ngModel)]="newFeedbackInput" placeholder="Edit your feedback..."
+                            (keydown.enter)="updateFeedback(feedback._id, newFeedbackInput, $event)"
+                            (input)="onEditInputChange(feedback._id)"></textarea>
+                            <div class="edit-actions">
+                                <button class="save-btn"
+                                        (click)="updateFeedback(feedback._id, newFeedbackInput)"
+                                        [disabled]="submissionInProgress[feedback._id]">
+                                    <span class="material-symbols-outlined">save</span>
+                                    {{ submissionInProgress[feedback._id] ? 'Saving...' : 'Save' }}
+                                </button>
+                                <button class="cancel-btn" (click)="cancelFeedbackEditing(feedback._id)">
+                                    <span class="material-symbols-outlined">cancel</span>
+                                    Cancel
+                                </button>
+                            </div>
+                            <div class="error-message" *ngIf="feedbackErrors[feedback._id]">
+                                <span class="material-icons">error_outline</span>
+                                {{ feedbackErrors[feedback._id] }}
+                            </div>
+                        </div>
+
+                        <app-reply-list [feedbackId]="feedback._id"/>
                     </div>
 
-                    <app-reply-list [feedbackId]="feedback._id"/>
                 </div>
 
                 <!-- No feedback -->
@@ -115,9 +146,10 @@
                 </div>
                 <div class="error-message" *ngIf="sectionErrors[section.key]">
                     <span class="material-icons">error_outline</span>
-                    {{sectionErrors[section.key]}}
+                    {{ sectionErrors[section.key] }}
                 </div>
             </div>
+
         </div>
 
         <!-- Add Section Card -->

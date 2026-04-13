@@ -183,109 +183,140 @@ app-reply-list {
                         }
                     }
 
-                    .vote-btn {
+                    .feedback-actions {
                         display: flex;
                         align-items: center;
-                        gap: 0.35rem;
-                        padding: 0.35rem 0.75rem;
-                        border-radius: 20px;
-                        border: 1.5px solid var(--color-border);
-                        background: var(--color-bg-white);
-                        color: var(--color-text-muted);
-                        font-size: 0.8rem;
-                        font-weight: 700;
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        position: relative;
+                        gap: 0.5rem;
                         flex-shrink: 0;
 
-                        .material-icons { font-size: 0.95rem; }
+                        .edit-btn {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            width: 30px;
+                            height: 30px;
+                            border: none;
+                            border-radius: 8px;
+                            background: none;
+                            color: var(--color-text-muted);
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            font-family: inherit;
 
-                        &:hover {
-                            border-color: var(--color-primary);
-                            color: var(--color-primary);
-                            background: var(--color-primary-light);
-                            z-index: 10001;
+                            .material-symbols-outlined {
+                                font-size: 0.95rem;
+                            }
+
+                            &:hover {
+                                background: var(--color-primary-light);
+                                color: var(--color-primary);
+                            }
+                        }
+                        
+                        .vote-btn {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.35rem;
+                            padding: 0.35rem 0.75rem;
+                            border-radius: 20px;
+                            border: 1.5px solid var(--color-border);
+                            background: var(--color-bg-white);
+                            color: var(--color-text-muted);
+                            font-size: 0.8rem;
+                            font-weight: 700;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            position: relative;
+                            flex-shrink: 0;
+
+                            .material-icons { font-size: 0.95rem; }
+
+                            &:hover {
+                                border-color: var(--color-primary);
+                                color: var(--color-primary);
+                                background: var(--color-primary-light);
+                                z-index: 10001;
+
+                                .voters-tooltip {
+                                    opacity: 1;
+                                    visibility: visible;
+                                }
+                            }
+
+                            &.voted {
+                                background: var(--color-primary);
+                                border-color: var(--color-primary);
+                                color: white;
+
+                                .material-icons { animation: bounce 0.4s ease; }
+                            }
+
+                            &.voting {
+                                opacity: 0.6;
+                                cursor: not-allowed;
+                                pointer-events: none;
+                            }
 
                             .voters-tooltip {
-                                opacity: 1;
-                                visibility: visible;
-                            }
-                        }
+                                position: absolute;
+                                top: calc(100% + 0.5rem);
+                                right: 0;
+                                background: var(--color-bg-white);
+                                border: 1px solid var(--color-border);
+                                border-radius: 10px;
+                                padding: 0.75rem;
+                                min-width: 180px;
+                                box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+                                opacity: 0;
+                                visibility: hidden;
+                                transition: all 0.2s ease;
+                                z-index: 10000;
+                                pointer-events: none;
 
-                        &.voted {
-                            background: var(--color-primary);
-                            border-color: var(--color-primary);
-                            color: white;
+                                .tooltip-header {
+                                    font-size: 0.68rem;
+                                    font-weight: 700;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.5px;
+                                    color: var(--color-text-muted);
+                                    margin-bottom: 0.5rem;
+                                }
 
-                            .material-icons { animation: bounce 0.4s ease; }
-                        }
-
-                        &.voting {
-                            opacity: 0.6;
-                            cursor: not-allowed;
-                            pointer-events: none;
-                        }
-
-                        .voters-tooltip {
-                            position: absolute;
-                            top: calc(100% + 0.5rem);
-                            right: 0;
-                            background: var(--color-bg-white);
-                            border: 1px solid var(--color-border);
-                            border-radius: 10px;
-                            padding: 0.75rem;
-                            min-width: 180px;
-                            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-                            opacity: 0;
-                            visibility: hidden;
-                            transition: all 0.2s ease;
-                            z-index: 10000;
-                            pointer-events: none;
-
-                            .tooltip-header {
-                                font-size: 0.68rem;
-                                font-weight: 700;
-                                text-transform: uppercase;
-                                letter-spacing: 0.5px;
-                                color: var(--color-text-muted);
-                                margin-bottom: 0.5rem;
-                            }
-
-                            .voter-list {
-                                display: flex;
-                                flex-direction: column;
-                                gap: 0.35rem;
-
-                                .voter-item {
+                                .voter-list {
                                     display: flex;
-                                    align-items: center;
-                                    gap: 0.5rem;
-                                    padding: 0.35rem 0.5rem;
-                                    border-radius: 6px;
-                                    background: var(--color-bg-card);
+                                    flex-direction: column;
+                                    gap: 0.35rem;
 
-                                    .voter-avatar {
-                                        width: 22px;
-                                        height: 22px;
-                                        border-radius: 50%;
-                                        background: var(--color-primary-light);
-                                        color: var(--color-primary);
-                                        font-size: 0.65rem;
-                                        font-weight: 700;
+                                    .voter-item {
                                         display: flex;
                                         align-items: center;
-                                        justify-content: center;
-                                        flex-shrink: 0;
-                                    }
+                                        gap: 0.5rem;
+                                        padding: 0.35rem 0.5rem;
+                                        border-radius: 6px;
+                                        background: var(--color-bg-card);
 
-                                    .name {
-                                        font-size: 0.8rem;
-                                        font-weight: 500;
-                                        color: var(--color-text-dark);
-                                        overflow: hidden;
-                                        white-space: nowrap;
-                                        text-overflow: ellipsis;
+                                        .voter-avatar {
+                                            width: 22px;
+                                            height: 22px;
+                                            border-radius: 50%;
+                                            background: var(--color-primary-light);
+                                            color: var(--color-primary);
+                                            font-size: 0.65rem;
+                                            font-weight: 700;
+                                            display: flex;
+                                            align-items: center;
+                                            justify-content: center;
+                                            flex-shrink: 0;
+                                        }
+
+                                        .name {
+                                            font-size: 0.8rem;
+                                            font-weight: 500;
+                                            color: var(--color-text-dark);
+                                            overflow: hidden;
+                                            white-space: nowrap;
+                                            text-overflow: ellipsis;
+                                        }
                                     }
                                 }
                             }
@@ -294,6 +325,79 @@ app-reply-list {
                 }
 
                 .feedback-body {
+
+                    .edit-mode {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.65rem;
+
+                        textarea {
+                            width: 100%;
+                            padding: 0.75rem 1rem;
+                            border: 1.5px solid var(--color-primary);
+                            border-radius: 10px;
+                            background: var(--color-bg-white);
+                            color: var(--color-text-dark);
+                            font-size: 0.875rem;
+                            font-family: inherit;
+                            resize: none;
+                            line-height: 1.5;
+                            height: 60px;
+                            transition: all 0.2s ease;
+
+                            &:focus {
+                                outline: none;
+                            }
+                        }
+
+                        .edit-actions {
+                            display: flex;
+                            gap: 0.5rem;
+
+                            button {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.35rem;
+                                padding: 0.45rem 1rem;
+                                border-radius: 8px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                                font-family: inherit;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                border: none;
+
+                                .material-symbols-outlined { font-size: 0.95rem; }
+
+                                &:disabled {
+                                    opacity: 0.6;
+                                    cursor: not-allowed;
+                                }
+                            }
+
+                            .save-btn {
+                                background: var(--color-primary);
+                                color: white;
+
+                                &:hover:not(:disabled) {
+                                    background: var(--color-primary-dark);
+                                    box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+                                }
+                            }
+
+                            .cancel-btn {
+                                background: var(--color-bg-card);
+                                color: var(--color-text-medium);
+                                border: 1.5px solid var(--color-border) !important;
+
+                                &:hover {
+                                    background: var(--color-bg-gray);
+                                    color: var(--color-text-dark);
+                                }
+                            }
+                        }
+                    }
+
                     ul {
                         list-style: none;
                         padding: 0;
@@ -428,18 +532,6 @@ app-reply-list {
                     }
                 }
             }
-
-            .error-message {
-                display: flex;
-                align-items: center;
-                gap: 0.4rem;
-                margin-top: 0.5rem;
-                font-size: 0.78rem;
-                color: #e74c3c;
-                font-weight: 500;
-
-                .material-icons { font-size: 0.9rem; }
-            }
         }
     }
 
@@ -505,6 +597,18 @@ app-reply-list {
             .add-section-inner p { color: var(--color-primary); }
         }
     }
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    font-size: 0.78rem;
+    color: #e74c3c;
+    font-weight: 500;
+
+    .material-icons { font-size: 0.9rem; }
 }
 
 .delete-modal,
