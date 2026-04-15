@@ -5,7 +5,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SessionTimerState, SocketService, TimerCommand } from '../../../services/socket.service';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
@@ -73,7 +72,6 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
 
   constructor(
     private socketService: SocketService,
-    private notification: NzNotificationService
   ) {}
 
   ngOnInit(): void {
@@ -219,7 +217,6 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     if (!wasFinished && this.isTimerFinished && command === 'finish' && !this.hasPlayedFinishAlarm) {
       this.hasPlayedFinishAlarm = true;
       this.isAlarmSilenced = false;
-      this.notification.error('Time\'s Up', 'Feedback submissions are now closed.');
       this.playTimerAlarm();
     }
 
