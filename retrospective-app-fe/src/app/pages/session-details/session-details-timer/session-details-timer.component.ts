@@ -6,11 +6,15 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { SessionTimerState, SocketService, TimerCommand } from '../../../services/socket.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { AudioOptions } from '../../../models/timer.model';
 
 @Component({
   selector: 'app-session-details-timer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NzMenuModule, NzButtonModule, NzDropDownModule],
   templateUrl: './session-details-timer.component.html',
   styleUrl: './session-details-timer.component.scss'
 })
@@ -25,14 +29,44 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
   remainingSeconds: number = 300;
   isTimerRunning: boolean = false;
   isTimerFinished: boolean = false;
+  isAlarmSilenced: boolean = false;
   timerError: string = '';
+
+  backgroundSounds: AudioOptions[] = [
+    { label: 'Sweet Life', value: 'Sweet Life' },
+    { label: '(ReinV Special) - My Heart Will Go On', value: 'My Heart Will Go On - Special' },
+    { label: 'Super Trouper', value: 'ABBA - Super Trouper' },
+    { label: 'A Thousand Miles', value: 'Vanessa Carlton - A Thousand Miles' },
+    { label: 'Relapse No1. 1 - Guilty as Sin x About You', value: 'Guilty as Sin x About You (remix)'},
+    { label: 'Relapse No. 2 - Multo', value: 'Multo  Cup of Joe' }
+  ]
+
+  backgroundAudioOptions = this.backgroundSounds.map(option => ({
+    label: option.label,
+    value: option.value
+  }))
+
+  selectedAudio: string | null = null;
+
+  selectAudio(audio: AudioOptions): void {
+    if (!this.isSessionCreator) return;
+    this.selectedAudio = audio.value;
+    this.socketService.emitTimerCommand(this.sessionId, 'configure', {
+      backgroundSoundUrl: this.selectedAudio
+    });
+
+    if (this.isTimerRunning && !this.isTimerFinished) {
+      this.stopBackgroundMusic();
+      this.playBackgroundMusic();
+    }
+  }
 
   private timerEndsAt: number | null = null;
   private alarmAudio: HTMLAudioElement | null = null;
   private backgroundAudio: HTMLAudioElement | null = null;
   private hasPlayedFinishAlarm: boolean = false;
-  private readonly defaultAlarmSoundPath: string = 'assets/sounds/3dabrar-funny-alarm-317531.mp3';
-  private readonly defaultBackgroundSoundPath: string = 'assets/sounds/alexgrohl-sweet-life-luxury-chill-438146.mp3';
+  private readonly defaultAlarmSoundPath: string = 'assets/sounds/alarm/3dabrar-funny-alarm-317531.mp3';
+  private readonly defaultBackgroundSoundPath: string = 'assets/sounds/backgrounds/Sweet Life.mp3';
 
   private socketSubs: Subscription[] = [];
   private realtimeTimer?: ReturnType<typeof setInterval>;
@@ -104,7 +138,10 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     }
     this.timerError = '';
     this.hasPlayedFinishAlarm = false;
-    this.socketService.emitTimerCommand(this.sessionId, 'start', { durationSeconds });
+    this.socketService.emitTimerCommand(this.sessionId, 'start', {
+      durationSeconds,
+      backgroundSoundUrl: this.selectedAudio || undefined
+    });
   }
 
   pauseFeedbackTimer(): void {
@@ -117,11 +154,7 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
 
     this.stopTimerAlarm();
     this.stopBackgroundMusic();
-    this.hasPlayedFinishAlarm = false;
-    this.timerError = '';
-
-    const durationSeconds = this.getDurationInputSeconds();
-    this.socketService.emitTimerCommand(this.sessionId, 'reset', { durationSeconds });
+    this.socketService.emitTimerCommand(this.sessionId, 'stop-alarm');
   }
 
   resetFeedbackTimer(): void {
@@ -130,6 +163,7 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     this.socketService.emitTimerCommand(this.sessionId, 'reset', { durationSeconds });
     this.stopTimerAlarm();
     this.stopBackgroundMusic();
+    this.isAlarmSilenced = false;
     this.timerError = '';
     this.hasPlayedFinishAlarm = false;
   }
@@ -152,6 +186,9 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
 
   private applyTimerState(state: SessionTimerState, command?: TimerCommand): void {
     const wasFinished = this.isTimerFinished;
+    const previousSelectedAudio = this.selectedAudio;
+    const sharedAudio = typeof state.backgroundSoundUrl === 'string' ? state.backgroundSoundUrl.trim() : '';
+    this.selectedAudio = sharedAudio || null;
 
     this.remainingSeconds = Math.max(0, Math.floor(state.remainingSeconds || 0));
     this.isTimerRunning = !!state.isRunning;
@@ -159,6 +196,11 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     this.timerFinishedChange.emit(this.isTimerFinished);
     this.timerEndsAt = state.endsAt ?? null;
     this.syncDurationInputs(state.durationSeconds);
+
+    const hasAudioSelectionChanged = previousSelectedAudio !== this.selectedAudio;
+    if (hasAudioSelectionChanged && this.isTimerRunning && !this.isTimerFinished) {
+      this.stopBackgroundMusic();
+    }
 
     if (this.isTimerRunning) {
       this.startRealtimeTicker();
@@ -168,14 +210,22 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
 
     this.syncBackgroundMusicPlayback();
 
+    if (command === 'stop-alarm') {
+      this.stopTimerAlarm();
+      this.stopBackgroundMusic();
+      this.isAlarmSilenced = true;
+    }
+
     if (!wasFinished && this.isTimerFinished && command === 'finish' && !this.hasPlayedFinishAlarm) {
       this.hasPlayedFinishAlarm = true;
+      this.isAlarmSilenced = false;
       this.notification.error('Time\'s Up', 'Feedback submissions are now closed.');
       this.playTimerAlarm();
     }
 
     if (!this.isTimerFinished) {
       this.hasPlayedFinishAlarm = false;
+      this.isAlarmSilenced = false;
       this.stopTimerAlarm();
     }
   }
@@ -246,10 +296,25 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
       return;
     }
 
-    const audio = new Audio(this.defaultBackgroundSoundPath);
+    const selectedAudioPath = this.selectedAudio
+      ? `assets/sounds/backgrounds/${this.selectedAudio}.mp3`
+      : this.defaultBackgroundSoundPath;
+    const audioPath = selectedAudioPath || this.defaultBackgroundSoundPath;
+    const audio = new Audio(audioPath);
     audio.loop = true;
-    audio.volume = 0.2;
+    audio.volume = 0.3;
     audio.play().catch(() => {
+      if (audioPath !== this.defaultBackgroundSoundPath) {
+        const fallbackAudio = new Audio(this.defaultBackgroundSoundPath);
+        fallbackAudio.loop = true;
+        fallbackAudio.volume = 0.3;
+        fallbackAudio.play().catch(() => {
+          this.backgroundAudio = null;
+        });
+        this.backgroundAudio = fallbackAudio;
+        return;
+      }
+
       this.backgroundAudio = null;
     });
     this.backgroundAudio = audio;

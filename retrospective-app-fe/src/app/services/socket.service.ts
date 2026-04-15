@@ -3,7 +3,7 @@ import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 
-export type TimerCommand = 'configure' | 'start' | 'pause' | 'reset' | 'finish';
+export type TimerCommand = 'configure' | 'start' | 'pause' | 'reset' | 'stop-alarm' | 'finish';
 
 export interface SessionTimerState {
   durationSeconds: number;
@@ -12,6 +12,7 @@ export interface SessionTimerState {
   isFinished: boolean;
   endsAt: number | null;
   alarmSoundUrl: string;
+  backgroundSoundUrl: string;
   updatedAt: number;
 }
 
@@ -22,17 +23,16 @@ export class SocketService implements OnDestroy {
   private socket: Socket;
 
   constructor() {
-    const token = localStorage.getItem('token') ?? ''; // ← grab token from localStorage
+    const token = localStorage.getItem('token') ?? '';
 
     this.socket = io(environment.apiBaseUrl.replace('/api', ''), {
-      transports: ['polling', 'websocket'], // ← polling first, upgrades to WS after
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 2000,
       reconnectionDelayMax: 10000,
       timeout: 20000,
-      auth: { token }  // ← pass token in handshake instead of relying on cookies
-      // ← removed withCredentials: true (this was causing incognito issues)
+      auth: { token } 
     });
 
     this.socket.on('connect', () => {
@@ -59,7 +59,7 @@ export class SocketService implements OnDestroy {
   emitTimerCommand(
     sessionId: string,
     command: Exclude<TimerCommand, 'finish'>,
-    payload?: { durationSeconds?: number; alarmSoundUrl?: string }
+    payload?: { durationSeconds?: number; alarmSoundUrl?: string; backgroundSoundUrl?: string }
   ): void {
     this.socket.emit('timer:command', { sessionId, command, payload });
   }

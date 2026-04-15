@@ -84,11 +84,7 @@
     right: 0;
     width: 80px;
     height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.4)
-    );
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4));
     animation: shimmer 2s ease-in-out infinite;
   }
 }
@@ -102,7 +98,7 @@
   padding: 1rem 1.5rem;
 }
 
-// ─── Left: Clock ────────────────────────────────────────────────────────────
+// ─── Left: Clock + Inputs ───────────────────────────────────────────────────
 
 .timer-left {
   display: flex;
@@ -151,14 +147,20 @@
   transition: color 0.3s ease;
 }
 
-// ─── Center: Inputs ─────────────────────────────────────────────────────────
+// ─── Inputs (now inside timer-left) ─────────────────────────────────────────
 
 .timer-inputs {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex: 1;
-  justify-content: center;
+}
+
+.input-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--color-border);
+  margin-right: 0.35rem;
+  flex-shrink: 0;
 }
 
 .input-sep {
@@ -214,6 +216,144 @@
 
     &:hover:not(:focus) {
       border-color: var(--color-text-muted);
+    }
+  }
+}
+
+// ─── Center: Audio Selector ─────────────────────────────────────────────────
+
+.timer-audio-select {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.audio-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+  padding: 0 1rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg-card);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  max-width: 260px;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background: var(--color-bg-white);
+    color: var(--color-text-dark);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.06);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .audio-icon {
+    font-size: 1rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .audio-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chevron-icon {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+  }
+}
+
+// Chevron rotation when dropdown is open (ng-zorro adds this class)
+.ant-dropdown-open .chevron-icon {
+  transform: rotate(180deg);
+}
+
+// ─── Dropdown Menu ──────────────────────────────────────────────────────────
+
+.audio-dropdown-menu {
+  border-radius: 12px !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    0 12px 40px rgba(0, 0, 0, 0.04) !important;
+  padding: 0.35rem !important;
+  min-width: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--color-bg-white) !important;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .audio-dropdown-item {
+    display: flex !important;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.75rem !important;
+    border-radius: 8px !important;
+    font-size: 0.82rem !important;
+    font-weight: 600 !important;
+    font-family: inherit !important;
+    color: var(--color-text-medium) !important;
+    transition: all 0.15s ease !important;
+    margin: 1px 0;
+
+    &:hover {
+      background: var(--color-bg-card) !important;
+      color: var(--color-text-dark) !important;
+    }
+
+    &.selected {
+      background: rgba(0, 122, 255, 0.06) !important;
+      color: var(--color-primary) !important;
+
+      .item-icon {
+        color: var(--color-primary);
+      }
+    }
+
+    .item-icon {
+      font-size: 1rem;
+      color: var(--color-text-muted);
+      flex-shrink: 0;
+      transition: color 0.15s ease;
+    }
+
+    .item-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .check-icon {
+      font-size: 1rem;
+      color: var(--color-primary);
+      flex-shrink: 0;
     }
   }
 }
@@ -286,7 +426,7 @@
     }
   }
 
-   &.stop {
+  &.stop {
     background: linear-gradient(135deg, #ef4444, #dc2626);
     color: #fff;
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
@@ -389,7 +529,12 @@
     gap: 0.875rem;
   }
 
-  .timer-inputs {
+  .timer-left {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  .timer-audio-select {
     justify-content: flex-start;
   }
 
@@ -407,12 +552,24 @@
     padding: 0.875rem 1.25rem;
   }
 
+  .timer-left {
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
   .timer-clock {
     font-size: 1.45rem;
   }
 
-  .timer-inputs {
+  .timer-audio-select {
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .audio-select-btn {
+    width: 100%;
+    max-width: none;
   }
 
   .timer-controls {
@@ -439,12 +596,28 @@
     padding: 0.75rem 1rem;
   }
 
+  .timer-left {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
   .timer-clock {
     font-size: 1.35rem;
   }
 
-  .timer-inputs {
+  .input-divider {
+    display: none;
+  }
+
+  .timer-audio-select {
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .audio-select-btn {
+    width: 100%;
+    max-width: none;
   }
 
   .timer-controls {

@@ -29,6 +29,7 @@ function getOrCreateTimer(sessionId) {
       isFinished: false,
       endsAt: null,
       alarmSoundUrl: "",
+      backgroundSoundUrl: "",
       timeoutId: null,
       updatedAt: nowMs()
     });
@@ -45,6 +46,7 @@ function toPublicTimerState(timer) {
     isFinished: timer.isFinished,
     endsAt: timer.endsAt,
     alarmSoundUrl: timer.alarmSoundUrl,
+    backgroundSoundUrl: timer.backgroundSoundUrl,
     updatedAt: timer.updatedAt
   };
 }
@@ -108,14 +110,22 @@ function handleTimerCommand(io, commandData = {}) {
   const timer = getOrCreateTimer(sessionId);
   const nextPayload = payload || {};
   const nextSoundUrl = normalizeSoundUrl(nextPayload.alarmSoundUrl);
+  const nextBackgroundSoundUrl = normalizeSoundUrl(nextPayload.backgroundSoundUrl);
 
   if (typeof nextPayload.alarmSoundUrl === "string") {
     timer.alarmSoundUrl = nextSoundUrl;
   }
 
+  if (typeof nextPayload.backgroundSoundUrl === "string") {
+    timer.backgroundSoundUrl = nextBackgroundSoundUrl;
+  }
+
   if (command === "configure") {
-    if (!timer.isRunning) {
-      timer.durationSeconds = clampDuration(nextPayload.durationSeconds);
+    const requestedDuration = Number(nextPayload.durationSeconds);
+    const hasDurationUpdate = Number.isFinite(requestedDuration) && requestedDuration >= 1;
+
+    if (!timer.isRunning && hasDurationUpdate) {
+      timer.durationSeconds = clampDuration(requestedDuration);
       timer.remainingSeconds = timer.durationSeconds;
       timer.isFinished = false;
       timer.endsAt = null;
@@ -162,6 +172,11 @@ function handleTimerCommand(io, commandData = {}) {
     timer.remainingSeconds = timer.durationSeconds;
     timer.endsAt = null;
     clearTimerTimeout(timer);
+  }
+
+  if (command === "stop-alarm") {
+    // Intentionally do not mutate timer running/finished state.
+    // This command only broadcasts a session-wide audio stop.
   }
 
   timer.updatedAt = nowMs();

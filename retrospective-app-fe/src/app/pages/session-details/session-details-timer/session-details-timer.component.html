@@ -11,6 +11,8 @@
   </div>
 
   <div class="timer-inner">
+
+    <!-- Left: Status + Clock + Duration Inputs -->
     <div class="timer-left">
       <div class="timer-status-dot" [class.pulse]="isTimerRunning"></div>
       <div class="timer-clock-block">
@@ -19,26 +21,61 @@
           {{ isTimerFinished ? 'Feedback closed' : isTimerRunning ? 'Counting down' : 'Ready' }}
         </span>
       </div>
+
+      <div class="timer-inputs" *ngIf="isSessionCreator && !isTimerRunning && !isTimerFinished">
+        <div class="input-divider"></div>
+        <div class="input-pill">
+          <label>min</label>
+          <input
+            type="number" min="0" max="180"
+            [ngModel]="timerDurationMinutes"
+            (ngModelChange)="onTimerMinutesChange($event)" />
+        </div>
+        <span class="input-sep">:</span>
+        <div class="input-pill">
+          <label>sec</label>
+          <input
+            type="number" min="0" max="59"
+            [ngModel]="timerDurationSeconds"
+            (ngModelChange)="onTimerSecondsChange($event)" />
+        </div>
+      </div>
     </div>
 
-    <div class="timer-inputs" *ngIf="isSessionCreator && !isTimerRunning && !isTimerFinished">
-      <div class="input-pill">
-        <label>min</label>
-        <input
-          type="number" min="0" max="180"
-          [ngModel]="timerDurationMinutes"
-          (ngModelChange)="onTimerMinutesChange($event)" />
-      </div>
-      <span class="input-sep">:</span>
-      <div class="input-pill">
-        <label>sec</label>
-        <input
-          type="number" min="0" max="59"
-          [ngModel]="timerDurationSeconds"
-          (ngModelChange)="onTimerSecondsChange($event)" />
-      </div>
+    <!-- Center: Audio Selector -->
+    <div class="timer-audio-select" *ngIf="isSessionCreator && !isTimerRunning && !isTimerFinished">
+      <button
+        class="audio-select-btn"
+        nz-dropdown
+        [nzDropdownMenu]="menu"
+        nzTrigger="click"
+        nzPlacement="bottomCenter">
+        <span class="material-symbols-outlined audio-icon">music_note</span>
+        <span class="audio-label">{{ selectedAudio || 'Background Music' }}</span>
+        <span class="material-symbols-outlined chevron-icon">expand_more</span>
+      </button>
+
+      <nz-dropdown-menu #menu="nzDropdownMenu">
+        <ul nz-menu class="audio-dropdown-menu">
+          <li
+            nz-menu-item
+            class="audio-dropdown-item"
+            *ngFor="let audio of backgroundAudioOptions"
+            [class.selected]="selectedAudio === audio.value"
+            (click)="selectAudio(audio)">
+            <span class="material-symbols-outlined item-icon">audiotrack</span>
+            <span class="item-name">{{ audio.label }}</span>
+            <span
+              class="material-symbols-outlined check-icon"
+              *ngIf="selectedAudio === audio.value">
+              check
+            </span>
+          </li>
+        </ul>
+      </nz-dropdown-menu>
     </div>
 
+    <!-- Right: Controls -->
     <div class="timer-controls" *ngIf="isSessionCreator">
       <button
         class="ctrl-btn start"
@@ -58,7 +95,7 @@
 
       <button
         class="ctrl-btn stop"
-        *ngIf="isTimerFinished"
+        *ngIf="isTimerFinished && !isAlarmSilenced"
         (click)="stopFeedbackAlarm()">
         <span class="material-symbols-outlined">stop</span>
         Stop
