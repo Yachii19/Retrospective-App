@@ -1,0 +1,459 @@
+// ─── Timer Strip ────────────────────────────────────────────────────────────
+
+.timer-strip {
+  position: relative;
+  margin-bottom: 1.25rem;
+  border-radius: 16px;
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-white);
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.running {
+    border-color: rgba(0, 122, 255, 0.25);
+    box-shadow:
+      0 0 0 3px rgba(0, 122, 255, 0.05),
+      0 4px 16px rgba(0, 122, 255, 0.08);
+  }
+
+  &.urgent {
+    border-color: rgba(239, 68, 68, 0.35);
+    box-shadow:
+      0 0 0 3px rgba(239, 68, 68, 0.06),
+      0 4px 16px rgba(239, 68, 68, 0.1);
+
+    .timer-clock {
+      color: #dc2626 !important;
+      animation: urgentPulse 1s ease-in-out infinite;
+    }
+
+    .timer-progress-fill {
+      background: linear-gradient(90deg, #f97316, #ef4444) !important;
+    }
+
+    .timer-status-dot {
+      background: #ef4444 !important;
+    }
+  }
+
+  &.finished {
+    border-color: rgba(220, 38, 38, 0.2);
+    background: linear-gradient(135deg, #fff8f8, #fff1f1);
+
+    .timer-clock {
+      color: #b91c1c !important;
+    }
+
+    .timer-label {
+      color: #b91c1c;
+      font-weight: 700;
+    }
+
+    .timer-status-dot {
+      background: #dc2626;
+      animation: none;
+    }
+
+    .timer-progress-fill {
+      background: linear-gradient(90deg, #ef4444, #dc2626) !important;
+    }
+  }
+}
+
+// ─── Progress Track ─────────────────────────────────────────────────────────
+
+.timer-progress-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-border-light);
+  overflow: hidden;
+}
+
+.timer-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #60a5fa);
+  transition: width 0.3s linear;
+  position: relative;
+
+  .progress-glow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 80px;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4)
+    );
+    animation: shimmer 2s ease-in-out infinite;
+  }
+}
+
+// ─── Inner Layout ───────────────────────────────────────────────────────────
+
+.timer-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+}
+
+// ─── Left: Clock ────────────────────────────────────────────────────────────
+
+.timer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.timer-status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-border);
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+
+  &.pulse {
+    background: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+    animation: dotPulse 1.5s ease-in-out infinite;
+  }
+}
+
+.timer-clock-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.timer-clock {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--color-text-dark);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.timer-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--color-text-muted);
+  transition: color 0.3s ease;
+}
+
+// ─── Center: Inputs ─────────────────────────────────────────────────────────
+
+.timer-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 1;
+  justify-content: center;
+}
+
+.input-sep {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  line-height: 1;
+  margin-top: 0.5rem;
+  user-select: none;
+}
+
+.input-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+
+  label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--color-text-muted);
+    user-select: none;
+  }
+
+  input {
+    width: 64px;
+    height: 38px;
+    border: 1.5px solid var(--color-border);
+    border-radius: 10px;
+    padding: 0 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--color-text-dark);
+    background: var(--color-bg-card);
+    text-align: center;
+    transition: all 0.2s ease;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+      opacity: 0;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      background: var(--color-bg-white);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    &:hover:not(:focus) {
+      border-color: var(--color-text-muted);
+    }
+  }
+}
+
+// ─── Right: Controls ────────────────────────────────────────────────────────
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.ctrl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 38px;
+  padding: 0 1rem;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+
+  .material-symbols-outlined {
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97) !important;
+  }
+
+  &.start {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary-dark);
+      box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+      transform: translateY(-1px);
+
+      .material-symbols-outlined {
+        transform: scale(1.15);
+      }
+    }
+  }
+
+  &.pause {
+    background: linear-gradient(135deg, #f59e0b, #eab308);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #d97706, #ca8a04);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+      transform: translateY(-1px);
+    }
+  }
+
+   &.stop {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
+      transform: translateY(-1px);
+
+      .material-symbols-outlined {
+        transform: scale(1.15);
+      }
+    }
+  }
+
+  &.reset {
+    background: var(--color-bg-card);
+    color: var(--color-text-medium);
+    border: 1.5px solid var(--color-border);
+
+    &:hover:not(:disabled) {
+      background: var(--color-bg-gray);
+      color: var(--color-text-dark);
+      border-color: var(--color-text-muted);
+      transform: translateY(-1px);
+
+      .material-symbols-outlined {
+        transform: rotate(-180deg);
+      }
+    }
+  }
+}
+
+// ─── Error ──────────────────────────────────────────────────────────────────
+
+.timer-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: #dc2626;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.04);
+  border-top: 1px solid rgba(239, 68, 68, 0.08);
+
+  .material-icons {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+}
+
+// ─── Animations ─────────────────────────────────────────────────────────────
+
+@keyframes dotPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.75);
+    box-shadow: 0 0 0 5px rgba(0, 122, 255, 0.05);
+  }
+}
+
+@keyframes urgentPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+@keyframes shimmer {
+  0%   { opacity: 0; transform: translateX(-100%); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+// ─── Responsive: Large Desktop (1700px+) ────────────────────────────────────
+
+@media (min-width: 1700px) {
+  .timer-inner {
+    padding: 1rem 1.75rem;
+  }
+}
+
+// ─── Responsive: Small Desktop (1025px–1366px) ─────────────────────────────
+
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .timer-inner {
+    gap: 1.25rem;
+  }
+}
+
+// ─── Responsive: Nest Hub (769px–1024px) ────────────────────────────────────
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .timer-inner {
+    flex-wrap: wrap;
+    gap: 0.875rem;
+  }
+
+  .timer-inputs {
+    justify-content: flex-start;
+  }
+
+  .timer-controls {
+    margin-left: 0;
+  }
+}
+
+// ─── Responsive: Tablet (481px–768px) ───────────────────────────────────────
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .timer-inner {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+  }
+
+  .timer-clock {
+    font-size: 1.45rem;
+  }
+
+  .timer-inputs {
+    justify-content: flex-start;
+  }
+
+  .timer-controls {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .ctrl-btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+// ─── Responsive: Mobile (≤480px) ────────────────────────────────────────────
+
+@media (max-width: 480px) {
+  .timer-strip {
+    border-radius: 14px;
+  }
+
+  .timer-inner {
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .timer-clock {
+    font-size: 1.35rem;
+  }
+
+  .timer-inputs {
+    justify-content: flex-start;
+  }
+
+  .timer-controls {
+    margin-left: 0;
+    width: 100%;
+
+    .ctrl-btn {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}

@@ -134,12 +134,17 @@
                         [name]="'feedback_input_' + section.key"
                         [(ngModel)]="feedbackInputs[section.key]"
                         placeholder="Share your thoughts..."
+                        [disabled]="isTimerFinished"
                         (keydown.enter)="addFeedback(section.key, $event)"
                         (input)="onInputChange(section.key)"></textarea>
                     <button
                         class="submit-btn"
+                        [class.disabled]="submissionInProgress[section.key] || isTimerFinished"
                         (click)="addFeedback(section.key)"
-                        [disabled]="submissionInProgress[section.key]">
+                        [disabled]="submissionInProgress[section.key] || isTimerFinished"
+                        nz-tooltip
+                        [nzTooltipTitle]="isTimerFinished ? 'Feedback submission is closed' : ''"
+                    >
                         <span class="material-symbols-outlined">send</span>
                         Submit
                     </button>

@@ -3,6 +3,18 @@ import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 
+export type TimerCommand = 'configure' | 'start' | 'pause' | 'reset' | 'finish';
+
+export interface SessionTimerState {
+  durationSeconds: number;
+  remainingSeconds: number;
+  isRunning: boolean;
+  isFinished: boolean;
+  endsAt: number | null;
+  alarmSoundUrl: string;
+  updatedAt: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -42,6 +54,26 @@ export class SocketService implements OnDestroy {
 
   leaveSession(sessionId: string): void {
     this.socket.emit('leave:session', sessionId);
+  }
+
+  emitTimerCommand(
+    sessionId: string,
+    command: Exclude<TimerCommand, 'finish'>,
+    payload?: { durationSeconds?: number; alarmSoundUrl?: string }
+  ): void {
+    this.socket.emit('timer:command', { sessionId, command, payload });
+  }
+
+  onTimerSynced(): Observable<{ sessionId: string; state: SessionTimerState }> {
+    return new Observable(observer => {
+      this.socket.on('timer:sync', (data) => observer.next(data));
+    });
+  }
+
+  onTimerUpdated(): Observable<{ sessionId: string; command: TimerCommand; state: SessionTimerState }> {
+    return new Observable(observer => {
+      this.socket.on('timer:update', (data) => observer.next(data));
+    });
   }
 
   onFeedbackAdded(): Observable<{ sectionKey: string; feedback: any }> {

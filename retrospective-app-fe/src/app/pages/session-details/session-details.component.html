@@ -14,9 +14,17 @@
 
   <div class="main-content" *ngIf="!isAccessDenied">
     <app-session-details-header/>
+
+    <app-session-details-timer
+      [sessionId]="sessionId"
+      [isSessionCreator]="isSessionCreator"
+      (timerFinishedChange)="onTimerFinishedChange($event)"/>
+
     <div class="session-grid-border">
       <div class="session-grid-wrapper" [class.modal-open]="isModalOpen">
-        <app-session-details-handler (modalStateChange)="isModalOpen = $event"/>
+        <app-session-details-handler
+          [isTimerFinished]="isTimerFinished"
+          (modalStateChange)="isModalOpen = $event"/>
       </div>
     </div>
   </div>

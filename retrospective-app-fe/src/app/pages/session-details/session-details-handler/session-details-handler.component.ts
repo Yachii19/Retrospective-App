@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FeedbackService } from '../../../services/feedback.service';
 import { RetroFeedback, VoteFeedbackResponse } from '../../../models/feedback.model';
 import { CommonModule } from '@angular/common';
@@ -13,17 +13,19 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { AvatarColorPipe } from '../../../pipes/avatar-color.pipe';
 import { SocketService } from '../../../services/socket.service';
 import { Observable, Subscription } from 'rxjs';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 @Component({
   selector: 'app-session-details-handler',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReplyListComponent, TimeAgoPipe, AvatarColorPipe],
+  imports: [CommonModule, NzToolTipModule, FormsModule, ReplyListComponent, TimeAgoPipe, AvatarColorPipe],
   templateUrl: './session-details-handler.component.html',
   styleUrl: './session-details-handler.component.scss'
 })
 export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
 
   @Output() modalStateChange = new EventEmitter<boolean>();
+  @Input() isTimerFinished: boolean = false;
 
   session: RetroSession | null = null;
   sessionId: string = '';
@@ -206,6 +208,11 @@ export class SessionDetailsHandlerComponent implements OnInit, OnDestroy {
   addFeedback(sectionKey: string, event?: Event): void {
     if (event) event.preventDefault();
     if (this.submissionInProgress[sectionKey]) return;
+
+    if (this.isTimerFinished) {
+      this.sectionErrors[sectionKey] = 'Timer is done. Feedback input is now closed.';
+      return;
+    }
 
     const feedbackText = this.feedbackInputs[sectionKey] || '';
     if (!feedbackText.trim()) {

@@ -1,0 +1,81 @@
+<div
+  class="timer-strip"
+  [class.running]="isTimerRunning"
+  [class.finished]="isTimerFinished"
+  [class.urgent]="isUrgent">
+
+  <div class="timer-progress-track">
+    <div class="timer-progress-fill" [style.width.%]="progressPercent">
+      <div class="progress-glow"></div>
+    </div>
+  </div>
+
+  <div class="timer-inner">
+    <div class="timer-left">
+      <div class="timer-status-dot" [class.pulse]="isTimerRunning"></div>
+      <div class="timer-clock-block">
+        <span class="timer-clock">{{ timerDisplay }}</span>
+        <span class="timer-label">
+          {{ isTimerFinished ? 'Feedback closed' : isTimerRunning ? 'Counting down' : 'Ready' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="timer-inputs" *ngIf="isSessionCreator && !isTimerRunning && !isTimerFinished">
+      <div class="input-pill">
+        <label>min</label>
+        <input
+          type="number" min="0" max="180"
+          [ngModel]="timerDurationMinutes"
+          (ngModelChange)="onTimerMinutesChange($event)" />
+      </div>
+      <span class="input-sep">:</span>
+      <div class="input-pill">
+        <label>sec</label>
+        <input
+          type="number" min="0" max="59"
+          [ngModel]="timerDurationSeconds"
+          (ngModelChange)="onTimerSecondsChange($event)" />
+      </div>
+    </div>
+
+    <div class="timer-controls" *ngIf="isSessionCreator">
+      <button
+        class="ctrl-btn start"
+        *ngIf="!isTimerRunning && !isTimerFinished"
+        (click)="startFeedbackTimer()">
+        <span class="material-symbols-outlined">play_arrow</span>
+        Start
+      </button>
+
+      <button
+        class="ctrl-btn pause"
+        *ngIf="isTimerRunning"
+        (click)="pauseFeedbackTimer()">
+        <span class="material-symbols-outlined">pause</span>
+        Pause
+      </button>
+
+      <button
+        class="ctrl-btn stop"
+        *ngIf="isTimerFinished"
+        (click)="stopFeedbackAlarm()">
+        <span class="material-symbols-outlined">stop</span>
+        Stop
+      </button>
+
+      <button
+        class="ctrl-btn reset"
+        (click)="resetFeedbackTimer()">
+        <span class="material-symbols-outlined">replay</span>
+        Reset
+      </button>
+    </div>
+
+  </div>
+
+  <div class="timer-error" *ngIf="timerError">
+    <span class="material-icons">error_outline</span>
+    {{ timerError }}
+  </div>
+</div>

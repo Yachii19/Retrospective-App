@@ -1,4 +1,5 @@
 const { Server } = require("socket.io");
+const { getTimerSyncPayload, handleTimerCommand } = require("./timerManager");
 
 let io;
 
@@ -22,12 +23,21 @@ function initSocket(server) {
     socket.on("join:session", (sessionId) => {
       socket.join(sessionId);
       console.log(`Socket ${socket.id} joined session: ${sessionId}`);
+
+      const timerSyncPayload = getTimerSyncPayload(sessionId);
+      if (timerSyncPayload) {
+        socket.emit("timer:sync", timerSyncPayload);
+      }
     });
 
     // Leave a session room
     socket.on("leave:session", (sessionId) => {
       socket.leave(sessionId);
       console.log(`Socket ${socket.id} left session: ${sessionId}`);
+    });
+
+    socket.on("timer:command", (commandData = {}) => {
+      handleTimerCommand(io, commandData);
     });
 
     socket.on("disconnect", () => {

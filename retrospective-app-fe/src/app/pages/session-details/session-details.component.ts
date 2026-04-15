@@ -10,11 +10,12 @@ import { UserService } from '../../services/user.service';
 import { SessionService } from '../../services/session.service';
 import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { SessionDetailsTimerComponent } from './session-details-timer/session-details-timer.component';
 
 @Component({
   selector: 'app-session-details',
   standalone: true,
-  imports: [SessionDetailsHeaderComponent, SessionDetailsHandlerComponent, CommonModule],
+  imports: [SessionDetailsHeaderComponent, SessionDetailsHandlerComponent, SessionDetailsTimerComponent, CommonModule],
   templateUrl: './session-details.component.html',
   styleUrl: './session-details.component.scss'
 })
@@ -23,6 +24,8 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
   sessionFeedbacks: RetroFeedback[] = [];
   session: RetroSession | null = null;
   isModalOpen: boolean = false;
+  isSessionCreator: boolean = false;
+  isTimerFinished: boolean = false;
 
   isAccessDenied: boolean = false;
 
@@ -51,7 +54,6 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     this.sessionId = this.route.snapshot.paramMap.get('id') || '';
-
     this.checkAccess();
   }
 
@@ -82,6 +84,10 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
     this.router.navigate(['/dashboard']);
   }
 
+  onTimerFinishedChange(isFinished: boolean): void {
+    this.isTimerFinished = isFinished;
+  }
+
   private checkAccess(): void {
     forkJoin({
       session: this.sessionService.getSessionById(this.sessionId),
@@ -91,6 +97,9 @@ export class SessionDetailsComponent implements OnInit, AfterViewInit, OnDestroy
         const sessionData = session.data as RetroSession;
         const sessionTeam = sessionData.team;
         const isMember = teams.includes(sessionTeam);
+        
+        this.session = sessionData;
+        this.isSessionCreator = this.authService.isCreator(this.session?.createdBy._id);
 
         if (!isMember) {
           console.warn('Access denied: not a member of this session\'s team');
