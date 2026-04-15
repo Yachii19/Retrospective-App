@@ -61,6 +61,7 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
   }
 
   private timerEndsAt: number | null = null;
+  private backgroundSoundStartedAt: number | null = null;
   private alarmAudio: HTMLAudioElement | null = null;
   private backgroundAudio: HTMLAudioElement | null = null;
   private hasPlayedFinishAlarm: boolean = false;
@@ -193,6 +194,7 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     this.isTimerFinished = !!state.isFinished;
     this.timerFinishedChange.emit(this.isTimerFinished);
     this.timerEndsAt = state.endsAt ?? null;
+    this.backgroundSoundStartedAt = state.backgroundSoundStartedAt ?? null;
     this.syncDurationInputs(state.durationSeconds);
 
     const hasAudioSelectionChanged = previousSelectedAudio !== this.selectedAudio;
@@ -300,11 +302,45 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
     const audio = new Audio(audioPath);
     audio.loop = true;
     audio.volume = 0.3;
+
+    const syncOffsetSeconds = this.getBackgroundOffsetSeconds();
+    const applySyncOffset = () => {
+      if (!Number.isFinite(syncOffsetSeconds) || syncOffsetSeconds <= 0) {
+        return;
+      }
+
+      if (Number.isFinite(audio.duration) && audio.duration > 0) {
+        audio.currentTime = syncOffsetSeconds % audio.duration;
+        return;
+      }
+
+      audio.currentTime = syncOffsetSeconds;
+    };
+
+    if (audio.readyState >= 1) {
+      applySyncOffset();
+    } else {
+      audio.addEventListener('loadedmetadata', applySyncOffset, { once: true });
+    }
+
     audio.play().catch(() => {
       if (audioPath !== this.defaultBackgroundSoundPath) {
         const fallbackAudio = new Audio(this.defaultBackgroundSoundPath);
         fallbackAudio.loop = true;
         fallbackAudio.volume = 0.3;
+
+        if (fallbackAudio.readyState >= 1) {
+          if (Number.isFinite(fallbackAudio.duration) && fallbackAudio.duration > 0 && syncOffsetSeconds > 0) {
+            fallbackAudio.currentTime = syncOffsetSeconds % fallbackAudio.duration;
+          }
+        } else {
+          fallbackAudio.addEventListener('loadedmetadata', () => {
+            if (Number.isFinite(fallbackAudio.duration) && fallbackAudio.duration > 0 && syncOffsetSeconds > 0) {
+              fallbackAudio.currentTime = syncOffsetSeconds % fallbackAudio.duration;
+            }
+          }, { once: true });
+        }
+
         fallbackAudio.play().catch(() => {
           this.backgroundAudio = null;
         });
@@ -315,6 +351,14 @@ export class SessionDetailsTimerComponent implements OnInit, OnDestroy, OnChange
       this.backgroundAudio = null;
     });
     this.backgroundAudio = audio;
+  }
+
+  private getBackgroundOffsetSeconds(): number {
+    if (!this.isTimerRunning || !this.backgroundSoundStartedAt) {
+      return 0;
+    }
+
+    return Math.max(0, (Date.now() - this.backgroundSoundStartedAt) / 1000);
   }
 
   private stopBackgroundMusic(): void {

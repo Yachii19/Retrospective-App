@@ -13,6 +13,7 @@ export interface SessionTimerState {
   endsAt: number | null;
   alarmSoundUrl: string;
   backgroundSoundUrl: string;
+  backgroundSoundStartedAt: number | null;
   updatedAt: number;
 }
 

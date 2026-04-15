@@ -30,6 +30,8 @@ function getOrCreateTimer(sessionId) {
       endsAt: null,
       alarmSoundUrl: "",
       backgroundSoundUrl: "",
+      backgroundSoundStartedAt: null,
+      backgroundSoundElapsedMs: 0,
       timeoutId: null,
       updatedAt: nowMs()
     });
@@ -47,6 +49,7 @@ function toPublicTimerState(timer) {
     endsAt: timer.endsAt,
     alarmSoundUrl: timer.alarmSoundUrl,
     backgroundSoundUrl: timer.backgroundSoundUrl,
+    backgroundSoundStartedAt: timer.backgroundSoundStartedAt,
     updatedAt: timer.updatedAt
   };
 }
@@ -117,7 +120,13 @@ function handleTimerCommand(io, commandData = {}) {
   }
 
   if (typeof nextPayload.backgroundSoundUrl === "string") {
+    const didBackgroundTrackChange = timer.backgroundSoundUrl !== nextBackgroundSoundUrl;
     timer.backgroundSoundUrl = nextBackgroundSoundUrl;
+
+    if (didBackgroundTrackChange) {
+      timer.backgroundSoundElapsedMs = 0;
+      timer.backgroundSoundStartedAt = timer.isRunning ? nowMs() : null;
+    }
   }
 
   if (command === "configure") {
@@ -129,6 +138,8 @@ function handleTimerCommand(io, commandData = {}) {
       timer.remainingSeconds = timer.durationSeconds;
       timer.isFinished = false;
       timer.endsAt = null;
+      timer.backgroundSoundStartedAt = null;
+      timer.backgroundSoundElapsedMs = 0;
       clearTimerTimeout(timer);
     }
   }
@@ -147,6 +158,11 @@ function handleTimerCommand(io, commandData = {}) {
       timer.isRunning = true;
       timer.isFinished = false;
       timer.endsAt = nowMs() + timer.remainingSeconds * 1000;
+      const fallbackElapsedMs = Math.max(0, (timer.durationSeconds - timer.remainingSeconds) * 1000);
+      const resumeElapsedMs = Math.max(0, Number(timer.backgroundSoundElapsedMs) || 0);
+      const effectiveElapsedMs = resumeElapsedMs > 0 ? resumeElapsedMs : fallbackElapsedMs;
+      timer.backgroundSoundStartedAt = nowMs() - effectiveElapsedMs;
+      timer.backgroundSoundElapsedMs = effectiveElapsedMs;
       scheduleTimerFinish(io, sessionId);
     }
   }
@@ -157,6 +173,10 @@ function handleTimerCommand(io, commandData = {}) {
       timer.isRunning = false;
       timer.endsAt = null;
       timer.isFinished = timer.remainingSeconds <= 0;
+      if (timer.backgroundSoundStartedAt) {
+        timer.backgroundSoundElapsedMs = Math.max(0, nowMs() - timer.backgroundSoundStartedAt);
+      }
+      timer.backgroundSoundStartedAt = null;
       clearTimerTimeout(timer);
     }
   }
@@ -171,6 +191,8 @@ function handleTimerCommand(io, commandData = {}) {
     timer.isFinished = false;
     timer.remainingSeconds = timer.durationSeconds;
     timer.endsAt = null;
+    timer.backgroundSoundStartedAt = null;
+    timer.backgroundSoundElapsedMs = 0;
     clearTimerTimeout(timer);
   }
 
